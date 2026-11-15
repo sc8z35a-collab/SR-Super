@@ -1,0 +1,15 @@
+{
+  "name": "terrain",
+  "columns": 6,
+  "sizes": [128, 384],
+  "quality": 86,
+  "sheets": [
+    "textures/specs/terrain-a-ground.json",
+    "textures/specs/terrain-b-cliffs.json"
+  ],
+  "layers": [
+    "coastal_grass", "thrift_flowers", "heather", "moss_turf", "dirt_path", "beach_sand",
+    "shingle", "dry_grass", "lichen_rock_top", "cliff_strata", "granite", "fractured_slate",
+    "seaweed_rock", "barnacle_rock", "orange_lichen", "peat", "scree", "sandstone_strata"
+  ]
+}

@@ -1,5 +1,6 @@
 import { SURFACE, SURFACE_START, SURFACE_LAYERS } from './surfaces.js';
 import { BASE, CRYPT, CRYPT_LIGHTS } from './layout.js';
+import { TERRAIN as T } from './landcover.js';
 import { DECOR, DECOR_START, DECOR_LAYERS, DECOR_SHADING, DECOR_FALLBACK, DECOR_GLOW, DECOR_STANDIN } from './decor.js';
 
 const glslVec3 = rows => rows.map(r => `vec3(${r.map(v => Number(v).toFixed(3)).join(',')})`).join(',');
@@ -209,6 +210,8 @@ uniform bool uHasCraft;
 uniform bool uHasSurfaces;
 uniform bool uHasDecor;
 uniform int uDecorLayers;
+uniform highp sampler2DArray uTerrain;
+uniform bool uHasTerrain;
 uniform bool uHasAltarpiece;
 uniform bool uInterior;
 uniform vec3 uPerson;
@@ -240,12 +243,71 @@ float visibility(vec3 n) {
 
 vec2 buildingDirection(vec2 xz){return mat2(uSite.z,-uSite.w,uSite.w,uSite.z)*xz;}
 vec2 buildingSpace(vec2 xz){return buildingDirection(xz-uSite.xy);}
-float footprintAO(vec3 p) {
+float footprintDistance(vec3 p) {
   vec2 v = buildingSpace(p.xz);
   vec2 nave = abs(v-vec2(0,3.1))-vec2(12.15,25.6);
   vec2 wing = abs(v-vec2(0,-3.33))-vec2(20.36,6.36);
-  float d = min(length(max(nave,0.0)),length(max(wing,0.0)));
-  return mix(.61,1.0,smoothstep(.02,2.8,d));
+  return min(length(max(nave,0.0)),length(max(wing,0.0)));
+}
+float footprintAO(vec3 p) {
+  return mix(.61,1.0,smoothstep(.02,2.8,footprintDistance(p)));
+}
+
+// Photographic ground from the terrain atlas (landcover.js), in the same sRGB^1.48 space as the decor.
+vec3 soil(float layer, vec2 uv) { return pow(texture(uTerrain,vec3(uv,layer)).rgb,vec3(1.48)); }
+vec3 soilFaces(float layer, vec3 p, vec3 n, float scale, bool detailed) {
+  vec3 w = pow(abs(n),vec3(3.0));
+  if(!detailed) {
+    vec2 uv = w.y>max(w.x,w.z) ? p.xz : w.x>w.z ? vec2(p.z,-p.y) : vec2(p.x,-p.y);
+    return soil(layer,uv*scale);
+  }
+  w = step(.06,w/(w.x+w.y+w.z))*w;
+  vec3 c = vec3(0.0);
+  if(w.x>0.0) c += w.x*soil(layer,vec2(p.z,-p.y)*scale);
+  if(w.z>0.0) c += w.z*soil(layer,vec2(p.x,-p.y)*scale+.37);
+  if(w.y>0.0) c += w.y*soil(layer,p.xz*scale+.71);
+  return c/(w.x+w.y+w.z);
+}
+vec3 landCover(vec3 p, vec3 n, bool detailed, float turf, float moss, float variation, float coarse, float grit,
+    float elevation, float bank, float stripes) {
+  vec2 g = p.xz;
+  // Wind-cropped grass that dries out in patches; thrift, heather and moss where the fields allow.
+  vec3 cover = soil(${T['coastalGrass']}.0,g*.42);
+  float dry = smoothstep(.42,.72,variation);
+  if(dry>.02) cover = mix(cover,soil(${T['dryGrass']}.0,g*.37+.31),dry);
+  if(detailed) {
+    float flowers = smoothstep(.63,.78,noise2(g*.13+5.7))*elevation;
+    float heath = smoothstep(.58,.74,noise2(g*.09-3.1))*smoothstep(5.0,8.6,p.y);
+    float damp = smoothstep(.57,.75,coarse)*(1.0-dry);
+    if(flowers>.02) cover = mix(cover,soil(${T['thrift']}.0,g*.45),flowers*.85);
+    if(heath>.02) cover = mix(cover,soil(${T['heather']}.0,g*.4+.53),heath);
+    if(damp>.02) cover = mix(cover,soil(damp>.5 ? ${T['moss']}.0 : ${T['peat']}.0,g*.5),damp*.75);
+    cover *= .82+.36*luminance(soil(${T['coastalGrass']}.0,g*.051));
+  }
+  float worn = (1.0-smoothstep(.1,2.4,footprintDistance(p)))*bank;
+  if(worn>.02) cover = mix(cover,soil(${T['dirtPath']}.0,g*.6),worn*.85);
+  // Bare rock: strata on the cliffs, granite and slate in the harder bands, lichen on the drier tops.
+  float kind = noise2(g*.045+vec2(p.y*.05,0.0));
+  float layer = coarse>.62 ? ${T['granite']}.0 : coarse>.52 ? ${T['slate']}.0 : kind>.58 ? ${T['sandstone']}.0 : ${T['cliff']}.0;
+  vec3 stone = soilFaces(layer,p,n,.3,detailed);
+  float top = smoothstep(.55,.82,n.y);
+  if(top>.02) stone = mix(stone,soil(${T['lichenTop']}.0,g*.45),top*.7);
+  float lichen = smoothstep(.62,.78,grit+coarse*.3)*smoothstep(2.0,4.5,p.y);
+  if(detailed&&lichen>.02) stone = mix(stone,soilFaces(${T['orangeLichen']}.0,p,n,.5,false),lichen*.55);
+  float scree = smoothstep(.42,.6,n.y)*(1.0-smoothstep(.6,.78,n.y));
+  if(scree>.02) stone = mix(stone,soil(${T['scree']}.0,g*.6),scree*.75);
+  stone *= .82+.36*stripes;
+  vec3 photo = mix(stone,cover,turf+(1.0-turf)*moss);
+  // The shore: sand and shingle on the flats, weed and barnacles on wet rock.
+  float shore = 1.0-smoothstep(.15,1.55,p.y);
+  if(shore>.02) {
+    vec3 beach = soil(${T['sand']}.0,g*.5);
+    float pebbles = smoothstep(.45,.62,noise2(g*.21));
+    if(detailed&&pebbles>.02) beach = mix(beach,soil(${T['shingle']}.0,g*.8),pebbles);
+    vec3 tidal = soilFaces(p.y<.6 ? ${T['barnacleRock']}.0 : ${T['seaweedRock']}.0,p,n,.55,detailed);
+    photo = mix(photo,mix(tidal,beach,smoothstep(.6,.86,n.y)),shore);
+  }
+  return photo;
 }
 
 vec3 geology(vec3 p, vec3 n, bool rock, bool detailed, out float bump) {
@@ -278,7 +340,11 @@ vec3 geology(vec3 p, vec3 n, bool rock, bool detailed, out float bump) {
   result = mix(result, mix(vec3(.164,.162,.125),vec3(.357,.324,.224),grit),sand*.72);
   float wetness = 1.0-smoothstep(.12+.25*coarse,1.22+.78*coarse,p.y);
   bump += grit*.24 + (1.0-turf) * (stripes*.50+split*.14-cleft*.46);
-  if(uHasMaterials&&uLayers>=40){
+  if(uHasTerrain){
+    vec3 photo = landCover(p,n,detailed,turf,moss,variation,coarse,grit,elevation,bank,stripes);
+    result = mix(result,photo*.78,.9);
+    bump += (luminance(photo)-.25)*.7*(1.0-.5*turf);
+  }else if(uHasMaterials&&uLayers>=40){
     float layer=16.0;
     if(turf>.33)layer=variation>.50?19.0:18.0;
     else if(p.y<.47)layer=sand>.25?23.0:17.0;
