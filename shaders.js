@@ -1,4 +1,7 @@
 import { SURFACE, SURFACE_START, SURFACE_LAYERS } from './surfaces.js';
+import { DECOR, DECOR_START, DECOR_LAYERS, DECOR_SHADING, DECOR_FALLBACK } from './decor.js';
+
+const glslVec3 = rows => rows.map(r => `vec3(${r.map(v => Number(v).toFixed(3)).join(',')})`).join(',');
 
 const header = `#version 300 es
 precision highp float;
@@ -194,6 +197,7 @@ uniform sampler2D uShadow;
 uniform highp sampler2DArray uMaterials;
 uniform highp sampler2DArray uCraft;
 uniform highp sampler2DArray uSurfaces;
+uniform highp sampler2DArray uDecor;
 uniform sampler2D uAltarpiece;
 uniform int uLayers;
 uniform vec4 uSite;
@@ -202,6 +206,7 @@ uniform bool uHasShadow;
 uniform bool uHasMaterials;
 uniform bool uHasCraft;
 uniform bool uHasSurfaces;
+uniform bool uHasDecor;
 uniform bool uHasAltarpiece;
 uniform bool uInterior;
 uniform vec3 uPerson;
@@ -518,6 +523,40 @@ vec3 surfaceMaterial(float type,vec3 n,out float bump,out float roughness){
   return max(base,vec3(.01));
 }
 
+// Decor atlas: photographic albedo generated with GPT Image 2.5 Sunburst (see decor.js).
+// shading.x > 0: world-projected repeats per metre; 0: the mesh UVs frame a single picture;
+// < 0: mesh UVs measured in metres, repeated -x times per metre.
+vec3 decorMaterial(float type, vec3 n, out float bump, out float roughness) {
+  const vec3 shading[${DECOR_LAYERS}] = vec3[${DECOR_LAYERS}](${glslVec3(DECOR_SHADING)});
+  const vec3 fallback[${DECOR_LAYERS}] = vec3[${DECOR_LAYERS}](${glslVec3(DECOR_FALLBACK)});
+  float layer = type-${DECOR_START}.0;
+  vec3 s = shading[int(layer)];
+  roughness = s.y;
+  bump = 0.0;
+  if(!uHasDecor) return fallback[int(layer)];
+  vec2 uv;
+  if(s.x==0.0) uv = vec2(clamp(vUv.x,.006,.994),clamp(1.0-vUv.y,.006,.994));
+  else if(s.x<0.0) uv = vUv*-s.x;
+  else {
+    vec2 local = buildingSpace(vWorld.xz);
+    vec2 axis = abs(buildingDirection(n.xz));
+    uv = (abs(n.y)>.70 ? local : vec2(axis.x>axis.y ? local.y : local.x,-vWorld.y))*s.x;
+  }
+  vec3 tex = texture(uDecor,vec3(uv,layer)).rgb;
+  float tone = luminance(tex);
+  bump = (tone-.45)*(roughness<.40 ? .28 : .78);
+  vec3 base = pow(tex,vec3(1.48))*s.z;
+  if(type==${DECOR.fontWater}.0){
+    float facing = max(0.0,dot(n,normalize(uEye-vWorld)));
+    base = mix(base,vec3(.20,.34,.37),.28*(1.0-facing));
+  }
+  if(type==${DECOR.motherOfPearl}.0||type==${DECOR.gems}.0){
+    float facing = max(0.0,dot(n,normalize(uEye-vWorld)));
+    base *= .86+.38*pow(1.0-facing,2.0);
+  }
+  return max(base,vec3(.008));
+}
+
 vec3 craftMaterial(float type, vec3 n, out float bump, out float roughness) {
   const vec3 palette[36] = vec3[36](
     vec3(.79,.49,.103), vec3(.737,.650,.470), vec3(.214,.112,.057),
@@ -697,6 +736,13 @@ void main() {
   } else if((type>=${SURFACE_START}.0&&type<${SURFACE.skin}.0)||
       (type>=${SURFACE.parchment}.0&&type<${SURFACE_START+SURFACE_LAYERS}.0)){
     base=surfaceMaterial(type,n,bump,roughness);
+  } else if(type==${DECOR.lanternGlass}.0){
+    vec2 glowUv = vec2(vWorld.x+vWorld.z,vWorld.y)*2.0;
+    vec3 glow = uHasDecor ? texture(uDecor,vec3(glowUv,${DECOR.lanternGlass-DECOR_START}.0)).rgb : vec3(1.0,.62,.24);
+    color = vec4(grade(pow(glow,vec3(1.25))*vec3(1.55,1.12,.78)*shade),1.0);
+    return;
+  } else if(type>=${DECOR_START}.0&&type<${DECOR_START+DECOR_LAYERS}.0){
+    base=decorMaterial(type,n,bump,roughness);
   } else if (type == 11.0) {
     color = vec4(grade(vec3(1.39,.80,.286)*shade),1.0);
     return;
@@ -752,6 +798,14 @@ void main() {
       float desk = exp(-length((pos-vec2(14.71,-3.8))*vec2(.41,.34)));
       direct += vec3(.53,.287,.10)*desk*(.33+.67*max(n.y,0.0))*(uFloor==4.0?1.0:.26);
     }
+    if(uFloor<1.5){
+      // Candlelight in the transept chapels (1F) and in the treasury and scriptorium (2F).
+      vec2 chapel = vec2(sign(pos.x)*15.9,-3.5);
+      float level = vWorld.y-5.45-uFloor*6.5;
+      float glow = exp(-length((pos-chapel)*vec2(.29,.23)))*smoothstep(11.2,12.6,abs(pos.x))
+        *(1.0-smoothstep(3.2,6.2,level))*step(-.5,level);
+      direct += vec3(.70,.45,.21)*glow*(.55+.45*max(0.0,n.y));
+    }
     if (type>=13.0 && type<=21.0) {
       float rim = pow(1.0-max(0.0,dot(n,view)),2.1);
       float key = max(0.0,dot(n,normalize(vec3(-.67,.52,-.53))));
@@ -763,7 +817,8 @@ void main() {
   float spec = pow(max(0.0,dot(normalize(view+SUN),n)),mix(104.0,10.0,roughness));
   vec3 glossy = SUN_COLOR * (fresnel * spec * (1.0-roughness) * lit * 1.27);
   if(uInterior && (type==32.0||type==38.0||type==60.0||type==${SURFACE.brass}.0||type==${SURFACE.silver}.0||
-      type==${SURFACE.amberGlass}.0)){
+      type==${SURFACE.amberGlass}.0||type==${DECOR.hammeredGold}.0||type==${DECOR.silverFiligree}.0||
+      type==${DECOR.gems}.0||type==${DECOR.gildedGesso}.0||type==${DECOR.compassDial}.0||type==${DECOR.fontWater}.0)){
     float polish = pow(max(0.0,dot(normalize(view+vec3(.24,.53,.813)),n)),15.0);
     glossy += base*polish*vec3(.18,.13,.078);
   }

@@ -1,0 +1,20 @@
+{
+  "name": "decor",
+  "columns": 6,
+  "sizes": [96, 256],
+  "quality": 88,
+  "sheets": [
+    "textures/specs/decor-a-baptistery.json",
+    "textures/specs/decor-b-mariners.json",
+    "textures/specs/decor-c-treasury.json",
+    "textures/specs/decor-d-garden.json"
+  ],
+  "layers": [
+    "terrazzo", "zellige", "carrara", "font_water", "wave_mosaic", "limestone_ashlar",
+    "gilded_gesso", "star_fresco", "sea_glass", "hull_planks", "fishing_net", "patched_sail",
+    "driftwood", "sea_chart", "compass_dial", "rusted_iron", "mother_of_pearl", "tarred_rope",
+    "crimson_velvet", "hammered_gold", "silver_filigree", "gem_cluster", "ebony_inlay", "banded_oak",
+    "illuminated_page", "scribe_desk", "lapis", "mossy_cobbles", "gravel", "herb_bed",
+    "terracotta", "straw_skep", "teak_slats", "lantern_glass", "wrought_iron", "ivy"
+  ]
+}

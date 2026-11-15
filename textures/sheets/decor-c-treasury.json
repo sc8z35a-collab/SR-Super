@@ -1,0 +1,22 @@
+{
+  "model": "gpt-image-2.5-sunburst",
+  "size": "2880x2880",
+  "quality": "xhigh",
+  "reasoning_effort": "xhigh",
+  "seconds": 74.0,
+  "usage": {
+    "input_tokens": 549,
+    "input_tokens_details": {
+      "image_tokens": 0,
+      "text_tokens": 549
+    },
+    "output_tokens": 10542,
+    "output_tokens_details": {
+      "image_tokens": 10542,
+      "text_tokens": 0
+    },
+    "total_tokens": 11091
+  },
+  "revised_prompt": null,
+  "prompt": "A square image divided into an exact 3 by 3 grid of nine equal square panels for a video game: a cathedral treasury and scriptorium: precious metals, velvet, jewels, books and fine woods.\nThe panels are separated by thin, perfectly straight, solid pure magenta (#FF00FF) divider lines, one-hundredth of the image wide; the outer border of the image has no divider. Every panel is filled edge to edge with its own material and nothing else.\nPhotorealistic physically based ALBEDO texture reference sheet. Strict orthographic, straight-on view of each surface (no perspective, no horizon). Soft, even, shadowless overcast studio lighting; no vignette, no glare, no reflections of the room. No text, no labels, no numbers, no watermark, no frames beyond the dividers.\nPanels in reading order (left to right, top to bottom):\n1. deep crimson crushed velvet fabric with soft directional sheen (a seamless, tileable, uniformly detailed material swatch with no focal point).\n2. hand-hammered pure gold sheet with many small overlapping facets, rich warm yellow gold (a seamless, tileable, uniformly detailed material swatch with no focal point).\n3. engraved sterling silver with dense scrolling acanthus filigree, slightly tarnished in the recesses (a seamless, tileable, uniformly detailed material swatch with no focal point).\n4. a dense bed of cabochon and faceted gemstones set in gold: rubies, sapphires, emeralds and pearls, packed edge to edge (a seamless, tileable, uniformly detailed material swatch with no focal point).\n5. black ebony wood with ivory marquetry inlay of interlacing geometric stars, polished (a seamless, tileable, uniformly detailed material swatch with no focal point).\n6. old dark oak chest boards with vertical grain crossed by a horizontal black iron strap with round rivet heads (a seamless, tileable, uniformly detailed material swatch with no focal point).\n7. a medieval illuminated manuscript page filling the panel: two columns of dense black gothic script lines, a large ornate gold and blue initial letter with vine borders, red rubrics, aged vellum (a flat artwork that fills the panel completely).\n8. worn walnut writing desk top with straight grain, a few old ink stains and fine knife scratches (a seamless, tileable, uniformly detailed material swatch with no focal point).\n9. polished lapis lazuli stone, intense ultramarine blue with gold pyrite flecks and white calcite streaks (a seamless, tileable, uniformly detailed material swatch with no focal point)."
+}

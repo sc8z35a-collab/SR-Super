@@ -4,6 +4,7 @@ import { clamp, ground, lerp } from './terrain.js';
 import { BASE, ROOF_INDEX, world, worldNormal } from './layout.js';
 import { visitFloor, nextPosition, locationName } from './walkways.js';
 import { SURFACE_LAYERS } from './surfaces.js';
+import { DECOR_LAYERS } from './decor.js';
 
 const el = id => document.getElementById(id);
 const canvas = el('scene');
@@ -75,7 +76,8 @@ let atlasRequest=0,atlasSizes={};
 const layerGroups=[
   {name:'materials',sizes:[128,384],layers:40,cols:8,method:'installMaterials'},
   {name:'craft',sizes:[112,288],layers:36,cols:6,method:'installCraft'},
-  {name:'surfaces',sizes:[96,256],layers:SURFACE_LAYERS,cols:6,method:'installSurfaces'}
+  {name:'surfaces',sizes:[96,256],layers:SURFACE_LAYERS,cols:6,method:'installSurfaces'},
+  {name:'decor',sizes:[96,256],layers:DECOR_LAYERS,cols:6,method:'installDecor'}
 ];
 async function imagePixels(name,depth,columns=depth) {
   try {

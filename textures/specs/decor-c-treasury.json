@@ -1,0 +1,15 @@
+{
+  "sheet": "decor-c-treasury",
+  "theme": "a cathedral treasury and scriptorium: precious metals, velvet, jewels, books and fine woods",
+  "tiles": [
+    {"id": "crimson_velvet", "tile": true, "prompt": "deep crimson crushed velvet fabric with soft directional sheen"},
+    {"id": "hammered_gold", "tile": true, "prompt": "hand-hammered pure gold sheet with many small overlapping facets, rich warm yellow gold"},
+    {"id": "silver_filigree", "tile": true, "prompt": "engraved sterling silver with dense scrolling acanthus filigree, slightly tarnished in the recesses"},
+    {"id": "gem_cluster", "tile": true, "prompt": "a dense bed of cabochon and faceted gemstones set in gold: rubies, sapphires, emeralds and pearls, packed edge to edge"},
+    {"id": "ebony_inlay", "tile": true, "prompt": "black ebony wood with ivory marquetry inlay of interlacing geometric stars, polished"},
+    {"id": "banded_oak", "tile": true, "prompt": "old dark oak chest boards with vertical grain crossed by a horizontal black iron strap with round rivet heads"},
+    {"id": "illuminated_page", "tile": false, "prompt": "a medieval illuminated manuscript page filling the panel: two columns of dense black gothic script lines, a large ornate gold and blue initial letter with vine borders, red rubrics, aged vellum"},
+    {"id": "scribe_desk", "tile": true, "prompt": "worn walnut writing desk top with straight grain, a few old ink stains and fine knife scratches"},
+    {"id": "lapis", "tile": true, "prompt": "polished lapis lazuli stone, intense ultramarine blue with gold pyrite flecks and white calcite streaks"}
+  ]
+}

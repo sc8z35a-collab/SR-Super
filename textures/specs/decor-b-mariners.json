@@ -1,0 +1,51 @@
+{
+  "sheet": "decor-b-mariners",
+  "theme": "a mariners' chapel inside a tidal cathedral: boats, sails, ropes and votive offerings",
+  "tiles": [
+    {
+      "id": "hull_planks",
+      "tile": true,
+      "prompt": "weathered wooden boat hull planks painted faded teal blue, horizontal clinker planks with chipped paint revealing grey wood, copper rivets"
+    },
+    {
+      "id": "fishing_net",
+      "tile": true,
+      "prompt": "knotted brown fishing net laid flat over a dark tarred wooden surface, diamond mesh pattern"
+    },
+    {
+      "id": "patched_sail",
+      "tile": true,
+      "prompt": "old cream sailcloth canvas with visible weave, a few darker rectangular patches stitched on, faint salt stains"
+    },
+    {
+      "id": "driftwood",
+      "tile": true,
+      "prompt": "sun-bleached silver-grey driftwood surface with deep wavy grain, cracks and a few small barnacles"
+    },
+    {
+      "id": "sea_chart",
+      "tile": false,
+      "prompt": "an antique hand-drawn nautical chart on aged parchment filling the whole panel: a rocky island coastline, a compass rose, rhumb lines, depth soundings in tiny numerals, sepia ink with faded blue sea wash"
+    },
+    {
+      "id": "compass_dial",
+      "tile": false,
+      "prompt": "an engraved brass ship's compass card seen straight from above, centred, filling the panel: ornate 32-point compass rose, fleur-de-lis north, degree ring, warm polished brass with dark engraved lines"
+    },
+    {
+      "id": "rusted_iron",
+      "tile": true,
+      "prompt": "heavily rusted wrought iron surface of an old anchor, flaking orange-brown rust, pitted dark metal, salt crust"
+    },
+    {
+      "id": "mother_of_pearl",
+      "tile": true,
+      "prompt": "iridescent abalone and mother-of-pearl shell inlay, swirling pastel blue, green, pink and silver sheen"
+    },
+    {
+      "id": "tarred_rope",
+      "tile": false,
+      "prompt": "tightly coiled thick hemp rope seen from above, dark tarred brown, twisted three-strand fibres, coils filling the panel"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "model": "gpt-image-2.5-sunburst",
+  "size": "2880x2880",
+  "quality": "xhigh",
+  "reasoning_effort": "xhigh",
+  "seconds": 73.9,
+  "usage": {
+    "input_tokens": 586,
+    "input_tokens_details": {
+      "image_tokens": 0,
+      "text_tokens": 586
+    },
+    "output_tokens": 10542,
+    "output_tokens_details": {
+      "image_tokens": 10542,
+      "text_tokens": 0
+    },
+    "total_tokens": 11128
+  },
+  "revised_prompt": null,
+  "prompt": "A square image divided into an exact 3 by 3 grid of nine equal square panels for a video game: a seaside cathedral baptistery: pale stone, water and glazed tiles.\nThe panels are separated by thin, perfectly straight, solid pure magenta (#FF00FF) divider lines, one-hundredth of the image wide; the outer border of the image has no divider. Every panel is filled edge to edge with its own material and nothing else.\nPhotorealistic physically based ALBEDO texture reference sheet. Strict orthographic, straight-on view of each surface (no perspective, no horizon). Soft, even, shadowless overcast studio lighting; no vignette, no glare, no reflections of the room. No text, no labels, no numbers, no watermark, no frames beyond the dividers.\nPanels in reading order (left to right, top to bottom):\n1. polished terrazzo floor, small white and grey marble chips with a few sea-green chips set in a pale warm-grey cement (a seamless, tileable, uniformly detailed material swatch with no focal point).\n2. hand-glazed square ceramic wall tiles in deep sea-green and turquoise, slightly uneven glossy glaze, thin pale grout lines, about 6 by 6 tiles (a seamless, tileable, uniformly detailed material swatch with no focal point).\n3. honed white Carrara marble with soft grey veins running diagonally (a seamless, tileable, uniformly detailed material swatch with no focal point).\n4. clear shallow water seen from above over pale stone, gentle ripples with bright caustic light patterns (a seamless, tileable, uniformly detailed material swatch with no focal point).\n5. a circular Byzantine floor mosaic medallion centred in the panel: three stylised fish swimming in curling blue and white waves, small gold tesserae ring border, ivory tesserae filling the corners (a flat artwork that fills the panel completely).\n6. pale coastal limestone ashlar wall, rectangular blocks in running bond (about 4 courses), fine chisel marks and thin mortar joints (a seamless, tileable, uniformly detailed material swatch with no focal point).\n7. burnished gold leaf over gesso with a punched tooled pattern of small circles and rosettes, slight wear showing red bole (a seamless, tileable, uniformly detailed material swatch with no focal point).\n8. faded medieval fresco ceiling: deep ultramarine blue plaster scattered with small eight-pointed gold stars, soft crackle and patches of worn plaster (a seamless, tileable, uniformly detailed material swatch with no focal point).\n9. a dense layer of frosted sea glass pebbles in aqua, pale green and clear white, tumbled smooth, packed edge to edge (a seamless, tileable, uniformly detailed material swatch with no focal point)."
+}

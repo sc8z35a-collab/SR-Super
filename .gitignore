@@ -1,0 +1,7 @@
+# Local secrets and raw image cache (never commit API keys)
+*.key
+.env
+.env.*
+textures/.cache/
+__pycache__/
+textures/tiles/
