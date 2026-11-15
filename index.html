@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#121c1f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="80 m × 50 mの岩島に建つ高さ約149 mの大聖堂。スマートフォンの横画面で6階と屋上まで一人称で散策できます。">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+  <title>潮岬の大聖堂</title>
+</head>
+<body>
+  <main id="entry" class="entry">
+    <div class="archwork" aria-hidden="true"><span></span><span></span><span></span></div>
+    <img class="entry-image landscape" src="cover.webp" alt="" aria-hidden="true" fetchpriority="high">
+    <section class="entry-layout" aria-labelledby="title">
+      <div class="entry-copy">
+        <p class="land-size">80 m × 50 m</p>
+        <h1 id="title">潮岬の大聖堂</h1>
+        <p class="entry-meta landscape">6階・屋上まで一人称で散策 <span>／</span> 3D・400p</p>
+        <p class="entry-meta portrait">スマートフォンを横向きにしてください</p>
+        <button class="primary landscape" id="enter" type="button"><span class="screen-icon" aria-hidden="true"></span>全画面で開く</button>
+        <div class="rotate-icon portrait" aria-hidden="true"><i></i><b></b></div>
+        <p id="full-help" class="full-help" role="status" hidden></p>
+      </div>
+    </section>
+  </main>
+
+  <main id="stage" class="stage" hidden>
+    <canvas id="scene" width="800" height="400" aria-label="大聖堂と岩島の3Dシーン。左のパッドで移動し、画面をドラッグして見回せます。" aria-describedby="gesture" tabindex="0"></canvas>
+    <div id="loading" class="message" role="status">3Dシーンを読み込み中</div>
+    <div id="fault" class="message" role="alert" hidden>
+      <p id="fault-text"></p>
+      <button id="retry" class="primary" type="button">再読み込み</button>
+      <button id="fault-back" class="glass fault-back" type="button">全画面を終了</button>
+    </div>
+    <div class="hud" id="hud" hidden>
+      <div class="hud-title"><span>潮岬の大聖堂</span><p id="location" aria-live="polite"></p></div>
+      <div class="tools" role="group" aria-label="画面操作">
+        <button class="glass quality-button" type="button" id="settings-button" aria-label="描画設定" aria-controls="settings" aria-expanded="false"><i class="tune-icon" aria-hidden="true"><b></b><b></b></i><span id="resolution-label">400p</span></button>
+        <button class="glass icon-only" type="button" id="hide-ui" aria-label="操作を隠す"><span class="focus-icon" aria-hidden="true"></span></button>
+        <button class="glass icon-only" type="button" id="exit" aria-label="全画面を終了"><span class="exit-icon" aria-hidden="true"></span></button>
+      </div>
+      <div id="joystick" class="joystick" role="group" aria-label="移動パッド。押した方向へ移動します。"><div id="stick-knob" class="joystick-knob" aria-hidden="true"></div></div>
+      <div id="view-reticle" class="view-reticle" aria-hidden="true"></div>
+      <div class="bottom">
+        <p id="gesture">左のパッドで移動・画面をドラッグして視点を操作</p>
+        <nav class="glass views" aria-label="視点の切り替え">
+          <button type="button" data-view="walk" aria-pressed="true">散策</button>
+          <button type="button" data-view="island" aria-pressed="false">全景</button>
+          <button type="button" data-view="front" aria-pressed="false">正面</button>
+          <button type="button" data-view="coast" aria-pressed="false">海岸</button>
+        </nav>
+        <button class="glass floor-button" id="floor-button" type="button" aria-controls="floors" aria-expanded="false">階を選ぶ <span aria-hidden="true">⌃</span></button>
+        <div class="glass zoom" id="zoom" role="group" aria-label="ズーム" hidden>
+          <button id="less" type="button" aria-label="縮小">−</button>
+          <button id="more" type="button" aria-label="拡大">+</button>
+        </div>
+      </div>
+    </div>
+    <button id="show-ui" class="glass restore icon-only" type="button" aria-label="操作を表示" hidden><span class="focus-icon" aria-hidden="true"></span></button>
+    <dialog id="floors" class="floor-dialog" aria-labelledby="floors-title">
+      <div class="dialog-head"><h2 id="floors-title">階を選ぶ</h2><button id="floors-close" class="glass icon-only close-settings" type="button" aria-label="階の選択を閉じる"><span class="exit-icon" aria-hidden="true"></span></button></div>
+      <div class="floor-grid">
+        <button class="glass" type="button" data-floor="0"><strong>1階</strong><span>身廊・祭壇</span></button>
+        <button class="glass" type="button" data-floor="1"><strong>2階</strong><span>側廊</span></button>
+        <button class="glass" type="button" data-floor="2"><strong>3階</strong><span>聖遺物室</span></button>
+        <button class="glass" type="button" data-floor="3"><strong>4階</strong><span>展望回廊</span></button>
+        <button class="glass" type="button" data-floor="4"><strong>5階</strong><span>古文書室</span></button>
+        <button class="glass" type="button" data-floor="5"><strong>6階</strong><span>鐘室</span></button>
+        <button class="glass floor-roof" type="button" data-floor="6"><strong>屋上</strong><span>テラス・管理小屋</span></button>
+      </div>
+      <p class="floor-help">入口から右の側廊にある階段で屋上まで上がれます。</p>
+    </dialog>
+    <dialog id="settings" aria-labelledby="settings-title">
+      <div class="dialog-head">
+        <h2 id="settings-title">描画設定</h2>
+        <button id="settings-close" class="glass icon-only close-settings" type="button" aria-label="設定を閉じる"><span class="exit-icon" aria-hidden="true"></span></button>
+      </div>
+      <fieldset>
+        <legend>描画解像度</legend>
+        <div class="options">
+          <label><input name="resolution" type="radio" value="400" checked><span>400p</span></label>
+          <label><input name="resolution" type="radio" value="320"><span>320p</span></label>
+          <label><input name="resolution" type="radio" value="240"><span>240p</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>描画品質</legend>
+        <div class="options">
+          <label><input name="quality" type="radio" value="2" checked><span>高品質</span></label>
+          <label><input name="quality" type="radio" value="1"><span>軽量</span></label>
+          <label><input name="quality" type="radio" value="0"><span>最軽量</span></label>
+        </div>
+        <p id="quality-detail">高精細の石材・装飾・影・光芒を描画。最大30 fps。</p>
+      </fieldset>
+      <label class="waves-option"><span>波・雲・人物の動き</span><input id="motion" type="checkbox" role="switch" checked></label>
+    </dialog>
+  </main>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
