@@ -29,7 +29,7 @@ function inside(r, x, z) { return x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.
 // ---------------------------------------------------------------- shared helpers
 
 // Surface of revolution; profile is [[height, radius], ...]. UVs are metres (arc length, profile length).
-function lathe(m, x, y, z, profile, mat, segs = 16, shade = 1, phase = 0) {
+export function lathe(m, x, y, z, profile, mat, segs = 16, shade = 1, phase = 0) {
   let v = 0;
   for (let j = 0; j < profile.length - 1; j++) {
     const [h0, r0] = profile[j], [h1, r1] = profile[j + 1];
@@ -47,7 +47,7 @@ function lathe(m, x, y, z, profile, mat, segs = 16, shade = 1, phase = 0) {
 }
 
 // Flat disc whose UVs frame the whole texture, for pictures (compass, rope coil, water).
-function disc(m, x, y, z, r, mat, segs = 24, shade = 1, phase = 0) {
+export function disc(m, x, y, z, r, mat, segs = 24, shade = 1, phase = 0) {
   for (let i = 0; i < segs; i++) {
     const a0 = phase + i / segs * TAU, a1 = phase + (i + 1) / segs * TAU;
     const uv = a => [.5 + .5 * Math.cos(a), .5 + .5 * Math.sin(a)];
@@ -57,25 +57,25 @@ function disc(m, x, y, z, r, mat, segs = 24, shade = 1, phase = 0) {
 }
 
 // Horizontal picture or floor inlay.
-function floorQuad(m, x0, x1, z0, z1, y, mat, shade = 1, uv = [[0, 0], [1, 0], [1, 1], [0, 1]]) {
+export function floorQuad(m, x0, x1, z0, z1, y, mat, shade = 1, uv = [[0, 0], [1, 0], [1, 1], [0, 1]]) {
   m.quad([x0, y, z1], [x1, y, z1], [x1, y, z0], [x0, y, z0], mat, shade, [0, 1, 0], uv);
 }
 
-function slab(m, r, y0, y1, mat, shade = 1) {
+export function slab(m, r, y0, y1, mat, shade = 1) {
   m.box((r.x0 + r.x1) / 2, (y0 + y1) / 2, (r.z0 + r.z1) / 2, r.x1 - r.x0, y1 - y0, r.z1 - r.z0, mat, shade);
 }
 
-function candle(m, x, y, z, h = .30, r = .028) {
+export function candle(m, x, y, z, h = .30, r = .028) {
   m.rod([x, y, z], [x, y + h, z], r, r * .9, LINEN, 8, 1.02, 0, true);
   m.rod([x, y + h, z], [x + .004, y + h + .07, z], r * .72, .002, LIGHT, 6, 1.1);
 }
 
-function candlestand(m, x, y, z, h = 1.25) {
+export function candlestand(m, x, y, z, h = 1.25) {
   lathe(m, x, y, z, [[0, .19], [.05, .17], [.09, .05], [h - .06, .035], [h - .03, .11], [h, .12]], BRONZE, 10, .95);
   candle(m, x, y + h, z, .34, .036);
 }
 
-function crossMark(m, x, y, z, size, mat, alongX = true) {
+export function crossMark(m, x, y, z, size, mat, alongX = true) {
   const w = size * .55;
   m.rod([x, y, z], [x, y + size, z], size * .06, size * .06, mat, 6, 1);
   const a = alongX ? [x - w / 2, y + size * .7, z] : [x, y + size * .7, z - w / 2];

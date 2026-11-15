@@ -1,5 +1,6 @@
 import { SURFACE, SURFACE_START, SURFACE_LAYERS } from './surfaces.js';
-import { DECOR, DECOR_START, DECOR_LAYERS, DECOR_SHADING, DECOR_FALLBACK } from './decor.js';
+import { BASE, CRYPT, CRYPT_LIGHTS } from './layout.js';
+import { DECOR, DECOR_START, DECOR_LAYERS, DECOR_SHADING, DECOR_FALLBACK, DECOR_GLOW, DECOR_STANDIN } from './decor.js';
 
 const glslVec3 = rows => rows.map(r => `vec3(${r.map(v => Number(v).toFixed(3)).join(',')})`).join(',');
 
@@ -207,6 +208,7 @@ uniform bool uHasMaterials;
 uniform bool uHasCraft;
 uniform bool uHasSurfaces;
 uniform bool uHasDecor;
+uniform int uDecorLayers;
 uniform bool uHasAltarpiece;
 uniform bool uInterior;
 uniform vec3 uPerson;
@@ -529,6 +531,7 @@ vec3 surfaceMaterial(float type,vec3 n,out float bump,out float roughness){
 vec3 decorMaterial(float type, vec3 n, out float bump, out float roughness) {
   const vec3 shading[${DECOR_LAYERS}] = vec3[${DECOR_LAYERS}](${glslVec3(DECOR_SHADING)});
   const vec3 fallback[${DECOR_LAYERS}] = vec3[${DECOR_LAYERS}](${glslVec3(DECOR_FALLBACK)});
+  const int standins[${DECOR_STANDIN.length}] = int[${DECOR_STANDIN.length}](${DECOR_STANDIN.join(',')});
   float layer = type-${DECOR_START}.0;
   vec3 s = shading[int(layer)];
   roughness = s.y;
@@ -542,10 +545,14 @@ vec3 decorMaterial(float type, vec3 n, out float bump, out float roughness) {
     vec2 axis = abs(buildingDirection(n.xz));
     uv = (abs(n.y)>.70 ? local : vec2(axis.x>axis.y ? local.y : local.x,-vWorld.y))*s.x;
   }
-  vec3 tex = texture(uDecor,vec3(uv,layer)).rgb;
+  // A layer missing from the loaded atlas borrows another layer's detail, tinted with its own colour.
+  bool standin = int(layer)>=uDecorLayers;
+  int source = standin ? standins[clamp(int(layer)-${DECOR_LAYERS-DECOR_STANDIN.length},0,${DECOR_STANDIN.length-1})] : int(layer);
+  vec3 tex = texture(uDecor,vec3(uv,float(source))).rgb;
   float tone = luminance(tex);
   bump = (tone-.45)*(roughness<.40 ? .28 : .78);
   vec3 base = pow(tex,vec3(1.48))*s.z;
+  if(standin) base = fallback[int(layer)]*s.z*clamp(luminance(base)/max(luminance(fallback[source]),.03),.35,1.9);
   if(type==${DECOR.fontWater}.0){
     float facing = max(0.0,dot(n,normalize(uEye-vWorld)));
     base = mix(base,vec3(.20,.34,.37),.28*(1.0-facing));
@@ -743,6 +750,7 @@ void main() {
     return;
   } else if(type>=${DECOR_START}.0&&type<${DECOR_START+DECOR_LAYERS}.0){
     base=decorMaterial(type,n,bump,roughness);
+${DECOR_GLOW.map(([name,gain])=>`    if(type==${DECOR[name]}.0){color=vec4(grade(base*vec3(${gain.join(',')})*shade),1.0);return;}`).join('\n')}
   } else if (type == 11.0) {
     color = vec4(grade(vec3(1.39,.80,.286)*shade),1.0);
     return;
@@ -806,6 +814,24 @@ void main() {
         *(1.0-smoothstep(3.2,6.2,level))*step(-.5,level);
       direct += vec3(.70,.45,.21)*glow*(.55+.45*max(0.0,n.y));
     }
+    // The crypt is lit only by its torches, candles and the glowing tide channel.
+    float crypt = 1.0-smoothstep(${(BASE+CRYPT.ceiling-.3).toFixed(3)},${(BASE+CRYPT.ceiling+.05).toFixed(3)},vWorld.y);
+    if(crypt>0.0){
+      const vec4 lamps[${CRYPT_LIGHTS.length}] = vec4[${CRYPT_LIGHTS.length}](${CRYPT_LIGHTS.map(l=>`vec4(${l.map(v=>v.toFixed(2)).join(',')})`).join(',')});
+      vec3 at = vec3(pos.x,vWorld.y-${BASE.toFixed(2)},pos.y);
+      vec2 nl = buildingDirection(n.xz);
+      vec3 normalLocal = vec3(nl.x,n.y,nl.y);
+      float flame = 0.0;
+      for(int i=0;i<${CRYPT_LIGHTS.length};i++){
+        vec3 d = lamps[i].xyz-at;
+        float r = length(d);
+        flame += lamps[i].w*(.3+.7*max(0.0,dot(normalLocal,d/max(r,.001))))/(1.0+r*r*.42);
+      }
+      float tide = exp(-max(0.0,abs(pos.x)-1.1)*.85)*step(${CRYPT.z0.toFixed(2)},pos.y)*(1.0-smoothstep(16.6,18.2,pos.y))
+        *(1.0-smoothstep(-.8,1.6,at.y-(${CRYPT.y.toFixed(2)})));
+      ambient = mix(ambient,vec3(.082,.090,.100),crypt);
+      direct = mix(direct,vec3(.98,.60,.29)*flame+vec3(.05,.34,.38)*tide,crypt);
+    }
     if (type>=13.0 && type<=21.0) {
       float rim = pow(1.0-max(0.0,dot(n,view)),2.1);
       float key = max(0.0,dot(n,normalize(vec3(-.67,.52,-.53))));
@@ -832,7 +858,7 @@ void main() {
   if (uInterior) {
     float dust = smoothstep(2.0,42.0,distanceEye)*.163;
     c = mix(c, vec3(.155,.125,.110), dust*.77);
-    if (detailed && uFloor<3.0) c += interiorScattering(vWorld,distanceEye);
+    if (detailed && uFloor<3.0 && uEye.y>${(BASE+CRYPT.ceiling).toFixed(3)}) c += interiorScattering(vWorld,distanceEye);
   } else {
     float haze = 1.0 - exp(-distanceEye*.00137);
     c = mix(c, vec3(.444,.583,.638), haze*.66);

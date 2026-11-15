@@ -1,0 +1,51 @@
+{
+  "sheet": "decor-e-crypt-stone",
+  "theme": "the stone crypt beneath a seaside cathedral: damp, ancient, lit by oil lamps",
+  "tiles": [
+    {
+      "id": "crypt_flagstones",
+      "tile": true,
+      "prompt": "worn large irregular grey flagstones of an ancient crypt floor, slightly damp, fine cracks and dark joints"
+    },
+    {
+      "id": "rubble_wall",
+      "tile": true,
+      "prompt": "rough rubble masonry wall of a medieval crypt, irregular dark limestone stones in thick pale mortar"
+    },
+    {
+      "id": "vault_brick",
+      "tile": true,
+      "prompt": "old red-brown brick of a barrel vault, uneven bricks in stretcher bond, white salt efflorescence"
+    },
+    {
+      "id": "wet_stone",
+      "tile": true,
+      "prompt": "dark wet slate floor with small reflective puddles and a damp sheen"
+    },
+    {
+      "id": "barnacle_stone",
+      "tile": true,
+      "prompt": "grey stone densely encrusted with white barnacles and a few small limpets"
+    },
+    {
+      "id": "algae_stone",
+      "tile": true,
+      "prompt": "pale stone covered in slimy bright green algae and darker moss patches"
+    },
+    {
+      "id": "carved_frieze",
+      "tile": true,
+      "prompt": "a horizontal band of Romanesque carved stone interlace knotwork, weathered pale limestone"
+    },
+    {
+      "id": "black_basalt",
+      "tile": true,
+      "prompt": "polished black basalt with faint grey speckles and soft reflections"
+    },
+    {
+      "id": "cistern_plaster",
+      "tile": true,
+      "prompt": "ancient Roman waterproof opus signinum plaster, pinkish terracotta with crushed brick fragments, water stains"
+    }
+  ]
+}

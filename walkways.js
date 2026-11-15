@@ -1,11 +1,12 @@
 import { Mesh } from './mesh.js';
-import { BASE, WIDTH, LENGTH, NAVE, WING, APSE, ENTRY, ENTRY_STEPS, FLOORS, ROOF_HEIGHT, ROOF_INDEX,
+import { BASE, WIDTH, LENGTH, NAVE, WING, APSE, ENTRY, ENTRY_STEPS, FLOORS, ROOF_HEIGHT, ROOF_INDEX, CRYPT, CRYPT_STAIR,
   UPPER_AISLE, UPPER_ROOM, HUT, HUT_STEP, inRoofHut, world, entryTop, buildingDistance } from './layout.js';
 import { CRAFT, decorateNave, decorateGallery, bridgeMoulding, chapterLibrary, bellChamber } from './ornament.js';
 import { SURFACE } from './surfaces.js';
 import { bellWinch, sanctuaryObjects, weatheredCrate, workshopObjects } from './furnishings.js';
 import { ground, coast, clamp, lerp } from './terrain.js';
 import { baptistery, marinersChapel, treasury, scriptorium, roofGarden, forecourt, roomName } from './chapels.js';
+import { crypt, cryptName } from './crypt.js';
 
 const OAK=4, FLOOR=6, TRIM=9, LIGHT=11, BRONZE=22, LINEN=23;
 const GRANITE=25, MARBLE=26, DARK_MARBLE=27, COPPER=29, GILT=31;
@@ -32,7 +33,7 @@ function block(m,r,y0,y1,mat,shade=1){
 function solid(r,y0,y1){
   obstacles.push({...r,y0,y1});
 }
-const kit={block,solid};
+const kit={block,solid,deck:(...a)=>deck(...a),rail:(...a)=>rail(...a),flight:(...a)=>stairFlight(...a)};
 function deck(m,r,y,mat=FLOOR,deep=.33){
   box(m,r,y-deep,y,mat,.96);
   floors.push({...r,y});
@@ -117,8 +118,10 @@ function pendant(m,x,y,z,size=1,chain=1.2){
 }
 
 function hall(m,decals){
-  const y=FLOORS[0];
-  deck(m,rect(-NAVE.x,NAVE.x,NAVE.back,NAVE.front-.72),y);
+  const y=FLOORS[0],cs=CRYPT_STAIR;
+  // The nave floor leaves an opening over the flight down to the crypt.
+  for(const r of [rect(-NAVE.x,NAVE.x,NAVE.back,cs.z0),rect(-NAVE.x,NAVE.x,cs.z1,NAVE.front-.72),
+    rect(-NAVE.x,cs.x0,cs.z0,cs.z1),rect(cs.x1,NAVE.x,cs.z0,cs.z1)])deck(m,r,y);
   deck(m,rect(-WING.x,-NAVE.x,WING.back,WING.front),y);
   deck(m,rect(NAVE.x,WING.x,WING.back,WING.front),y);
   deck(m,rect(-3.04*WIDTH,3.04*WIDTH,NAVE.front-.74,NAVE.front-.08),y);
@@ -176,6 +179,7 @@ function hall(m,decals){
   decorateNave(m,y,block);
   baptistery(m,kit);
   marinersChapel(m,kit);
+  crypt(m,kit);
   for(const [x,z,w,d] of [[.05,15.7,5.5,6.7],[.05,5.3,5.1,5.9],[8.05,-3.79,7.6,5.4],[.85,-11.56,5.4,4.1],[1.39,-21.07,5.1,5]]){
     decals.quad([x-w*.5,y+.013,z+d*.4],[x+w*.5,y+.013,z+d*.21],
       [x+w*.44,y+.013,z-d*.55],[x-w*.56,y+.013,z-d*.30],3,.95);
@@ -415,7 +419,13 @@ export function buildWalkways(){
   return {walkExterior,roofExterior,walkFloors,decals};
 }
 
+export const CRYPT_LEVEL=-1;
+// The crypt is not a storey of FLOORS: its walkers keep floor 0 and are told apart by height.
+export function levelOf(actor){
+  return actor.interior&&actor.y<FLOORS[0]-.21?CRYPT_LEVEL:actor.floor;
+}
 export function visitFloor(index,atEntrance=false){
+  if(index===CRYPT_LEVEL)return {x:-9.6,z:17.3,y:CRYPT.y,interior:true,floor:0};
   const y=FLOORS[index];
   if(index===0&&atEntrance)return {x:0,z:NAVE.front+1.74,y:entryTop(NAVE.front+1.74),interior:false,floor:0};
   if(index===0)return {x:0,z:24.9,y,interior:true,floor:0};
@@ -482,6 +492,7 @@ export function locationName(actor){
   if(actor.floor===ROOF_INDEX && actor.y>=ROOF_HEIGHT-.057)
     return actor.interior?'屋上 · 管理小屋':roomName(ROOF_INDEX,actor.x,actor.z)??names[ROOF_INDEX];
   if(!actor.interior)return roomName(0,actor.x,actor.z,true)??'島の外周';
+  if(levelOf(actor)===CRYPT_LEVEL)return actor.y>CRYPT.y+.21?'1階 ↔ 地下 · 階段':cryptName(actor.z);
   if(Math.abs(actor.y-FLOORS[actor.floor])>.21){
     const level=Math.max(0,FLOORS.findLastIndex(y=>y<=actor.y));
     return level===ROOF_INDEX-1?'6階 ↔ 屋上 · 階段':`${level+1}階 ↔ ${level+2}階 · 階段`;

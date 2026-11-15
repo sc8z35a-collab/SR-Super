@@ -1,0 +1,51 @@
+{
+  "sheet": "decor-g-tombs",
+  "theme": "the tomb hall of a cathedral crypt: marble sarcophagi, effigies and memorials",
+  "tiles": [
+    {
+      "id": "sarcophagus_relief",
+      "tile": true,
+      "prompt": "a carved white marble sarcophagus relief frieze of grapevines, leaves and small birds, weathered"
+    },
+    {
+      "id": "effigy_marble",
+      "tile": true,
+      "prompt": "smooth weathered white marble with faint grey veins and soft yellowed patina"
+    },
+    {
+      "id": "porphyry",
+      "tile": true,
+      "prompt": "polished imperial purple porphyry stone with tiny white feldspar flecks"
+    },
+    {
+      "id": "bronze_plaque",
+      "tile": true,
+      "prompt": "engraved dark bronze memorial panel with ornamental borders and abstract engraved patterns, no letters"
+    },
+    {
+      "id": "alabaster",
+      "tile": true,
+      "prompt": "translucent warm honey alabaster with cloudy veins"
+    },
+    {
+      "id": "angel_fresco",
+      "tile": false,
+      "prompt": "a faded medieval fresco filling the panel: two winged angels with gold halos holding a ship between them, soft ochre and blue pigments, cracked plaster"
+    },
+    {
+      "id": "gold_icon",
+      "tile": false,
+      "prompt": "a Byzantine icon painting filling the panel: a bearded saint in red robes holding a small sailing ship, gold leaf background, dark wooden frame edge"
+    },
+    {
+      "id": "iron_grille",
+      "tile": true,
+      "prompt": "black wrought iron grille with repeating quatrefoil openings, seen straight on in front of a dark background"
+    },
+    {
+      "id": "wax_drips",
+      "tile": true,
+      "prompt": "thick layers of melted cream candle wax drips and pools"
+    }
+  ]
+}

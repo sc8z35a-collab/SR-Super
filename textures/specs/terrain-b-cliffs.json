@@ -1,0 +1,51 @@
+{
+  "sheet": "terrain-b-cliffs",
+  "theme": "sea cliffs and the rocky shore of a small Atlantic island, each surface photographed straight on",
+  "tiles": [
+    {
+      "id": "cliff_strata",
+      "tile": true,
+      "prompt": "a vertical sea cliff face of layered grey sedimentary rock with horizontal strata and cracks, seen straight on"
+    },
+    {
+      "id": "granite",
+      "tile": true,
+      "prompt": "coarse grey and pink granite rock surface with feldspar crystals"
+    },
+    {
+      "id": "fractured_slate",
+      "tile": true,
+      "prompt": "dark blue-grey fractured slate rock with sharp angular cracks"
+    },
+    {
+      "id": "seaweed_rock",
+      "tile": true,
+      "prompt": "wet dark intertidal rock draped with brown and green seaweed"
+    },
+    {
+      "id": "barnacle_rock",
+      "tile": true,
+      "prompt": "grey rock densely covered with white barnacles and black mussels"
+    },
+    {
+      "id": "orange_lichen",
+      "tile": true,
+      "prompt": "grey rock surface with bright orange and yellow crustose lichen patches"
+    },
+    {
+      "id": "peat",
+      "tile": true,
+      "prompt": "dark brown wet peat soil with fibrous roots, seen from directly above"
+    },
+    {
+      "id": "scree",
+      "tile": true,
+      "prompt": "loose angular grey scree stones and gravel seen from directly above"
+    },
+    {
+      "id": "sandstone_strata",
+      "tile": true,
+      "prompt": "eroded banded red and ochre sandstone with curved layers, seen straight on"
+    }
+  ]
+}

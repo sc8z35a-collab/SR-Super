@@ -1,0 +1,51 @@
+{
+  "sheet": "decor-h-chapel",
+  "theme": "a small candlelit chapel in a cathedral crypt: textiles, woods and devotional objects",
+  "tiles": [
+    {
+      "id": "embroidered_linen",
+      "tile": true,
+      "prompt": "white altar linen with fine gold thread embroidery of crosses and vines"
+    },
+    {
+      "id": "cedar",
+      "tile": true,
+      "prompt": "warm reddish cedar wood planks with straight grain and small knots"
+    },
+    {
+      "id": "olive_wood",
+      "tile": true,
+      "prompt": "polished olive wood with swirling dark and honey-coloured grain"
+    },
+    {
+      "id": "soot_plaster",
+      "tile": true,
+      "prompt": "lime plaster blackened by centuries of candle soot, darker towards the top, streaks"
+    },
+    {
+      "id": "ochre_plaster",
+      "tile": true,
+      "prompt": "warm yellow ochre lime plaster wall, slightly uneven, faint brush marks"
+    },
+    {
+      "id": "azulejo",
+      "tile": true,
+      "prompt": "blue and white Portuguese azulejo tiles with floral patterns, glazed, 4 by 4 tiles"
+    },
+    {
+      "id": "votive_glass",
+      "tile": true,
+      "prompt": "glowing ruby-red votive candle glass with a warm inner light and moulded diamond pattern"
+    },
+    {
+      "id": "pressed_tin",
+      "tile": true,
+      "prompt": "rows of small pressed tin ex-voto plaques shaped like hearts, ships and hands, silvery tin"
+    },
+    {
+      "id": "kilim",
+      "tile": true,
+      "prompt": "an old woven wool kilim rug with geometric red, indigo and ochre patterns, slightly worn"
+    }
+  ]
+}

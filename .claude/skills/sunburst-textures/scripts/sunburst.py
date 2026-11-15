@@ -99,8 +99,8 @@ def generate(key, spec_path, force=False):
         print(f'[{name}] cached sheet found, skipping API call')
         return raw
     prompt = sheet_prompt(spec)
-    size_i, quality_i, effort_i = 0, 0, 0
-    for attempt in range(12):
+    size_i, quality_i, effort_i, server_errors = 0, 0, 0, 0
+    for attempt in range(8):
         size, quality, effort = SIZES[size_i], QUALITIES[quality_i], EFFORTS[effort_i]
         print(f'[{name}] {MODEL} size={size} quality={quality} reasoning={effort}', flush=True)
         started = time.time()
@@ -118,6 +118,9 @@ def generate(key, spec_path, force=False):
         error = data.get('error') or {}
         message, param = error.get('message', ''), error.get('param') or ''
         print(f'[{name}] refused ({status}): {message}', flush=True)
+        if error.get('type') == 'insufficient_quota' or error.get('code') in ('credit_balance_exhausted', 'insufficient_quota'):
+            # Retrying cannot help; stop every worker instead of hammering the API.
+            raise SystemExit(f'[{name}] OpenAI credits are exhausted: add credits, then run generate again.')
         if 'size' in param or 'size' in message.lower():
             if size_i + 1 >= len(SIZES):
                 break
@@ -126,8 +129,10 @@ def generate(key, spec_path, force=False):
             quality_i += 1
         elif 'reasoning' in (param + message) and effort_i + 1 < len(EFFORTS):
             effort_i += 1
-        elif status in (429, 500, 502, 503, 504):
-            time.sleep(20 * (attempt + 1))
+        elif status in (429, 500, 502, 503, 504) and server_errors < 2:
+            # A failed request may still be billed, so retry server errors at most twice.
+            server_errors += 1
+            time.sleep(30 * server_errors)
         else:
             break
     sys.exit(f'[{name}] generation failed')
@@ -240,7 +245,8 @@ def main():
         specs = [str(ROOT / s) for s in atlas['sheets']]
     if args.command in ('generate', 'all'):
         key = api_key(args)
-        with ThreadPoolExecutor(max_workers=4) as pool:
+        # Four parallel 2880px requests drew 502s from the API; two at a time is reliable.
+        with ThreadPoolExecutor(max_workers=2) as pool:
             list(pool.map(lambda s: generate(key, s, args.force), specs))
     if args.command in ('slice', 'all'):
         for spec in specs:

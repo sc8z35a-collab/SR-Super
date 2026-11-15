@@ -14,6 +14,15 @@ export const UPPER_AISLE={x0:7.17,x1:11.34,z0:WING.front-.24,z1:20.59};
 export const UPPER_ROOM={x0:7.17,x1:WING.x-.86,z0:WING.back+.84,z1:WING.front+.03};
 export const HUT={x0:14.52,x1:18.51,z0:-7.76,z1:-4.00,doorA:-6.99,doorB:-5.27};
 export const HUT_STEP=.105;
+// The crypt under the front of the nave, reached by a flight down the west aisle.
+export const CRYPT={y:-4.45,ceiling:-.275,x0:-11.4,x1:11.4,z0:3.4,z1:27.8};
+export const CRYPT_STAIR={x0:-10.75,x1:-8.45,z0:5.0,z1:16.4};
+export const CRYPT_COLUMNS={x:[-7.4,-3.6,3.6,7.4],z:[7.0,11.4,15.8,20.2]};
+// Light sources for the crypt shader: [x, height above the base, z, strength].
+export const CRYPT_LIGHTS=[
+  ...CRYPT_COLUMNS.z.flatMap(z=>[[-3.0,-2.4,z,1],[3.0,-2.4,z,1]]),
+  [0,-3.0,26.35,1.25],[-2.6,-1.95,24.6,.8],[2.6,-1.95,24.6,.8],[-3.6,-3.5,24.75,.7]
+];
 export function inRoofHut(x,z){
   return x>=HUT.x0+.04&&x<HUT.x1-.04&&z>HUT.z0+.05&&z<HUT.z1-.05;
 }

@@ -189,6 +189,7 @@ export class Renderer {
     const next=this.installLayerArray(pixels);
     if(this.decor)this.gl.deleteTexture(this.decor);
     this.decor=next;
+    this.decorLayers=pixels.depth;
   }
 
   installArt(name,{width,height,data}) {
@@ -333,6 +334,7 @@ export class Renderer {
       mat.i('uHasSurfaces',!!this.surfaces);
       mat.i('uDecor',8);
       mat.i('uHasDecor',!!this.decor);
+      mat.i('uDecorLayers',this.decor?this.decorLayers:0);
       mat.f('uFloor',floor);
       mat.i('uShadow', 1);
       mat.v2('uShadowStep', shadow ? [1/shadow.size,1/shadow.size] : [0,0]);
