@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "潮岬の大聖堂",
+  "short_name": "潮岬の大聖堂",
+  "lang": "ja",
+  "description": "横画面の全画面で巡る岩島と大聖堂。",
+  "scope": "./",
+  "start_url": "./",
+  "orientation": "landscape",
+  "display": "fullscreen",
+  "background_color": "#121c1f",
+  "theme_color": "#121c1f",
+  "icons": [
+    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
+}
