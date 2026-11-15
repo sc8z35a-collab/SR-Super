@@ -127,6 +127,7 @@ export class Renderer {
     this.materials = null;
     this.craft = null;
     this.surfaces = null;
+    this.decor = null;
     this.altarpiece = null;
     this.materialLayerCount=0;
     this.stainedGlass = null;
@@ -182,6 +183,12 @@ export class Renderer {
     const next=this.installLayerArray(pixels);
     if(this.surfaces)this.gl.deleteTexture(this.surfaces);
     this.surfaces=next;
+  }
+
+  installDecor(pixels) {
+    const next=this.installLayerArray(pixels);
+    if(this.decor)this.gl.deleteTexture(this.decor);
+    this.decor=next;
   }
 
   installArt(name,{width,height,data}) {
@@ -324,6 +331,8 @@ export class Renderer {
       mat.i('uHasAltarpiece',!!this.altarpiece);
       mat.i('uSurfaces',7);
       mat.i('uHasSurfaces',!!this.surfaces);
+      mat.i('uDecor',8);
+      mat.i('uHasDecor',!!this.decor);
       mat.f('uFloor',floor);
       mat.i('uShadow', 1);
       mat.v2('uShadowStep', shadow ? [1/shadow.size,1/shadow.size] : [0,0]);
@@ -338,6 +347,8 @@ export class Renderer {
     bind(gl,6,this.altarpiece??this.map);
     gl.activeTexture(gl.TEXTURE0+7);
     gl.bindTexture(gl.TEXTURE_2D_ARRAY,this.surfaces??this.materials);
+    gl.activeTexture(gl.TEXTURE0+8);
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY,this.decor??this.surfaces??this.materials);
     setupMaterials(this.stone);
     if (!interior) {
       this.draw(quality === 2 ? this.high : this.low);

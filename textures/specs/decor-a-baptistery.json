@@ -1,0 +1,15 @@
+{
+  "sheet": "decor-a-baptistery",
+  "theme": "a seaside cathedral baptistery: pale stone, water and glazed tiles",
+  "tiles": [
+    {"id": "terrazzo", "tile": true, "prompt": "polished terrazzo floor, small white and grey marble chips with a few sea-green chips set in a pale warm-grey cement"},
+    {"id": "zellige", "tile": true, "prompt": "hand-glazed square ceramic wall tiles in deep sea-green and turquoise, slightly uneven glossy glaze, thin pale grout lines, about 6 by 6 tiles"},
+    {"id": "carrara", "tile": true, "prompt": "honed white Carrara marble with soft grey veins running diagonally"},
+    {"id": "font_water", "tile": true, "prompt": "clear shallow water seen from above over pale stone, gentle ripples with bright caustic light patterns"},
+    {"id": "wave_mosaic", "tile": false, "prompt": "a circular Byzantine floor mosaic medallion centred in the panel: three stylised fish swimming in curling blue and white waves, small gold tesserae ring border, ivory tesserae filling the corners"},
+    {"id": "limestone_ashlar", "tile": true, "prompt": "pale coastal limestone ashlar wall, rectangular blocks in running bond (about 4 courses), fine chisel marks and thin mortar joints"},
+    {"id": "gilded_gesso", "tile": true, "prompt": "burnished gold leaf over gesso with a punched tooled pattern of small circles and rosettes, slight wear showing red bole"},
+    {"id": "star_fresco", "tile": true, "prompt": "faded medieval fresco ceiling: deep ultramarine blue plaster scattered with small eight-pointed gold stars, soft crackle and patches of worn plaster"},
+    {"id": "sea_glass", "tile": true, "prompt": "a dense layer of frosted sea glass pebbles in aqua, pale green and clear white, tumbled smooth, packed edge to edge"}
+  ]
+}

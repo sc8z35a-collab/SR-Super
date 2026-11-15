@@ -1,0 +1,22 @@
+{
+  "model": "gpt-image-2.5-sunburst",
+  "size": "2880x2880",
+  "quality": "xhigh",
+  "reasoning_effort": "xhigh",
+  "seconds": 78.2,
+  "usage": {
+    "input_tokens": 593,
+    "input_tokens_details": {
+      "image_tokens": 0,
+      "text_tokens": 593
+    },
+    "output_tokens": 10542,
+    "output_tokens_details": {
+      "image_tokens": 10542,
+      "text_tokens": 0
+    },
+    "total_tokens": 11135
+  },
+  "revised_prompt": null,
+  "prompt": "A square image divided into an exact 3 by 3 grid of nine equal square panels for a video game: a mariners' chapel inside a tidal cathedral: boats, sails, ropes and votive offerings.\nThe panels are separated by thin, perfectly straight, solid pure magenta (#FF00FF) divider lines, one-hundredth of the image wide; the outer border of the image has no divider. Every panel is filled edge to edge with its own material and nothing else.\nPhotorealistic physically based ALBEDO texture reference sheet. Strict orthographic, straight-on view of each surface (no perspective, no horizon). Soft, even, shadowless overcast studio lighting; no vignette, no glare, no reflections of the room. No text, no labels, no numbers, no watermark, no frames beyond the dividers.\nPanels in reading order (left to right, top to bottom):\n1. weathered wooden boat hull planks painted faded teal blue, horizontal clinker planks with chipped paint revealing grey wood, copper rivets (a seamless, tileable, uniformly detailed material swatch with no focal point).\n2. knotted brown fishing net laid flat over a dark tarred wooden surface, diamond mesh pattern (a seamless, tileable, uniformly detailed material swatch with no focal point).\n3. old cream sailcloth canvas with visible weave, a few darker rectangular patches stitched on, faint salt stains (a seamless, tileable, uniformly detailed material swatch with no focal point).\n4. sun-bleached silver-grey driftwood surface with deep wavy grain, cracks and a few small barnacles (a seamless, tileable, uniformly detailed material swatch with no focal point).\n5. an antique hand-drawn nautical chart on aged parchment filling the whole panel: a rocky island coastline, a compass rose, rhumb lines, depth soundings in tiny numerals, sepia ink with faded blue sea wash (a flat artwork that fills the panel completely).\n6. an engraved brass ship's compass card seen straight from above, centred, filling the panel: ornate 32-point compass rose, fleur-de-lis north, degree ring, warm polished brass with dark engraved lines (a flat artwork that fills the panel completely).\n7. heavily rusted wrought iron surface of an old anchor, flaking orange-brown rust, pitted dark metal, salt crust (a seamless, tileable, uniformly detailed material swatch with no focal point).\n8. iridescent abalone and mother-of-pearl shell inlay, swirling pastel blue, green, pink and silver sheen (a seamless, tileable, uniformly detailed material swatch with no focal point).\n9. tightly coiled thick hemp rope seen from above, dark tarred brown, twisted three-strand fibres, coils filling the panel (a seamless, tileable, uniformly detailed material swatch with no focal point)."
+}

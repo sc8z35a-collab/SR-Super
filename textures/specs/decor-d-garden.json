@@ -1,0 +1,15 @@
+{
+  "sheet": "decor-d-garden",
+  "theme": "a windswept island garden and forecourt beside a stone cathedral",
+  "tiles": [
+    {"id": "mossy_cobbles", "tile": true, "prompt": "old granite cobblestone paving seen from above, rounded grey stones with green moss between them"},
+    {"id": "gravel", "tile": true, "prompt": "raked pale grey and white beach gravel seen from above, small rounded pebbles"},
+    {"id": "herb_bed", "tile": true, "prompt": "a herb garden bed seen from directly above: dark rich soil densely planted with small lavender, thyme and sage plants, purple flower spikes"},
+    {"id": "terracotta", "tile": true, "prompt": "weathered unglazed terracotta pot surface, orange clay with white salt bloom and faint horizontal throwing rings"},
+    {"id": "straw_skep", "tile": true, "prompt": "woven golden straw of a traditional beehive skep, coiled bundles of straw bound with split cane, horizontal coils"},
+    {"id": "teak_slats", "tile": true, "prompt": "weathered silver-brown teak garden bench slats, four parallel horizontal boards with narrow gaps, visible grain"},
+    {"id": "lantern_glass", "tile": true, "prompt": "warm glowing amber frosted lantern glass with seeded bubbles and a soft hammered texture, lit from behind"},
+    {"id": "wrought_iron", "tile": true, "prompt": "black painted wrought iron with patches of chipped paint and light rust, slightly hammered surface"},
+    {"id": "ivy", "tile": true, "prompt": "dense dark green ivy leaves covering a wall, overlapping glossy heart-shaped leaves"}
+  ]
+}

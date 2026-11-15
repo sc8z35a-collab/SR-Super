@@ -1,0 +1,22 @@
+{
+  "model": "gpt-image-2.5-sunburst",
+  "size": "2880x2880",
+  "quality": "xhigh",
+  "reasoning_effort": "xhigh",
+  "seconds": 70.9,
+  "usage": {
+    "input_tokens": 532,
+    "input_tokens_details": {
+      "image_tokens": 0,
+      "text_tokens": 532
+    },
+    "output_tokens": 10542,
+    "output_tokens_details": {
+      "image_tokens": 10542,
+      "text_tokens": 0
+    },
+    "total_tokens": 11074
+  },
+  "revised_prompt": null,
+  "prompt": "A square image divided into an exact 3 by 3 grid of nine equal square panels for a video game: a windswept island garden and forecourt beside a stone cathedral.\nThe panels are separated by thin, perfectly straight, solid pure magenta (#FF00FF) divider lines, one-hundredth of the image wide; the outer border of the image has no divider. Every panel is filled edge to edge with its own material and nothing else.\nPhotorealistic physically based ALBEDO texture reference sheet. Strict orthographic, straight-on view of each surface (no perspective, no horizon). Soft, even, shadowless overcast studio lighting; no vignette, no glare, no reflections of the room. No text, no labels, no numbers, no watermark, no frames beyond the dividers.\nPanels in reading order (left to right, top to bottom):\n1. old granite cobblestone paving seen from above, rounded grey stones with green moss between them (a seamless, tileable, uniformly detailed material swatch with no focal point).\n2. raked pale grey and white beach gravel seen from above, small rounded pebbles (a seamless, tileable, uniformly detailed material swatch with no focal point).\n3. a herb garden bed seen from directly above: dark rich soil densely planted with small lavender, thyme and sage plants, purple flower spikes (a seamless, tileable, uniformly detailed material swatch with no focal point).\n4. weathered unglazed terracotta pot surface, orange clay with white salt bloom and faint horizontal throwing rings (a seamless, tileable, uniformly detailed material swatch with no focal point).\n5. woven golden straw of a traditional beehive skep, coiled bundles of straw bound with split cane, horizontal coils (a seamless, tileable, uniformly detailed material swatch with no focal point).\n6. weathered silver-brown teak garden bench slats, four parallel horizontal boards with narrow gaps, visible grain (a seamless, tileable, uniformly detailed material swatch with no focal point).\n7. warm glowing amber frosted lantern glass with seeded bubbles and a soft hammered texture, lit from behind (a seamless, tileable, uniformly detailed material swatch with no focal point).\n8. black painted wrought iron with patches of chipped paint and light rust, slightly hammered surface (a seamless, tileable, uniformly detailed material swatch with no focal point).\n9. dense dark green ivy leaves covering a wall, overlapping glossy heart-shaped leaves (a seamless, tileable, uniformly detailed material swatch with no focal point)."
+}

@@ -5,6 +5,7 @@ import { CRAFT, decorateNave, decorateGallery, bridgeMoulding, chapterLibrary, b
 import { SURFACE } from './surfaces.js';
 import { bellWinch, sanctuaryObjects, weatheredCrate, workshopObjects } from './furnishings.js';
 import { ground, coast, clamp, lerp } from './terrain.js';
+import { baptistery, marinersChapel, treasury, scriptorium, roofGarden, forecourt, roomName } from './chapels.js';
 
 const OAK=4, FLOOR=6, TRIM=9, LIGHT=11, BRONZE=22, LINEN=23;
 const GRANITE=25, MARBLE=26, DARK_MARBLE=27, COPPER=29, GILT=31;
@@ -28,6 +29,10 @@ function block(m,r,y0,y1,mat,shade=1){
   box(m,r,y0,y1,mat,shade);
   obstacles.push({...r,y0,y1});
 }
+function solid(r,y0,y1){
+  obstacles.push({...r,y0,y1});
+}
+const kit={block,solid};
 function deck(m,r,y,mat=FLOOR,deep=.33){
   box(m,r,y-deep,y,mat,.96);
   floors.push({...r,y});
@@ -91,6 +96,7 @@ function foundation(m){
       box(m,rect(x-.20,x+.20,a,b),y+.65,y+.74,TRIM,1.02);
     }
   }
+  forecourt(m,kit);
 }
 
 function flame(m,x,y,z){
@@ -168,6 +174,8 @@ function hall(m,decals){
   m.rod([-.30,y+1.96,altar-.39],[.30,y+1.96,altar-.39],.042,.042,GILT,8,.96);
   sanctuaryObjects(m,y+1.290,altar+.33);
   decorateNave(m,y,block);
+  baptistery(m,kit);
+  marinersChapel(m,kit);
   for(const [x,z,w,d] of [[.05,15.7,5.5,6.7],[.05,5.3,5.1,5.9],[8.05,-3.79,7.6,5.4],[.85,-11.56,5.4,4.1],[1.39,-21.07,5.1,5]]){
     decals.quad([x-w*.5,y+.013,z+d*.4],[x+w*.5,y+.013,z+d*.21],
       [x+w*.44,y+.013,z-d*.55],[x-w*.56,y+.013,z-d*.30],3,.95);
@@ -209,6 +217,10 @@ function gallery(m,index){
   for(const r of [left,rect(inner,outer,galleryStart,s.z0),rect(inner,s.x0,s.z0,s.z1+1.55),
     rect(s.x1,outer,s.z0,s.z1+1.55),rect(inner,outer,s.z1+1.55,galleryEnd)])deck(m,r,y,stone);
   const bridgeRanges=[[galleryStart,galleryStart+2.18],[-5.65,-3.14],[galleryEnd-2.07,galleryEnd]];
+  if(index===1){
+    treasury(m,kit);
+    scriptorium(m,kit);
+  }
   guard(m,left,y,{west:[[wingLow,wingHigh]],east:bridgeRanges});
   guard(m,right,y,{east:[[wingLow,wingHigh]],west:bridgeRanges});
   rail(m,[s.x0,s.z0],[s.x0,s.z1+1.55],y);
@@ -384,6 +396,7 @@ function roofTerrace(m){
   parapet(m,[a.x1,a.z1],[a.x1,r.z1],y);
   hut(m,y);
   weatheredCrate(m,17.75,y,-3.04,block);
+  roofGarden(m,kit);
   for(const [x,z] of [[13.12,-1.95],[17.04,1.31]]){
     block(m,rect(x-.58,x+.58,z-.235,z+.235),y,y+.51,CRAFT.fieldstone,.91);
     m.beveledBox(x,y+.55,z,1.31,.119,.54,.033,CRAFT.deck,.95);
@@ -467,11 +480,11 @@ export function nextPosition(actor,dx,dz){
 }
 export function locationName(actor){
   if(actor.floor===ROOF_INDEX && actor.y>=ROOF_HEIGHT-.057)
-    return actor.interior?'屋上 · 管理小屋':names[ROOF_INDEX];
-  if(!actor.interior)return '島の外周';
+    return actor.interior?'屋上 · 管理小屋':roomName(ROOF_INDEX,actor.x,actor.z)??names[ROOF_INDEX];
+  if(!actor.interior)return roomName(0,actor.x,actor.z,true)??'島の外周';
   if(Math.abs(actor.y-FLOORS[actor.floor])>.21){
     const level=Math.max(0,FLOORS.findLastIndex(y=>y<=actor.y));
     return level===ROOF_INDEX-1?'6階 ↔ 屋上 · 階段':`${level+1}階 ↔ ${level+2}階 · 階段`;
   }
-  return names[actor.floor];
+  return roomName(actor.floor,actor.x,actor.z)??names[actor.floor];
 }
