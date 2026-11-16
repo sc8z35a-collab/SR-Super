@@ -214,6 +214,9 @@ function tombHall(m, kit) {
   }
   sarcophagus(m, kit, 0, 18.95, false, D.porphyry, D.alabaster);
   plaque(m, CRYPT.x0 + .04, 18.6, true);
+  // Damp plaster over the rubble of the tomb hall.
+  slab(m, rect(CRYPT.x1 - .03, CRYPT.x1, 11.6, SCREEN_Z), Y, TOP, FABRIC.dampPlaster, .95);
+  slab(m, rect(CRYPT.x0, CRYPT.x0 + .03, CRYPT_STAIR.z1 + .2, SCREEN_Z), Y, TOP, FABRIC.dampPlaster, .95);
   // Iron screen before the chapel, with a gate in the middle.
   for (const [a, b] of [[CRYPT.x0, -2.0], [2.0, CRYPT.x1]]) {
     kit.block(m, rect(a, b, SCREEN_Z - .03, SCREEN_Z + .03), Y, Y + 2.55, D.ironGrille, 1);
@@ -325,7 +328,9 @@ function stair(m, kit) {
   const s = CRYPT_STAIR, y = FLOORS[0];
   kit.flight(m, s, Y, y, -1);
   // Masonry fills the space under the flight.
-  for (const x of [s.x0, s.x1]) m.tri([x, Y, s.z0], [x, Y, s.z1], [x, y - .32, s.z0], D.rubbleWall, .9);
+  m.tri([s.x0, Y, s.z0], [s.x0, Y, s.z1], [s.x0, y - .32, s.z0], D.rubbleWall, .9);
+  // The open side shows the stair's own side wall, rising to the viewer's right (toward z0).
+  m.tri([s.x1, Y, s.z0], [s.x1, Y, s.z1], [s.x1, y - .32, s.z0], FABRIC.stairWall, 1, undefined, [[1, 0], [0, 0], [1, 1]]);
   slab(m, rect(s.x0, s.x1, s.z0 - .05, s.z0), Y, y - .3, D.rubbleWall, .9);
   kit.solid(rect(s.x0, s.x1, s.z0, s.z1 - .6), Y, Y + .4);
   // Guard rails around the opening in the nave floor.

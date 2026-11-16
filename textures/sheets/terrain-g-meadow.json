@@ -1,0 +1,6 @@
+{
+  "source": "supplied by the user as a finished 3x3 sheet",
+  "size": "1125x1125",
+  "dividers": "none detected; sliced at exact thirds with a 3.5% inset",
+  "spec": "textures/specs/terrain-g-meadow.json"
+}

@@ -1,0 +1,51 @@
+{
+  "sheet": "terrain-g-meadow",
+  "theme": "more turf and soil on a small Atlantic island",
+  "tiles": [
+    {
+      "id": "grass_blades",
+      "tile": true,
+      "prompt": "close-up grass blades"
+    },
+    {
+      "id": "daisy_grass",
+      "tile": true,
+      "prompt": "grass with daisies"
+    },
+    {
+      "id": "thistle",
+      "tile": true,
+      "prompt": "thistle patch"
+    },
+    {
+      "id": "sheep_track",
+      "tile": true,
+      "prompt": "sheep track worn through turf"
+    },
+    {
+      "id": "dead_bracken",
+      "tile": true,
+      "prompt": "dead brown bracken"
+    },
+    {
+      "id": "bilberry",
+      "tile": true,
+      "prompt": "low bilberry shrubs with berries"
+    },
+    {
+      "id": "burnt_heath",
+      "tile": true,
+      "prompt": "burnt black heath"
+    },
+    {
+      "id": "bank_section",
+      "tile": true,
+      "prompt": "earth bank section with grass roots"
+    },
+    {
+      "id": "gravel_path",
+      "tile": true,
+      "prompt": "compacted gravel path"
+    }
+  ]
+}

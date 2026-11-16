@@ -10,7 +10,10 @@
     "textures/specs/fabric-a-exterior.json",
     "textures/specs/fabric-b-interior.json",
     "textures/specs/fabric-c-floors.json",
-    "textures/specs/fabric-d-ceilings.json"
+    "textures/specs/fabric-d-ceilings.json",
+    "textures/specs/fabric-e-exterior.json",
+    "textures/specs/fabric-f-interior.json",
+    "textures/specs/fabric-g-walls.json"
   ],
   "layers": [
     "ext_ashlar",
@@ -48,6 +51,33 @@
     "slate_roof",
     "lead_roof",
     "mossy_roof",
-    "gutter"
+    "gutter",
+    "dry_stone_wall",
+    "retaining_wall",
+    "rusticated",
+    "brick_peel",
+    "whitewash",
+    "salt_eroded",
+    "copper_stain",
+    "window_recess",
+    "studded_door",
+    "striped_marble",
+    "fresco_band",
+    "plaster_relief",
+    "gold_mosaic",
+    "blind_arcade",
+    "saint_niche",
+    "wood_lattice",
+    "faded_blue",
+    "graffiti_stone",
+    "battlement",
+    "garden_wall",
+    "rounded_stone_wall",
+    "louvre",
+    "barred_window",
+    "balustrade",
+    "stair_wall",
+    "well_interior",
+    "damp_plaster"
   ]
 }

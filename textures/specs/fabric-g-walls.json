@@ -1,0 +1,51 @@
+{
+  "sheet": "fabric-g-walls",
+  "theme": "walls, fences and special masonry around a seaside cathedral",
+  "tiles": [
+    {
+      "id": "battlement",
+      "tile": false,
+      "prompt": "crenellated battlement wall"
+    },
+    {
+      "id": "garden_wall",
+      "tile": true,
+      "prompt": "mossy garden wall with ivy"
+    },
+    {
+      "id": "rounded_stone_wall",
+      "tile": true,
+      "prompt": "wall of sea-rounded stones"
+    },
+    {
+      "id": "louvre",
+      "tile": false,
+      "prompt": "wooden belfry louvre"
+    },
+    {
+      "id": "barred_window",
+      "tile": false,
+      "prompt": "stone wall with a barred window"
+    },
+    {
+      "id": "balustrade",
+      "tile": false,
+      "prompt": "stone balustrade"
+    },
+    {
+      "id": "stair_wall",
+      "tile": false,
+      "prompt": "side wall of a stone stair"
+    },
+    {
+      "id": "well_interior",
+      "tile": true,
+      "prompt": "wet stone inside a well"
+    },
+    {
+      "id": "damp_plaster",
+      "tile": true,
+      "prompt": "damp crypt plaster"
+    }
+  ]
+}

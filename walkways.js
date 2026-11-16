@@ -8,7 +8,7 @@ import { ground, coast, clamp, lerp } from './terrain.js';
 import { baptistery, marinersChapel, treasury, scriptorium, roofGarden, forecourt, roomName } from './chapels.js';
 import { crypt, cryptName } from './crypt.js';
 import { FABRIC } from './fabric.js';
-import { naveHangings, chapelCeilings, upperCeilings, gutterTrough } from './chapels.js';
+import { naveHangings, chapelCeilings, upperCeilings, gutterTrough, nicheAndScreen } from './chapels.js';
 
 const OAK=4, FLOOR=6, TRIM=9, LIGHT=11, BRONZE=22, LINEN=23;
 const GRANITE=25, MARBLE=26, DARK_MARBLE=27, COPPER=29, GILT=31;
@@ -183,6 +183,7 @@ function hall(m,decals){
   marinersChapel(m,kit);
   naveHangings(m);
   chapelCeilings(m,0);
+  nicheAndScreen(m,kit);
   crypt(m,kit);
   for(const [x,z,w,d] of [[.05,15.7,5.5,6.7],[.05,5.3,5.1,5.9],[8.05,-3.79,7.6,5.4],[.85,-11.56,5.4,4.1],[1.39,-21.07,5.1,5]]){
     decals.quad([x-w*.5,y+.013,z+d*.4],[x+w*.5,y+.013,z+d*.21],
@@ -313,7 +314,7 @@ function hut(m,y){
   deck(m,inside,y+HUT_STEP,CRAFT.deck,.23);
   for(const wall of [rect(h.x0,h.x0+.19,h.z0,h.doorA),rect(h.x0,h.x0+.19,h.doorB,h.z1),
     rect(h.x1-.20,h.x1,h.z0,h.z1),rect(h.x0,h.x1,h.z0,h.z0+.20),rect(h.x0,h.x1,h.z1-.19,h.z1)]){
-    block(m,wall,y,y+2.52,CRAFT.fieldstone,.94);
+    block(m,wall,y,y+2.52,FABRIC.brickPeel,.94);
   }
   box(m,rect(h.x0,h.x0+.20,h.doorA,h.doorB),y+2.11,y+2.52,CRAFT.blackOak,.94);
   for(const [x,z] of [[h.x0,h.z0],[h.x0,h.z1],[h.x1,h.z0],[h.x1,h.z1],
@@ -339,6 +340,9 @@ function hut(m,y){
   }
   for(const z of [h.z0+.005,h.z1-.005]){
     m.tri([h.x0,y+2.44,z],[h.x1,y+2.44,z],[middle,y+3.79,z],CRAFT.brick,.95);
+    // A louvred vent in each gable; the viewer outside sees u running to the right.
+    const out=z<(h.z0+h.z1)/2?-1:1, lx=out<0?[middle+.35,middle-.35]:[middle-.35,middle+.35], zz=z+out*.012;
+    m.quad([lx[0],y+2.62,zz],[lx[1],y+2.62,zz],[lx[1],y+3.2,zz],[lx[0],y+3.2,zz],FABRIC.louvre,1,[0,0,out],[[0,0],[1,0],[1,1],[0,1]]);
     m.rod([h.x0-.10,y+2.52,z],[middle,y+3.87,z],.052,.049,CRAFT.blackOak,5,.91);
     m.rod([middle,y+3.87,z],[h.x1+.10,y+2.52,z],.049,.052,CRAFT.blackOak,5,.91);
   }
@@ -377,6 +381,13 @@ function parapet(m,a,b,y){
   const z0=Math.min(a[1],b[1]),z1=Math.max(a[1],b[1]);
   const panel=flat?rect(x0,x1,z0-.151,z1+.151):rect(x0-.151,x1+.151,z0,z1);
   block(m,panel,y-.055,y+.82,CRAFT.fieldstone,.92);
+  // Battlement masonry dressed onto both faces of the panel (metre UVs, lower 80% of the picture).
+  for(const side of [-1,1]){
+    const off=.155*side;
+    const P=(t,h)=>flat?[lerp(x0,x1,t),h,(z0+z1)/2+off]:[(x0+x1)/2+off,h,lerp(z0,z1,t)];
+    m.quad(P(0,y-.05),P(1,y-.05),P(1,y+.815),P(0,y+.815),FABRIC.battlement,.96,undefined,
+      [[0,1/.42],[length,1/.42],[length,.2/.42],[0,.2/.42]]);
+  }
   const head=flat?rect(x0-.025,x1+.025,z0-.218,z1+.218):rect(x0-.218,x1+.218,z0-.025,z1+.025);
   box(m,head,y+.79,y+.93,CRAFT.flags,1.03);
   const count=Math.floor(length/1.04);

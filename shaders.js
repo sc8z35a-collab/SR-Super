@@ -288,6 +288,22 @@ vec3 rockBand(float t, float layers[6], vec3 p, vec3 n, bool detailed) {
   if(detailed&&w>.01&&i<5) c = mix(c,soilFaces(layers[i+1],p,n,.3,false),w);
   return c;
 }
+vec3 soilBand8(float t, float layers[8], vec2 uv, bool blend) {
+  float f = clamp(t,0.0,.9999)*8.0;
+  int i = int(f);
+  vec3 c = soil(layers[i],uv);
+  float w = smoothstep(.76,1.0,fract(f));
+  if(blend&&w>.01&&i<7) c = mix(c,soil(layers[i+1],uv),w);
+  return c;
+}
+vec3 rockBand8(float t, float layers[8], vec3 p, vec3 n, bool detailed) {
+  float f = clamp(t,0.0,.9999)*8.0;
+  int i = int(f);
+  vec3 c = soilFaces(layers[i],p,n,.3,detailed);
+  float w = smoothstep(.76,1.0,fract(f));
+  if(detailed&&w>.01&&i<7) c = mix(c,soilFaces(layers[i+1],p,n,.3,false),w);
+  return c;
+}
 // Value noise gathers near .5; stretch it so every band gets its share.
 float spread(float v) { return clamp((v-.22)/.56,0.0,.9999); }
 
@@ -302,15 +318,15 @@ vec3 landCover(vec3 p, vec3 n, bool detailed, float turf, float moss, float vari
     // Clover, dandelions and long grass in the sheltered hollows.
     float meadow = smoothstep(.58,.74,noise2(g*.11+1.9))*(1.0-dry)*(1.0-smoothstep(7.0,9.5,p.y));
     if(meadow>.02) cover = mix(cover,soilBand(spread(noise2(g*.05+7.3)),
-      float[6](${T.clover}.0,${T.clover}.0,${T.dandelion}.0,${T.tallGrass}.0,${T.tallGrass}.0,${T.clover}.0),g*.45,true),meadow*.9);
+      float[6](${T.clover}.0,${T.daisies}.0,${T.dandelion}.0,${T.tallGrass}.0,${T.thistle}.0,${T.clover}.0),g*.45,true),meadow*.9);
     // Thrift and wild thyme scattered over the open turf.
     float flowers = smoothstep(.63,.78,noise2(g*.13+5.7))*elevation;
     if(flowers>.02) cover = mix(cover,soilBand(spread(noise2(g*.07+2.2)),
-      float[6](${T.thrift}.0,${T.thrift}.0,${T.thyme}.0,${T.thyme}.0,${T.thrift}.0,${T.thyme}.0),g*.45,true),flowers*.85);
+      float[6](${T.thrift}.0,${T.daisies}.0,${T.thyme}.0,${T.thyme}.0,${T.daisies}.0,${T.thrift}.0),g*.45,true),flowers*.85);
     // Heather, gorse and bracken on the high ground.
     float heath = smoothstep(.58,.74,noise2(g*.09-3.1))*smoothstep(5.0,8.6,p.y);
     if(heath>.02) cover = mix(cover,soilBand(spread(noise2(g*.06+4.4)),
-      float[6](${T.heather}.0,${T.heather}.0,${T.gorse}.0,${T.bracken}.0,${T.bracken}.0,${T.heather}.0),g*.4+.53,true),heath);
+      float[6](${T.heather}.0,${T.bilberry}.0,${T.gorse}.0,${T.bracken}.0,${T.deadBracken}.0,${T.heather}.0),g*.4+.53,true),heath);
     // Moss, peat and mud where water collects.
     float damp = smoothstep(.57,.75,coarse)*(1.0-dry);
     if(damp>.02) cover = mix(cover,soilBand(spread(noise2(g*.08-6.0)),
@@ -318,20 +334,25 @@ vec3 landCover(vec3 p, vec3 n, bool detailed, float turf, float moss, float vari
     // Marram on the dunes and samphire on the salt flats just above the beach.
     float backshore = smoothstep(.9,1.5,p.y)*(1.0-smoothstep(2.4,3.6,p.y))*bank*smoothstep(.42,.58,noise2(g*.11-2.6));
     if(backshore>.02) cover = mix(cover,soilBand(spread(noise2(g*.06+8.8)),
-      float[6](${T.marram}.0,${T.marram}.0,${T.marram}.0,${T.saltmarsh}.0,${T.saltmarsh}.0,${T.marram}.0),g*.45,true),backshore);
+      float[6](${T.marram}.0,${T.duneRipples}.0,${T.marram}.0,${T.saltmarsh}.0,${T.saltmarsh}.0,${T.duneRipples}.0),g*.45,true),backshore);
     // Stones breaking through the turf on the gentler slopes.
+    // Sheep tracks wind across the turf; one patch of heath has been burnt.
+    float track = (1.0-smoothstep(.0,.035,abs(noise2(g*.06+2.4)-.5)))*bank;
+    if(track>.02) cover = mix(cover,soil(${T.sheepTrack}.0,g*.55),track*.9);
+    float burnt = smoothstep(.74,.82,noise2(g*.035+31.0))*smoothstep(4.0,7.0,p.y);
+    if(burnt>.02) cover = mix(cover,soil(${T.burntHeath}.0,g*.5),burnt);
     float stony = smoothstep(.56,.72,noise2(g*.1+9.1))*(1.0-smoothstep(.86,.95,n.y));
     if(stony>.02) cover = mix(cover,soil(${T.stonyGrass}.0,g*.45),stony*.85);
     cover *= .82+.36*luminance(soil(${T.coastalGrass}.0,g*.051));
   }
   // Earth, roots, mud and wind-blown leaves worn into the ground round the building.
   float worn = (1.0-smoothstep(.1,2.4,footprintDistance(p)))*bank;
-  if(worn>.02) cover = mix(cover,soilBand(spread(noise2(g*.09+3.3)),
-    float[6](${T.dirtPath}.0,${T.rubble}.0,${T.rootSoil}.0,${T.mud}.0,${T.leafLitter}.0,${T.dirtPath}.0),g*.6,detailed),worn*.85);
+  if(worn>.02) cover = mix(cover,soilBand8(spread(noise2(g*.09+3.3)),
+    float[8](${T.dirtPath}.0,${T.gravelPath}.0,${T.rubble}.0,${T.rootSoil}.0,${T.mud}.0,${T.leafLitter}.0,${T.sheepTrack}.0,${T.dirtPath}.0),g*.6,detailed),worn*.85);
 
   // Each headland shows its own stone; chalk breaks through in one place.
-  vec3 stone = rockBand(spread(noise2(g*.028+vec2(3.7,-1.2))),
-    float[6](${T.cliff}.0,${T.sandstone}.0,${T.gneiss}.0,${T.granite}.0,${T.slate}.0,${T.karst}.0),p,n,detailed);
+  vec3 stone = rockBand8(spread(noise2(g*.028+vec2(3.7,-1.2))),
+    float[8](${T.cliff}.0,${T.sandstone}.0,${T.gneiss}.0,${T.shale}.0,${T.granite}.0,${T.slate}.0,${T.karst}.0,${T.serpentine}.0),p,n,detailed);
   float chalk = smoothstep(.70,.80,noise2(g*.02-9.0));
   if(chalk>.02) stone = mix(stone,soilFaces(${T.chalk}.0,p,n,.3,false),chalk);
   // A lava flow and a red clay bank break the cliffs elsewhere.
@@ -344,7 +365,15 @@ vec3 landCover(vec3 p, vec3 n, bool detailed, float turf, float moss, float vari
     float[6](${T.lichenTop}.0,${T.mossyBoulders}.0,${T.basalt}.0,${T.basalt}.0,${T.grus}.0,${T.lichenTop}.0),g*.45,detailed),top*.75);
   if(detailed) {
     float lichen = smoothstep(.62,.78,grit+coarse*.3)*smoothstep(2.0,4.5,p.y);
-    if(lichen>.02) stone = mix(stone,soilFaces(${T.orangeLichen}.0,p,n,.5,false),lichen*.55);
+    if(lichen>.02) stone = mix(stone,soilFaces(noise2(g*.04+6.0)>.5 ? ${T.orangeLichen}.0 : ${T.yellowLichen}.0,p,n,.5,false),lichen*.55);
+    // White quartz veins threading the rock.
+    float vein = 1.0-smoothstep(.0,.035,abs(noise2(vec2(g.x*.05+p.y*.08,g.y*.05+1.7))-.5));
+    if(vein>.02) stone = mix(stone,soilFaces(${T.quartzVein}.0,p,n,.45,false),vein*.8);
+    // Earth banks on the moderate slopes and crumbling earth along the cliff tops.
+    float bank2 = smoothstep(.45,.6,n.y)*(1.0-smoothstep(.62,.76,n.y))*smoothstep(.45,.6,noise2(g*.07+4.0));
+    if(bank2>.02) stone = mix(stone,soilFaces(${T.bankSection}.0,p,n,.45,false),bank2);
+    float crumble = (1.0-smoothstep(.35,.6,n.y))*smoothstep(5.5,7.5,p.y)*smoothstep(.45,.6,noise2(g*.08-2.0));
+    if(crumble>.02) stone = mix(stone,soilFaces(${T.crumblingEarth}.0,p,n,.4,false),crumble);
     float shady = smoothstep(.15,-.35,dot(n,SUN))*smoothstep(.45,.7,coarse)*(1.0-top);
     if(shady>.02) stone = mix(stone,soilFaces(${T.mossyRock}.0,p,n,.4,false),shady*.8);
     float seep = (1.0-smoothstep(.3,.6,n.y))*smoothstep(.56,.7,noise2(vec2(g.x*.15+g.y*.1,p.y*.05)))*(1.0-smoothstep(2.5,5.0,p.y));
@@ -369,13 +398,16 @@ vec3 landCover(vec3 p, vec3 n, bool detailed, float turf, float moss, float vari
   if(shore>.02) {
     vec3 beach = soilBand(spread(noise2(g*.045+4.1)),
       float[6](${T.sand}.0,${T.shingle}.0,${T.shellBeach}.0,${T.driftwood}.0,${T.mudflat}.0,${T.blackSand}.0),g*.5,detailed);
+    float stones = smoothstep(.55,.7,noise2(g*.07-5.5));
+    if(detailed&&stones>.02) beach = mix(beach,soil(p.y<.5 ? ${T.poolPebbles}.0 : ${T.wetCobbles}.0,g*.7),stones);
     if(detailed) {
       float wet = 1.0-smoothstep(.12,.45,p.y);
       if(wet>.02) beach = mix(beach,soil(${T.foamSand}.0,g*.55),wet*.8);
       float strand = smoothstep(.5,.7,p.y)*(1.0-smoothstep(.8,1.05,p.y))*smoothstep(.4,.55,noise2(g*.3));
       if(strand>.02) beach = mix(beach,soil(${T.wrack}.0,g*.6),strand*.75);
     }
-    float tideLayer = p.y<.6 ? (noise2(g*.15+2.0)>.55 ? ${T.smoothRock}.0 : ${T.barnacleRock}.0) : ${T.seaweedRock}.0;
+    float tideLayer = p.y<.6 ? (noise2(g*.15+2.0)>.55 ? ${T.smoothRock}.0 : ${T.barnacleRock}.0)
+      : (noise2(g*.12-3.0)>.55 ? ${T.greenWeedRock}.0 : ${T.seaweedRock}.0);
     vec3 tidal = soilFaces(tideLayer,p,n,.55,detailed);
     float shelf = smoothstep(.55,.8,n.y);
     if(shelf>.02) tidal = mix(tidal,soil(${T.rockShelf}.0,g*.45),shelf);
@@ -746,14 +778,25 @@ vec3 dressFabric(float type, vec3 n, inout float bump) {
       if(streak>.02) c = mix(c,fabricTex(${F.extStreaked}.0,uv*.42),streak);
       float mossy = smoothstep(.1,-.3,dot(n,SUN))*smoothstep(.5,.66,noise2(uv*.09-4.0))*(1.0-smoothstep(18.0,40.0,h));
       if(mossy>.02) c = mix(c,fabricTex(${F.extMossy}.0,uv*.42),mossy);
-      float grime = 1.0-smoothstep(2.0,7.5,h+2.5*noise2(uv*.2));
-      if(grime>.02) c = mix(c,fabricTex(${F.extSooty}.0,uv*.42),grime);
+      // Copper run-off below the terrace roofs, salt-eaten stone on the seaward faces.
+      float copper = smoothstep(.6,.74,noise2(vec2(uv.x*.2,4.0)))*smoothstep(26.0,30.0,h)*(1.0-smoothstep(38.0,41.0,h));
+      if(copper>.02) c = mix(c,fabricTex(${F.copperStain}.0,uv*.42),copper);
+      vec2 out2 = normalize(pos+.001);
+      float seaward = max(0.0,dot(normalize(buildingDirection(n.xz)+.001),out2));
+      float salt = seaward*smoothstep(.5,.66,noise2(uv*.11+8.0))*(1.0-smoothstep(10.0,18.0,h));
+      if(salt>.02) c = mix(c,fabricTex(${F.saltEroded}.0,uv*.5),salt);
+      // A rusticated base course, darkened by grime at the very foot.
+      float base = 1.0-smoothstep(4.6,5.2,h);
+      if(base>.02) c = mix(c,fabricTex(${F.rusticated}.0,uv*.45),base);
+      float grime = 1.0-smoothstep(1.0,4.0,h+2.0*noise2(uv*.2));
+      if(grime>.02) c = mix(c,fabricTex(${F.extSooty}.0,uv*.42),grime*.7);
       c *= .7+.3*luminance(fabricTex(${F.extAshlar}.0,uv*.047))/.35;
       gain = 1.25;
     } else if(n.y<-.45) {
       c = fabricTex(${F.stainedCeiling}.0,uv*.35);
     } else if(h>25.9&&h<39.0) {
-      c = fabricTex(${F.whitePlaster}.0,uv*.4);
+      // White plaster in the library, faded blue in the bell chamber.
+      c = h<32.5 ? fabricTex(${F.whitePlaster}.0,uv*.4) : fabricTex(${F.fadedBlue}.0,uv*.45);
       gain = .75;
     } else {
       // Pale ashlar, clustered shafts along the arcades and soot above the altar.
@@ -762,7 +805,23 @@ vec3 dressFabric(float type, vec3 n, inout float bump) {
       if(column>.02) c = mix(c,fabricTex(${F.columnStone}.0,vec2(uv.x*.6,uv.y*.35)),column);
       float soot = smoothstep(-16.0,-21.0,pos.y)*smoothstep(2.5,8.0,h);
       if(soot>.02) c = mix(c,fabricTex(${F.sootyStone}.0,uv*.4),soot*.85);
+      // Striped courses above the arcades and a gold mosaic apse.
+      float striped = (1.0-smoothstep(.85,1.15,abs(abs(pos.x)-6.6)))*smoothstep(11.6,12.2,h)*(1.0-smoothstep(21.0,22.0,h));
+      if(striped>.02) c = mix(c,fabricTex(${F.stripedMarble}.0,uv*.5),striped);
+      float apse = smoothstep(-20.5,-22.5,pos.y)*smoothstep(8.5,10.0,h);
+      if(apse>.02) c = mix(c,fabricTex(${F.goldMosaic}.0,uv*1.2)*1.25,apse);
+      // Sailors' graffiti scratched along the walls of the east stair.
+      if(pos.x>10.4&&pos.y>4.3&&pos.y<18.6&&h<26.0&&abs(n.y)<.35)
+        c = fabricTex(${F.graffitiStone}.0,vec2(fract(uv.x*.42),fract(uv.y*.42)));
       gain = .72;
+      // A blind arcade round the end walls of the ground floor.
+      vec2 nl = abs(buildingDirection(n.xz));
+      if(abs(n.y)<.35&&nl.y>.8&&h>1.45&&h<4.45) { c = fabricTex(${F.blindArcade}.0,vec2(uv.x*.33,1.0-(h-1.45)/3.0)); gain = .75; }
+    }
+    // A painted floral band under each storey's ceiling.
+    if(uInterior&&abs(n.y)<.35&&level>4.55&&level<5.35&&h<26.0&&n.y>-.45) {
+      c = fabricTex(${F.frescoBand}.0,vec2(uv.x*.4,clamp((5.35-level)/.8,.01,.99)));
+      gain = .75;
     }
     // Oak panelling round the lower walls of the upper storeys.
     if(uInterior&&abs(n.y)<.35&&h>6.0&&level<1.15) {
@@ -775,7 +834,7 @@ vec3 dressFabric(float type, vec3 n, inout float bump) {
     c = uInterior ? fabricTex(${F.archVoussoir}.0,uv*.8) : fabricTex(h>48.0 ? ${F.spireCarving}.0 : ${F.windowMoulding}.0,uv*.7);
     gain = uInterior ? .72 : 1.2;
   } else if(type==25.0) {
-    c = fabricTex(${F.granitePlinth}.0,uv*.55);
+    c = h<-1.0 ? fabricTex(${F.retainingWall}.0,uv*.45) : fabricTex(${F.granitePlinth}.0,uv*.55);
   } else if(type==26.0) {
     c = fabricTex(${F.whiteMarble}.0,uv*.6);
   } else if(type==27.0) {
@@ -789,6 +848,12 @@ vec3 dressFabric(float type, vec3 n, inout float bump) {
   } else if(type==12.0) {
     c = fabricTex(${F.leadRoof}.0,uv*.6);
     gain = .55;
+  } else if(type==10.0) {
+    c = fabricTex(${F.windowRecess}.0,uv*.5);
+    gain = .45;
+  } else if(abs(n.y)<.5) {
+    c = fabricTex(${F.studdedDoor}.0,vec2(fract(uv.x*.55),fract(uv.y*.4)));
+    gain = .6;
   } else {
     c = fabricTex(${F.oakFloor}.0,uv*.8);
     gain = .55;
@@ -954,6 +1019,7 @@ void main() {
   } else if (type == 8.0) {
     float t = clamp(vUv.y,0.0,1.0);
     vec3 grass = mix(vec3(.061,.107,.040),vec3(.301,.348,.135),pow(t,.73));
+    if(uHasTerrain) grass = soil(${T.grassBlades}.0,vWorld.xz*.9+vec2(vUv.x*.2,0.0))*(.42+.62*pow(t,.7));
     base = grass * footprintAO(vWorld);
   }else if(type>=13.0&&type<25.0){
     base=characterMaterial(vWorld,vUv,type,bump,roughness);
@@ -994,6 +1060,7 @@ ${DECOR_GLOW.map(([name,gain])=>`    if(type==${DECOR[name]}.0){color=vec4(grade
     return;
   } else {
     base = vec3(.022,.026,.028) * (.85 + .25*noise2(vWorld.xy*2.1));
+    if(uHasFabric&&type==10.0) base = dressFabric(type,n,bump);
   }
 
   if (detailed) {

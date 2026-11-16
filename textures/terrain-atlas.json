@@ -3,7 +3,7 @@
   "columns": 6,
   "sizes": [
     128,
-    384
+    320
   ],
   "quality": 86,
   "sheets": [
@@ -12,7 +12,9 @@
     "textures/specs/terrain-c-meadow.json",
     "textures/specs/terrain-d-rocks.json",
     "textures/specs/terrain-e-shore.json",
-    "textures/specs/terrain-f-extra.json"
+    "textures/specs/terrain-f-extra.json",
+    "textures/specs/terrain-g-meadow.json",
+    "textures/specs/terrain-h-rockshore.json"
   ],
   "layers": [
     "coastal_grass",
@@ -68,6 +70,24 @@
     "smooth_rock",
     "lava_rock",
     "red_clay",
-    "cave_rock"
+    "cave_rock",
+    "grass_blades",
+    "daisy_grass",
+    "thistle",
+    "sheep_track",
+    "dead_bracken",
+    "bilberry",
+    "burnt_heath",
+    "bank_section",
+    "gravel_path",
+    "quartz_vein",
+    "serpentine",
+    "shale",
+    "yellow_lichen",
+    "dune_ripples",
+    "pool_pebbles",
+    "green_weed_rock",
+    "wet_cobbles",
+    "crumbling_earth"
   ]
 }

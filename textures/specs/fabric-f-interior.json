@@ -1,0 +1,51 @@
+{
+  "sheet": "fabric-f-interior",
+  "theme": "more interior walls of a Gothic cathedral",
+  "tiles": [
+    {
+      "id": "striped_marble",
+      "tile": true,
+      "prompt": "black and white striped masonry"
+    },
+    {
+      "id": "fresco_band",
+      "tile": false,
+      "prompt": "painted floral fresco band"
+    },
+    {
+      "id": "plaster_relief",
+      "tile": false,
+      "prompt": "plaster relief panel"
+    },
+    {
+      "id": "gold_mosaic",
+      "tile": true,
+      "prompt": "gold mosaic wall"
+    },
+    {
+      "id": "blind_arcade",
+      "tile": false,
+      "prompt": "Gothic blind arcade"
+    },
+    {
+      "id": "saint_niche",
+      "tile": false,
+      "prompt": "niche with a saint statue"
+    },
+    {
+      "id": "wood_lattice",
+      "tile": false,
+      "prompt": "carved wooden lattice screen"
+    },
+    {
+      "id": "faded_blue",
+      "tile": true,
+      "prompt": "faded blue plaster wall"
+    },
+    {
+      "id": "graffiti_stone",
+      "tile": false,
+      "prompt": "stone with old carved graffiti"
+    }
+  ]
+}

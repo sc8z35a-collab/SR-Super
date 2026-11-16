@@ -622,7 +622,8 @@ function groundAt(x, z) {
 
 function well(m, x, z, kit) {
   const y = groundAt(x, z) - .05;
-  lathe(m, x, y, z, [[0, .82], [.78, .8], [.86, .84], [.86, .66], [.3, .64]], D.limestone, 18, .97);
+  lathe(m, x, y, z, [[0, .82], [.78, .8], [.86, .84], [.86, .66]], D.limestone, 18, .97);
+  lathe(m, x, y, z, [[.86, .66], [.3, .64]], FABRIC.wellInterior, 18, .9);
   disc(m, x, y + .3, z, .65, D.fontWater, 18, .9);
   lathe(m, x, y + .78, z, [[0, .845], [.1, .845], [.1, .65]], D.carrara, 18, 1);
   for (const side of [-1, 1]) {
@@ -665,6 +666,8 @@ export function forecourt(m, kit) {
     }
   }
   well(m, wx, wz, kit);
+  gatehouse(m, kit);
+  islandWalls(m, kit);
   for (const [x, z] of [[-2.25, 36.6], [2.25, 36.0], [-1.9, 39.6], [2.15, 40.1]]) {
     const y = groundAt(x, z) - .04;
     lantern(m, x, y, z, 2.0);
@@ -723,6 +726,12 @@ export function chapelCeilings(m, floor) {
 // Stained plaster over the library and soot-black beams over the bell chamber.
 export function upperCeilings(m, index) {
   const room = { x0: 7.17, x1: 19.5, z0: -8.74, z1: 2.97 };
+  // Plaster relief panels over the upper aisles, around the opening of the stair above.
+  const a = { x0: 7.17, x1: 11.34, z0: 2.82, z1: 20.59 }, s = { x0: 8.05, x1: 11.18, z0: 4.45, z1: 18.12 };
+  const top = (index === 4 ? FLOORS[5] : ROOF_HEIGHT) - .38;
+  for (const r of [[a.x0, a.x1, a.z0, s.z0], [a.x0, s.x0, s.z0, s.z1], [s.x1, a.x1, s.z0, s.z1], [a.x0, a.x1, s.z1, a.z1]]) {
+    floorQuad(m, r[0], r[1], r[2], r[3], top, FABRIC.plasterRelief, 1);
+  }
   if (index === 4) floorQuad(m, room.x0, room.x1, room.z0, room.z1, FLOORS[5] - .46, FABRIC.stainedCeiling, 1);
   if (index === 5) floorQuad(m, room.x0, room.x1, room.z0, room.z1, ROOF_HEIGHT - .5, FABRIC.sootBeams, 1);
 }
@@ -740,4 +749,68 @@ export function gutterTrough(m, a, b, r) {
   for (const p of [a, b]) {
     for (let i = 0; i < n; i++) m.tri(p, at(p, Math.PI * i / n), at(p, Math.PI * (i + 1) / n), D.wroughtIron, .9);
   }
+}
+
+// ---------------------------------------------------------------- walls of the island and new screens
+
+// A picture on a vertical rectangle facing `out` (+x/-x/+z/-z); u runs to the viewer's right.
+function picture(m, cx, cz, y0, y1, w, out, mat) {
+  const [ox, oz] = out;
+  // The viewer looks along -out; their right is (oz, -ox) in building space.
+  const rx = oz, rz = -ox;
+  const p = (u, y) => [cx + rx * (u - .5) * w, y, cz + rz * (u - .5) * w];
+  m.quad(p(0, y0), p(1, y0), p(1, y1), p(0, y1), mat, 1, [ox, 0, oz], [[0, 0], [1, 0], [1, 1], [0, 1]]);
+}
+
+// The watchman's lodge on the forecourt: whitewashed, with a studded door, a barred window and a louvred gable.
+export function gatehouse(m, kit) {
+  const r = rect(6.4, 8.8, 32.6, 34.6), cx = 7.6, cz = 33.6;
+  const corners = [[r.x0, r.z0], [r.x1, r.z0], [r.x0, r.z1], [r.x1, r.z1]].map(([x, z]) => groundAt(x, z));
+  const y0 = Math.min(...corners) - .3, g = Math.max(...corners), top = g + 2.3;
+  kit.block(m, r, y0, top, FABRIC.whitewash, 1);
+  const door = groundAt(r.x0, cz);
+  picture(m, r.x0 - .012, cz, door, door + 1.95, 1.0, [-1, 0], FABRIC.studdedDoor);
+  picture(m, cx, r.z1 + .012, g + .6, g + 1.9, 1.3, [0, 1], FABRIC.barredWindow);
+  const ridge = top + .95;
+  for (const [z, e] of [[r.z0 - .3, -1], [r.z1 + .3, 1]]) {
+    m.quad([r.x0 - .22, top - .05, z], [r.x1 + .22, top - .05, z], [r.x1 + .22, ridge, cz], [r.x0 - .22, ridge, cz], 2, 1, [0, .7, e * .7]);
+  }
+  for (const x of [r.x0, r.x1]) m.tri([x, top, r.z0], [x, top, r.z1], [x, ridge - .05, cz], FABRIC.whitewash, .97);
+  picture(m, r.x1 + .012, cz, top + .12, top + .7, .7, [1, 0], FABRIC.louvre);
+  m.rod([r.x0 - .25, ridge, cz], [r.x1 + .25, ridge, cz], .06, .06, 12, 6, .9);
+}
+
+function wallRun(m, kit, x, z0, z1, mat, h = .95, t = .55) {
+  const n = Math.ceil((z1 - z0) / 1.2);
+  for (let i = 0; i < n; i++) {
+    const a = lerp(z0, z1, i / n), b = lerp(z0, z1, (i + 1) / n), g = groundAt(x, (a + b) / 2);
+    kit.block(m, rect(x - t / 2, x + t / 2, a, b), g - .4, g + h, mat, .96);
+    m.beveledBox(x, g + h + .06, (a + b) / 2, t + .08, .12, b - a + .02, .03, mat, 1.02);
+  }
+}
+
+// Field walls along both flanks of the island, a garden wall and a balustrade on the headland.
+export function islandWalls(m, kit) {
+  for (const [a, b] of [[7.0, 12.4], [14.0, 19.0]]) wallRun(m, kit, -16.6, a, b, FABRIC.roundedStoneWall);
+  for (const [a, b] of [[6.0, 10.6], [12.2, 16.0]]) wallRun(m, kit, 15.6, a, b, FABRIC.dryStoneWall, .85, .5);
+  wallRun(m, kit, 7.3, 35.6, 37.8, FABRIC.gardenWall, 1.3, .45);
+  const z = 40.55, w = 1.47;
+  for (let i = 0; i < 3; i++) {
+    const cx = 3.75 + i * w, g = groundAt(cx, z) - .03;
+    m.box(cx, g + .5, z, w, 1.0, .16, D.limestone, .9);
+    for (const side of [-1, 1]) picture(m, cx, z + side * .085, g, g + 1.0, w, [0, side], FABRIC.balustrade);
+    m.beveledBox(cx, g + 1.05, z, w + .02, .1, .3, .02, D.limestone, 1.02);
+    kit.solid(rect(cx - w / 2, cx + w / 2, z - .15, z + .15), g, g + 1.1);
+  }
+}
+
+// Saints in niches on the inner face of the west front, and a lattice screen at the scriptorium's mouth.
+export function nicheAndScreen(m, kit) {
+  const y = FLOORS[0];
+  for (const x of [-3.4, 3.4]) picture(m, x, 29.18, y + 1.2, y + 4.0, 1.6, [0, -1], FABRIC.saintNiche);
+  const sx = 12.05, z0 = -4.4, z1 = -2.2, y1 = FLOORS[1];
+  for (const side of [-1, 1]) picture(m, sx + side * .012, (z0 + z1) / 2, y1 + .05, y1 + 2.25, z1 - z0, [side, 0], FABRIC.woodLattice);
+  for (const z of [z0, z1]) m.rod([sx, y1, z], [sx, y1 + 2.3, z], .04, .04, FABRIC.studdedDoor, 6, .9);
+  m.rod([sx, y1 + 2.3, z0], [sx, y1 + 2.3, z1], .04, .04, FABRIC.studdedDoor, 6, .9);
+  kit.solid(rect(sx - .08, sx + .08, z0, z1), y1, y1 + 2.3);
 }
