@@ -1,6 +1,7 @@
 // New rooms and objects dressed with the GPT Image 2.5 Sunburst decor atlas (decor.js).
 // All coordinates are building-local metres (x across, z along the nave, y above the base).
 import { DECOR as D } from './decor.js';
+import { FABRIC } from './fabric.js';
 import { SURFACE as S } from './surfaces.js';
 import { CRAFT as C } from './ornament.js';
 import { FLOORS, ROOF_HEIGHT, BASE, world } from './layout.js';
@@ -29,7 +30,7 @@ function inside(r, x, z) { return x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.
 // ---------------------------------------------------------------- shared helpers
 
 // Surface of revolution; profile is [[height, radius], ...]. UVs are metres (arc length, profile length).
-function lathe(m, x, y, z, profile, mat, segs = 16, shade = 1, phase = 0) {
+export function lathe(m, x, y, z, profile, mat, segs = 16, shade = 1, phase = 0) {
   let v = 0;
   for (let j = 0; j < profile.length - 1; j++) {
     const [h0, r0] = profile[j], [h1, r1] = profile[j + 1];
@@ -47,7 +48,7 @@ function lathe(m, x, y, z, profile, mat, segs = 16, shade = 1, phase = 0) {
 }
 
 // Flat disc whose UVs frame the whole texture, for pictures (compass, rope coil, water).
-function disc(m, x, y, z, r, mat, segs = 24, shade = 1, phase = 0) {
+export function disc(m, x, y, z, r, mat, segs = 24, shade = 1, phase = 0) {
   for (let i = 0; i < segs; i++) {
     const a0 = phase + i / segs * TAU, a1 = phase + (i + 1) / segs * TAU;
     const uv = a => [.5 + .5 * Math.cos(a), .5 + .5 * Math.sin(a)];
@@ -57,25 +58,25 @@ function disc(m, x, y, z, r, mat, segs = 24, shade = 1, phase = 0) {
 }
 
 // Horizontal picture or floor inlay.
-function floorQuad(m, x0, x1, z0, z1, y, mat, shade = 1, uv = [[0, 0], [1, 0], [1, 1], [0, 1]]) {
+export function floorQuad(m, x0, x1, z0, z1, y, mat, shade = 1, uv = [[0, 0], [1, 0], [1, 1], [0, 1]]) {
   m.quad([x0, y, z1], [x1, y, z1], [x1, y, z0], [x0, y, z0], mat, shade, [0, 1, 0], uv);
 }
 
-function slab(m, r, y0, y1, mat, shade = 1) {
+export function slab(m, r, y0, y1, mat, shade = 1) {
   m.box((r.x0 + r.x1) / 2, (y0 + y1) / 2, (r.z0 + r.z1) / 2, r.x1 - r.x0, y1 - y0, r.z1 - r.z0, mat, shade);
 }
 
-function candle(m, x, y, z, h = .30, r = .028) {
+export function candle(m, x, y, z, h = .30, r = .028) {
   m.rod([x, y, z], [x, y + h, z], r, r * .9, LINEN, 8, 1.02, 0, true);
   m.rod([x, y + h, z], [x + .004, y + h + .07, z], r * .72, .002, LIGHT, 6, 1.1);
 }
 
-function candlestand(m, x, y, z, h = 1.25) {
+export function candlestand(m, x, y, z, h = 1.25) {
   lathe(m, x, y, z, [[0, .19], [.05, .17], [.09, .05], [h - .06, .035], [h - .03, .11], [h, .12]], BRONZE, 10, .95);
   candle(m, x, y + h, z, .34, .036);
 }
 
-function crossMark(m, x, y, z, size, mat, alongX = true) {
+export function crossMark(m, x, y, z, size, mat, alongX = true) {
   const w = size * .55;
   m.rod([x, y, z], [x, y + size, z], size * .06, size * .06, mat, 6, 1);
   const a = alongX ? [x - w / 2, y + size * .7, z] : [x, y + size * .7, z - w / 2];
@@ -621,7 +622,8 @@ function groundAt(x, z) {
 
 function well(m, x, z, kit) {
   const y = groundAt(x, z) - .05;
-  lathe(m, x, y, z, [[0, .82], [.78, .8], [.86, .84], [.86, .66], [.3, .64]], D.limestone, 18, .97);
+  lathe(m, x, y, z, [[0, .82], [.78, .8], [.86, .84], [.86, .66]], D.limestone, 18, .97);
+  lathe(m, x, y, z, [[.86, .66], [.3, .64]], FABRIC.wellInterior, 18, .9);
   disc(m, x, y + .3, z, .65, D.fontWater, 18, .9);
   lathe(m, x, y + .78, z, [[0, .845], [.1, .845], [.1, .65]], D.carrara, 18, 1);
   for (const side of [-1, 1]) {
@@ -664,6 +666,8 @@ export function forecourt(m, kit) {
     }
   }
   well(m, wx, wz, kit);
+  gatehouse(m, kit);
+  islandWalls(m, kit);
   for (const [x, z] of [[-2.25, 36.6], [2.25, 36.0], [-1.9, 39.6], [2.15, 40.1]]) {
     const y = groundAt(x, z) - .04;
     lantern(m, x, y, z, 2.0);
@@ -676,4 +680,137 @@ export function forecourt(m, kit) {
     pot(m, x, y, z, r, h);
     kit.solid(around(x, z, r * 2.2, r * 2.2), y, y + h);
   }
+}
+
+// ---------------------------------------------------------------- fabric pictures in the nave and rooms
+
+// A picture hung on an aisle wall; `side` is the wall's sign of x. Viewed from the nave, u runs to the right.
+function wallPicture(m, side, z, y0, y1, w, mat, frame) {
+  const x = side * 11.28, a = z - side * w / 2, b = z + side * w / 2;
+  m.quad([x, y0, a], [x, y0, b], [x, y1, b], [x, y1, a], mat, 1, [-side, 0, 0], [[0, 0], [1, 0], [1, 1], [0, 1]]);
+  if (frame) {
+    for (const [p, q] of [[[a, y0], [b, y0]], [[a, y1], [b, y1]], [[a, y0], [a, y1]], [[b, y0], [b, y1]]]) {
+      m.rod([x - side * .03, p[1], p[0]], [x - side * .03, q[1], q[0]], .04, .04, D.gildedGesso, 6, 1);
+    }
+  } else {
+    m.rod([x - side * .06, y1 + .05, a - side * .12], [x - side * .06, y1 + .05, b + side * .12], .025, .025, D.wroughtIron, 6, 1);
+  }
+}
+
+export function naveHangings(m) {
+  const y = FLOORS[0];
+  // Tapestries between the windows of the west aisle, murals on the east piers.
+  for (const z of [-15.63, 9.0, 15.04]) wallPicture(m, -1, z, y + 1.75, y + 4.55, 2.15, FABRIC.tapestry, false);
+  wallPicture(m, 1, -15.63, y + 1.75, y + 4.55, 2.15, FABRIC.muralPlaster, true);
+  for (const side of [-1, 1]) wallPicture(m, side, -15.63, FLOORS[1] + 1.6, FLOORS[1] + 4.4, 2.15, FABRIC.muralPlaster, true);
+  // Ledger stones in the aisles near the apse and a chequered pavement under the crossing.
+  for (const side of [-1, 1]) {
+    for (const z of [-12.4, -18.9]) floorQuad(m, side * 9.5 - .55, side * 9.5 + .55, z - 1.0, z + 1.0, y + .009, FABRIC.tombSlab, 1);
+  }
+  floorQuad(m, -3.8, 3.8, -7.1, .5, y + .004, FABRIC.checkerMarble, 1);
+}
+
+// Ceilings under the decks above the transept chapels (1F) and the treasury and scriptorium (2F).
+export function chapelCeilings(m, floor) {
+  for (const room of ROOMS.filter(r => r.floor === floor)) {
+    const y = FLOORS[floor + 1] - (floor === 0 ? .33 : .33) - .02;
+    if (floor === 0) {
+      const mid = (room.z0 + room.z1) / 2;
+      for (const [a, b] of [[room.z0, mid], [mid, room.z1]]) floorQuad(m, room.x0, room.x1, a, b, y, FABRIC.plasterVault, 1);
+    } else {
+      floorQuad(m, room.x0, room.x1, room.z0, room.z1, y, FABRIC.beamCeiling, 1);
+    }
+  }
+}
+
+// Stained plaster over the library and soot-black beams over the bell chamber.
+export function upperCeilings(m, index) {
+  const room = { x0: 7.17, x1: 19.5, z0: -8.74, z1: 2.97 };
+  // Plaster relief panels over the upper aisles, around the opening of the stair above.
+  const a = { x0: 7.17, x1: 11.34, z0: 2.82, z1: 20.59 }, s = { x0: 8.05, x1: 11.18, z0: 4.45, z1: 18.12 };
+  const top = (index === 4 ? FLOORS[5] : ROOF_HEIGHT) - .38;
+  for (const r of [[a.x0, a.x1, a.z0, s.z0], [a.x0, s.x0, s.z0, s.z1], [s.x1, a.x1, s.z0, s.z1], [a.x0, a.x1, s.z1, a.z1]]) {
+    floorQuad(m, r[0], r[1], r[2], r[3], top, FABRIC.plasterRelief, 1);
+  }
+  if (index === 4) floorQuad(m, room.x0, room.x1, room.z0, room.z1, FLOORS[5] - .46, FABRIC.stainedCeiling, 1);
+  if (index === 5) floorQuad(m, room.x0, room.x1, room.z0, room.z1, ROOF_HEIGHT - .5, FABRIC.sootBeams, 1);
+}
+
+// A lead half-pipe gutter from a to b (level), UVs in metres.
+export function gutterTrough(m, a, b, r) {
+  const length = Math.hypot(b[0] - a[0], b[2] - a[2]), n = 10;
+  const dz = (b[2] - a[2]) / length, dx = (b[0] - a[0]) / length;
+  const at = (p, t) => [p[0] - dz * Math.cos(t) * r, p[1] - Math.sin(t) * r, p[2] + dx * Math.cos(t) * r];
+  for (let i = 0; i < n; i++) {
+    const t0 = Math.PI * i / n, t1 = Math.PI * (i + 1) / n;
+    m.quad(at(a, t0), at(b, t0), at(b, t1), at(a, t1), FABRIC.gutter, 1, undefined,
+      [[0, t0 * r], [length, t0 * r], [length, t1 * r], [0, t1 * r]]);
+  }
+  for (const p of [a, b]) {
+    for (let i = 0; i < n; i++) m.tri(p, at(p, Math.PI * i / n), at(p, Math.PI * (i + 1) / n), D.wroughtIron, .9);
+  }
+}
+
+// ---------------------------------------------------------------- walls of the island and new screens
+
+// A picture on a vertical rectangle facing `out` (+x/-x/+z/-z); u runs to the viewer's right.
+function picture(m, cx, cz, y0, y1, w, out, mat) {
+  const [ox, oz] = out;
+  // The viewer looks along -out; their right is (oz, -ox) in building space.
+  const rx = oz, rz = -ox;
+  const p = (u, y) => [cx + rx * (u - .5) * w, y, cz + rz * (u - .5) * w];
+  m.quad(p(0, y0), p(1, y0), p(1, y1), p(0, y1), mat, 1, [ox, 0, oz], [[0, 0], [1, 0], [1, 1], [0, 1]]);
+}
+
+// The watchman's lodge on the forecourt: whitewashed, with a studded door, a barred window and a louvred gable.
+export function gatehouse(m, kit) {
+  const r = rect(6.4, 8.8, 32.6, 34.6), cx = 7.6, cz = 33.6;
+  const corners = [[r.x0, r.z0], [r.x1, r.z0], [r.x0, r.z1], [r.x1, r.z1]].map(([x, z]) => groundAt(x, z));
+  const y0 = Math.min(...corners) - .3, g = Math.max(...corners), top = g + 2.3;
+  kit.block(m, r, y0, top, FABRIC.whitewash, 1);
+  const door = groundAt(r.x0, cz);
+  picture(m, r.x0 - .012, cz, door, door + 1.95, 1.0, [-1, 0], FABRIC.studdedDoor);
+  picture(m, cx, r.z1 + .012, g + .6, g + 1.9, 1.3, [0, 1], FABRIC.barredWindow);
+  const ridge = top + .95;
+  for (const [z, e] of [[r.z0 - .3, -1], [r.z1 + .3, 1]]) {
+    m.quad([r.x0 - .22, top - .05, z], [r.x1 + .22, top - .05, z], [r.x1 + .22, ridge, cz], [r.x0 - .22, ridge, cz], 2, 1, [0, .7, e * .7]);
+  }
+  for (const x of [r.x0, r.x1]) m.tri([x, top, r.z0], [x, top, r.z1], [x, ridge - .05, cz], FABRIC.whitewash, .97);
+  picture(m, r.x1 + .012, cz, top + .12, top + .7, .7, [1, 0], FABRIC.louvre);
+  m.rod([r.x0 - .25, ridge, cz], [r.x1 + .25, ridge, cz], .06, .06, 12, 6, .9);
+}
+
+function wallRun(m, kit, x, z0, z1, mat, h = .95, t = .55) {
+  const n = Math.ceil((z1 - z0) / 1.2);
+  for (let i = 0; i < n; i++) {
+    const a = lerp(z0, z1, i / n), b = lerp(z0, z1, (i + 1) / n), g = groundAt(x, (a + b) / 2);
+    kit.block(m, rect(x - t / 2, x + t / 2, a, b), g - .4, g + h, mat, .96);
+    m.beveledBox(x, g + h + .06, (a + b) / 2, t + .08, .12, b - a + .02, .03, mat, 1.02);
+  }
+}
+
+// Field walls along both flanks of the island, a garden wall and a balustrade on the headland.
+export function islandWalls(m, kit) {
+  for (const [a, b] of [[7.0, 12.4], [14.0, 19.0]]) wallRun(m, kit, -16.6, a, b, FABRIC.roundedStoneWall);
+  for (const [a, b] of [[6.0, 10.6], [12.2, 16.0]]) wallRun(m, kit, 15.6, a, b, FABRIC.dryStoneWall, .85, .5);
+  wallRun(m, kit, 7.3, 35.6, 37.8, FABRIC.gardenWall, 1.3, .45);
+  const z = 40.55, w = 1.47;
+  for (let i = 0; i < 3; i++) {
+    const cx = 3.75 + i * w, g = groundAt(cx, z) - .03;
+    m.box(cx, g + .5, z, w, 1.0, .16, D.limestone, .9);
+    for (const side of [-1, 1]) picture(m, cx, z + side * .085, g, g + 1.0, w, [0, side], FABRIC.balustrade);
+    m.beveledBox(cx, g + 1.05, z, w + .02, .1, .3, .02, D.limestone, 1.02);
+    kit.solid(rect(cx - w / 2, cx + w / 2, z - .15, z + .15), g, g + 1.1);
+  }
+}
+
+// Saints in niches on the inner face of the west front, and a lattice screen at the scriptorium's mouth.
+export function nicheAndScreen(m, kit) {
+  const y = FLOORS[0];
+  for (const x of [-3.4, 3.4]) picture(m, x, 29.18, y + 1.2, y + 4.0, 1.6, [0, -1], FABRIC.saintNiche);
+  const sx = 12.05, z0 = -4.4, z1 = -2.2, y1 = FLOORS[1];
+  for (const side of [-1, 1]) picture(m, sx + side * .012, (z0 + z1) / 2, y1 + .05, y1 + 2.25, z1 - z0, [side, 0], FABRIC.woodLattice);
+  for (const z of [z0, z1]) m.rod([sx, y1, z], [sx, y1 + 2.3, z], .04, .04, FABRIC.studdedDoor, 6, .9);
+  m.rod([sx, y1 + 2.3, z0], [sx, y1 + 2.3, z1], .04, .04, FABRIC.studdedDoor, 6, .9);
+  kit.solid(rect(sx - .08, sx + .08, z0, z1), y1, y1 + 2.3);
 }

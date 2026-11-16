@@ -25,6 +25,7 @@ GPT Image 2.5 Sunburst で **1:1・最高画質（quality `xhigh`、reasoning ef
 | 画質 | `quality: "xhigh"`、`reasoning: {"effort": "xhigh"}`（拒否されたら `high` に自動で下げてログに残す） |
 | 形式 | PNG（生データは `textures/.cache/`、保存用は `textures/sheets/*.webp`） |
 | 1 回の生成 | 3×3 = 9 テクスチャ。区切りはマゼンタ (#FF00FF) の線で、分割時に自動検出 |
+| 失敗時 | 残高切れ（`credit_balance_exhausted`）なら即停止。5xx は 2 回まで再試行（失敗した要求も課金されうる）。同時実行は 2 枚 |
 
 ## 手順
 
@@ -68,6 +69,8 @@ GPT Image 2.5 Sunburst で **1:1・最高画質（quality `xhigh`、reasoning ef
    ```
 
    `decor-96.webp`（軽量用）と `decor-256.webp`（高品質用）が書き出され、最後に `DECOR_FALLBACK` 配列が表示される。
+   地形は `textures/terrain-atlas.json`（`terrain-128.webp` / `terrain-320.webp`、層の名前は `landcover.js`）、
+   大聖堂の壁・床・天井・屋根は `textures/fabric-atlas.json`（`fabric-128.webp` / `fabric-256.webp`、`fabric.js`）で同じようにパックする。
 
 5. **ゲームに組み込む**
    - `decor.js`: `NAMES` に名前を追加（アトラスと同じ順）、`DECOR_SHADING` に `[1m あたりの繰り返し数（0 = 一枚絵、負 = メッシュ UV をメートルとして使う）, 粗さ, 明るさ]`、`DECOR_FALLBACK` に pack の出力を貼る。
@@ -76,6 +79,15 @@ GPT Image 2.5 Sunburst で **1:1・最高画質（quality `xhigh`、reasoning ef
    - `sw.js` のキャッシュ名を上げる。
 
 6. **確認** — `python3 -m http.server` で起動し、横画面・全画面で該当の部屋を見る。品質「最軽量」でも崩れないか確認。
+
+## 外部で作ったシートを使う
+
+API を使わずに用意した 3×3 のシート（ChatGPT などで作った画像）も同じ手順で使える。
+
+1. 並び順がシート定義（`textures/specs/<sheet>.json`）の `tiles` と同じことを目で確認する。
+2. `textures/sheets/<sheet>.webp` として保存する（`textures/.cache/<sheet>.png` があればそちらが優先される）。
+3. `slice` → `pack` を実行する。マゼンタの区切り線が無い場合は 3 等分の位置で切り、各マスの内側 3.5% を捨てるので、細い区切り線は自動で落ちる。
+4. 出どころを `textures/sheets/<sheet>.json` に記録しておく。
 
 ## 一括実行
 

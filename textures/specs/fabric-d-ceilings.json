@@ -1,0 +1,51 @@
+{
+  "sheet": "fabric-d-ceilings",
+  "theme": "the ceilings and roofs of a Gothic cathedral",
+  "tiles": [
+    {
+      "id": "rib_vault",
+      "tile": false,
+      "prompt": "stone rib vault seen from below with a carved boss"
+    },
+    {
+      "id": "plaster_vault",
+      "tile": false,
+      "prompt": "white plaster groin vault seen from below"
+    },
+    {
+      "id": "beam_ceiling",
+      "tile": true,
+      "prompt": "wooden beam and plank ceiling"
+    },
+    {
+      "id": "stained_ceiling",
+      "tile": true,
+      "prompt": "plaster ceiling with water stains"
+    },
+    {
+      "id": "soot_beams",
+      "tile": false,
+      "prompt": "soot-blackened wooden beams and planks"
+    },
+    {
+      "id": "slate_roof",
+      "tile": true,
+      "prompt": "grey slate roof"
+    },
+    {
+      "id": "lead_roof",
+      "tile": true,
+      "prompt": "standing-seam lead roof"
+    },
+    {
+      "id": "mossy_roof",
+      "tile": true,
+      "prompt": "old stone roof slates with moss and lichen"
+    },
+    {
+      "id": "gutter",
+      "tile": false,
+      "prompt": "lead gutter along the top of a stone wall"
+    }
+  ]
+}

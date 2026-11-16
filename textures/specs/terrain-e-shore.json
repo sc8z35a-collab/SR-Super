@@ -1,0 +1,51 @@
+{
+  "sheet": "terrain-e-shore",
+  "theme": "the shore, beaches and salt marsh of a small Atlantic island, photographed straight down from above",
+  "tiles": [
+    {
+      "id": "mudflat",
+      "tile": true,
+      "prompt": "a wet tidal mudflat with ripples and small worm casts"
+    },
+    {
+      "id": "wrack",
+      "tile": true,
+      "prompt": "a strandline of washed-up brown and red seaweed"
+    },
+    {
+      "id": "shell_beach",
+      "tile": true,
+      "prompt": "a beach of whole and broken sea shells and small pebbles"
+    },
+    {
+      "id": "black_sand",
+      "tile": true,
+      "prompt": "black volcanic sand with small lava pebbles"
+    },
+    {
+      "id": "driftwood_shingle",
+      "tile": true,
+      "prompt": "grey pebble shingle scattered with bleached driftwood sticks"
+    },
+    {
+      "id": "rock_shelf",
+      "tile": true,
+      "prompt": "a flat tidal rock shelf with shallow pools and green weed"
+    },
+    {
+      "id": "saltmarsh",
+      "tile": true,
+      "prompt": "salt marsh samphire plants in red and green"
+    },
+    {
+      "id": "marram_dune",
+      "tile": true,
+      "prompt": "marram grass tufts growing from pale dune sand"
+    },
+    {
+      "id": "foam_sand",
+      "tile": true,
+      "prompt": "wet sand with lacy white sea foam at the waterline"
+    }
+  ]
+}

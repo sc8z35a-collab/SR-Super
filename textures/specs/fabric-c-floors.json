@@ -1,0 +1,51 @@
+{
+  "sheet": "fabric-c-floors",
+  "theme": "the floors of a Gothic cathedral",
+  "tiles": [
+    {
+      "id": "nave_flags",
+      "tile": true,
+      "prompt": "grey stone flagstones of the nave"
+    },
+    {
+      "id": "checker_marble",
+      "tile": false,
+      "prompt": "black and white checkered marble pavement"
+    },
+    {
+      "id": "green_marble",
+      "tile": true,
+      "prompt": "dark green marble with white veins"
+    },
+    {
+      "id": "white_marble",
+      "tile": true,
+      "prompt": "white Carrara marble"
+    },
+    {
+      "id": "oak_floor",
+      "tile": true,
+      "prompt": "oak floorboards"
+    },
+    {
+      "id": "terracotta_tiles",
+      "tile": true,
+      "prompt": "square terracotta floor tiles"
+    },
+    {
+      "id": "stone_steps",
+      "tile": true,
+      "prompt": "worn stone steps"
+    },
+    {
+      "id": "terrace_slabs",
+      "tile": true,
+      "prompt": "weathered stone slabs of a roof terrace"
+    },
+    {
+      "id": "tomb_slab",
+      "tile": false,
+      "prompt": "carved ledger stone set in a floor, no inscription"
+    }
+  ]
+}

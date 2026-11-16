@@ -1,0 +1,51 @@
+{
+  "sheet": "fabric-a-exterior",
+  "theme": "the exterior stonework of a weathered seaside Gothic cathedral",
+  "tiles": [
+    {
+      "id": "ext_ashlar",
+      "tile": true,
+      "prompt": "weathered grey limestone ashlar wall"
+    },
+    {
+      "id": "ext_sooty",
+      "tile": true,
+      "prompt": "lower wall blackened by sea wind and grime"
+    },
+    {
+      "id": "ext_mossy",
+      "tile": true,
+      "prompt": "ashlar with moss and white salt stains"
+    },
+    {
+      "id": "ext_streaked",
+      "tile": true,
+      "prompt": "ashlar with dark rain streaks"
+    },
+    {
+      "id": "window_moulding",
+      "tile": false,
+      "prompt": "carved Gothic window moulding with a quatrefoil spandrel"
+    },
+    {
+      "id": "spire_carving",
+      "tile": false,
+      "prompt": "carved tracery band of a pinnacle"
+    },
+    {
+      "id": "buttress",
+      "tile": true,
+      "prompt": "rough stone of a buttress corner"
+    },
+    {
+      "id": "belfry_rubble",
+      "tile": true,
+      "prompt": "rubble masonry of a belfry wall"
+    },
+    {
+      "id": "granite_plinth",
+      "tile": true,
+      "prompt": "granite plinth with a moulded base course"
+    }
+  ]
+}

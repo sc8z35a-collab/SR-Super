@@ -2,9 +2,11 @@ import { Renderer } from './renderer.js';
 import { add, sub, normal } from './mesh.js';
 import { clamp, ground, lerp } from './terrain.js';
 import { BASE, ROOF_INDEX, world, worldNormal } from './layout.js';
-import { visitFloor, nextPosition, locationName } from './walkways.js';
+import { visitFloor, nextPosition, locationName, levelOf, CRYPT_LEVEL } from './walkways.js';
 import { SURFACE_LAYERS } from './surfaces.js';
 import { DECOR_LAYERS } from './decor.js';
+import { TERRAIN_LAYERS } from './landcover.js';
+import { FABRIC_LAYERS } from './fabric.js';
 
 const el = id => document.getElementById(id);
 const canvas = el('scene');
@@ -77,14 +79,19 @@ const layerGroups=[
   {name:'materials',sizes:[128,384],layers:40,cols:8,method:'installMaterials'},
   {name:'craft',sizes:[112,288],layers:36,cols:6,method:'installCraft'},
   {name:'surfaces',sizes:[96,256],layers:SURFACE_LAYERS,cols:6,method:'installSurfaces'},
-  {name:'decor',sizes:[96,256],layers:DECOR_LAYERS,cols:6,method:'installDecor'}
+  {name:'decor',sizes:[96,256],layers:DECOR_LAYERS,cols:6,method:'installDecor'},
+  {name:'terrain',sizes:[128,320],layers:TERRAIN_LAYERS,cols:6,method:'installTerrain'},
+  {name:'fabric',sizes:[128,256],layers:FABRIC_LAYERS,cols:6,method:'installFabric'}
 ];
 async function imagePixels(name,depth,columns=depth) {
   try {
     const img=new Image();
     img.src=new URL(name,import.meta.url);
     await img.decode();
-    const width=img.naturalWidth/columns,height=img.naturalHeight/Math.ceil(depth/columns);
+    // Atlases hold square tiles; an older atlas may hold fewer layers than the code knows about.
+    const width=img.naturalWidth/columns;
+    const height=columns>1?width:img.naturalHeight/Math.ceil(depth/columns);
+    if(columns>1)depth=Math.min(depth,columns*Math.floor(img.naturalHeight/height));
     const sheet=Object.assign(document.createElement('canvas'),{width,height});
     const context=sheet.getContext('2d',{willReadFrequently:true});
     const data=new Uint8Array(width*height*4*depth);
@@ -262,7 +269,7 @@ function refreshMode(){
     :'ドラッグで回転・ピンチで拡大';
   for(const btn of buttons)btn.setAttribute('aria-pressed',btn.dataset.view===mode);
   for(const btn of floorLinks){
-    if(walking&&Number(btn.dataset.floor)===walker.floor)btn.setAttribute('aria-current','true');
+    if(walking&&Number(btn.dataset.floor)===levelOf(walker))btn.setAttribute('aria-current','true');
     else btn.removeAttribute('aria-current');
   }
 }
@@ -303,7 +310,7 @@ function setFloor(index){
   walker=visitFloor(index);
   cameraFloor=walker.y;
   const poses=[[0,.09],[-.035,-.14],[-.035,-.14],[-.035,-.14],[.93,.055],[1.14,.155],[1.25,.012]];
-  const [yaw,pitch]=poses[index];
+  const [yaw,pitch]=index===CRYPT_LEVEL?[.86,.02]:poses[index];
   look={yaw,pitch};
   stopInput();
   refreshMode();

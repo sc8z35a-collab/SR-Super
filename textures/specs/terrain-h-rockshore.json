@@ -1,0 +1,51 @@
+{
+  "sheet": "terrain-h-rockshore",
+  "theme": "more rock and shore on a small Atlantic island",
+  "tiles": [
+    {
+      "id": "quartz_vein",
+      "tile": true,
+      "prompt": "white quartz vein in rock"
+    },
+    {
+      "id": "serpentine",
+      "tile": true,
+      "prompt": "green serpentinite"
+    },
+    {
+      "id": "shale",
+      "tile": true,
+      "prompt": "layered flaky shale"
+    },
+    {
+      "id": "yellow_lichen",
+      "tile": true,
+      "prompt": "rock with yellow lichen"
+    },
+    {
+      "id": "dune_ripples",
+      "tile": true,
+      "prompt": "wind-rippled dune sand"
+    },
+    {
+      "id": "pool_pebbles",
+      "tile": true,
+      "prompt": "pebbles under rock-pool water"
+    },
+    {
+      "id": "green_weed_rock",
+      "tile": true,
+      "prompt": "waterline rock with green weed"
+    },
+    {
+      "id": "wet_cobbles",
+      "tile": true,
+      "prompt": "wet shining black cobbles"
+    },
+    {
+      "id": "crumbling_earth",
+      "tile": true,
+      "prompt": "crumbling cliff-top earth"
+    }
+  ]
+}

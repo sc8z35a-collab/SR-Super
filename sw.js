@@ -1,10 +1,11 @@
-const CACHE = 'tidal-cathedral-v7';
+const CACHE = 'tidal-cathedral-v11';
 const LOCAL = ['./', './index.html', './style.css', './main.js', './mesh.js', './terrain.js', './cathedral.js',
   './character.js', './shaders.js', './renderer.js', './manifest.webmanifest', './icon-192.png', './icon-512.png',
   './layout.js','./walkways.js','./ornament.js','./materials-128.webp','./craft-112.webp',
   './surfaces.js','./furnishings.js','./surfaces-96.webp','./stained-glass.webp','./altarpiece.webp','./cover.webp',
-  './decor.js','./chapels.js','./decor-96.webp'];
-const detailPaths=new Set(['./materials-384.webp','./craft-288.webp','./surfaces-256.webp','./decor-256.webp']
+  './decor.js','./chapels.js','./decor-96.webp','./crypt.js','./landcover.js','./terrain-128.webp',
+  './fabric.js','./fabric-128.webp'];
+const detailPaths=new Set(['./materials-384.webp','./craft-288.webp','./surfaces-256.webp','./decor-256.webp','./terrain-320.webp','./fabric-256.webp']
   .map(name=>new URL(name,self.location.href).pathname));
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(LOCAL)));

@@ -1,0 +1,51 @@
+{
+  "sheet": "decor-f-tidal",
+  "theme": "a tidal grotto inside a cathedral crypt where the sea seeps in",
+  "tiles": [
+    {
+      "id": "seawater",
+      "tile": true,
+      "prompt": "dark teal-green seawater seen from above, gentle ripples, a few floating specks"
+    },
+    {
+      "id": "tide_pool",
+      "tile": true,
+      "prompt": "the bed of a shallow rock pool seen from above: orange starfish, red sea anemones, pebbles and pink coralline algae under clear water"
+    },
+    {
+      "id": "kelp",
+      "tile": true,
+      "prompt": "wet brown kelp and bladderwrack seaweed piled densely, glossy"
+    },
+    {
+      "id": "mussels",
+      "tile": true,
+      "prompt": "a dense bed of blue-black mussel shells with a few barnacles"
+    },
+    {
+      "id": "shell_sand",
+      "tile": true,
+      "prompt": "white and cream crushed shell sand with small broken shell fragments"
+    },
+    {
+      "id": "octopus_mosaic",
+      "tile": false,
+      "prompt": "a circular Roman floor mosaic medallion centred in the panel: an octopus with curling tentacles in red, ochre and black tesserae on cream, a blue wave border"
+    },
+    {
+      "id": "verdigris",
+      "tile": true,
+      "prompt": "old bronze covered in mottled turquoise-green verdigris patina"
+    },
+    {
+      "id": "wet_sand",
+      "tile": true,
+      "prompt": "wet rippled sea sand seen from above, small ripple marks and shell bits"
+    },
+    {
+      "id": "glow_algae",
+      "tile": true,
+      "prompt": "bioluminescent algae glowing cyan and blue-green in dark rock crevices, glowing specks on near-black stone"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "sheet": "fabric-e-exterior",
+  "theme": "more exterior walls of a seaside cathedral and its island",
+  "tiles": [
+    {
+      "id": "dry_stone_wall",
+      "tile": true,
+      "prompt": "mortarless dry stone wall"
+    },
+    {
+      "id": "retaining_wall",
+      "tile": true,
+      "prompt": "stone retaining wall with plants"
+    },
+    {
+      "id": "rusticated",
+      "tile": true,
+      "prompt": "rusticated stone blocks"
+    },
+    {
+      "id": "brick_peel",
+      "tile": true,
+      "prompt": "plaster peeling off brick"
+    },
+    {
+      "id": "whitewash",
+      "tile": true,
+      "prompt": "whitewashed wall"
+    },
+    {
+      "id": "salt_eroded",
+      "tile": true,
+      "prompt": "salt-eroded honeycombed stone"
+    },
+    {
+      "id": "copper_stain",
+      "tile": true,
+      "prompt": "stone with green copper stains"
+    },
+    {
+      "id": "window_recess",
+      "tile": true,
+      "prompt": "dark stone of a window recess"
+    },
+    {
+      "id": "studded_door",
+      "tile": false,
+      "prompt": "iron-studded wooden door"
+    }
+  ]
+}

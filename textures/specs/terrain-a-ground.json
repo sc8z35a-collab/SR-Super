@@ -1,0 +1,51 @@
+{
+  "sheet": "terrain-a-ground",
+  "theme": "the windswept grassy top of a small rocky island in the North Atlantic, photographed straight down from above",
+  "tiles": [
+    {
+      "id": "coastal_grass",
+      "tile": true,
+      "prompt": "short dense wind-cropped coastal grass seen from directly above, fresh green with a few yellow blades"
+    },
+    {
+      "id": "thrift_flowers",
+      "tile": true,
+      "prompt": "coastal turf scattered with clumps of pink sea thrift flowers, seen from directly above"
+    },
+    {
+      "id": "heather",
+      "tile": true,
+      "prompt": "low purple and brown heather moorland seen from directly above"
+    },
+    {
+      "id": "moss_turf",
+      "tile": true,
+      "prompt": "thick green moss and tiny plants on thin soil seen from directly above"
+    },
+    {
+      "id": "dirt_path",
+      "tile": true,
+      "prompt": "a compacted brown earth footpath with small stones and worn grass edges seen from directly above"
+    },
+    {
+      "id": "beach_sand",
+      "tile": true,
+      "prompt": "fine pale golden beach sand seen from directly above, slight footprints and ripples"
+    },
+    {
+      "id": "shingle",
+      "tile": true,
+      "prompt": "rounded grey and brown beach shingle pebbles seen from directly above"
+    },
+    {
+      "id": "dry_grass",
+      "tile": true,
+      "prompt": "dry straw-coloured coastal grass and dead stems seen from directly above"
+    },
+    {
+      "id": "lichen_rock_top",
+      "tile": true,
+      "prompt": "the flat top of a grey rock outcrop with white and pale green lichen, seen from directly above"
+    }
+  ]
+}

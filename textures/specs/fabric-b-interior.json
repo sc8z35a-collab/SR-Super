@@ -1,0 +1,51 @@
+{
+  "sheet": "fabric-b-interior",
+  "theme": "the interior walls of a Gothic cathedral",
+  "tiles": [
+    {
+      "id": "int_ashlar",
+      "tile": true,
+      "prompt": "pale limestone ashlar"
+    },
+    {
+      "id": "column_stone",
+      "tile": true,
+      "prompt": "clustered column shafts in pale stone"
+    },
+    {
+      "id": "capital",
+      "tile": false,
+      "prompt": "carved acanthus column capital"
+    },
+    {
+      "id": "arch_voussoir",
+      "tile": false,
+      "prompt": "round arch of stone voussoirs"
+    },
+    {
+      "id": "white_plaster",
+      "tile": true,
+      "prompt": "white lime plaster wall"
+    },
+    {
+      "id": "mural_plaster",
+      "tile": false,
+      "prompt": "faded medieval mural of an angel with flowers"
+    },
+    {
+      "id": "sooty_stone",
+      "tile": true,
+      "prompt": "stone blackened by candle soot"
+    },
+    {
+      "id": "oak_wainscot",
+      "tile": false,
+      "prompt": "oak wall panelling with a top rail"
+    },
+    {
+      "id": "tapestry",
+      "tile": false,
+      "prompt": "medieval millefleur tapestry with a unicorn"
+    }
+  ]
+}

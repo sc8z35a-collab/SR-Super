@@ -1,11 +1,14 @@
 import { Mesh } from './mesh.js';
-import { BASE, WIDTH, LENGTH, NAVE, WING, APSE, ENTRY, ENTRY_STEPS, FLOORS, ROOF_HEIGHT, ROOF_INDEX,
+import { BASE, WIDTH, LENGTH, NAVE, WING, APSE, ENTRY, ENTRY_STEPS, FLOORS, ROOF_HEIGHT, ROOF_INDEX, CRYPT, CRYPT_STAIR,
   UPPER_AISLE, UPPER_ROOM, HUT, HUT_STEP, inRoofHut, world, entryTop, buildingDistance } from './layout.js';
 import { CRAFT, decorateNave, decorateGallery, bridgeMoulding, chapterLibrary, bellChamber } from './ornament.js';
 import { SURFACE } from './surfaces.js';
 import { bellWinch, sanctuaryObjects, weatheredCrate, workshopObjects } from './furnishings.js';
 import { ground, coast, clamp, lerp } from './terrain.js';
 import { baptistery, marinersChapel, treasury, scriptorium, roofGarden, forecourt, roomName } from './chapels.js';
+import { crypt, cryptName } from './crypt.js';
+import { FABRIC } from './fabric.js';
+import { naveHangings, chapelCeilings, upperCeilings, gutterTrough, nicheAndScreen } from './chapels.js';
 
 const OAK=4, FLOOR=6, TRIM=9, LIGHT=11, BRONZE=22, LINEN=23;
 const GRANITE=25, MARBLE=26, DARK_MARBLE=27, COPPER=29, GILT=31;
@@ -32,7 +35,7 @@ function block(m,r,y0,y1,mat,shade=1){
 function solid(r,y0,y1){
   obstacles.push({...r,y0,y1});
 }
-const kit={block,solid};
+const kit={block,solid,deck:(...a)=>deck(...a),rail:(...a)=>rail(...a),flight:(...a)=>stairFlight(...a)};
 function deck(m,r,y,mat=FLOOR,deep=.33){
   box(m,r,y-deep,y,mat,.96);
   floors.push({...r,y});
@@ -88,8 +91,8 @@ function foundation(m){
   const tread=ENTRY.length/ENTRY_STEPS;
   for(let i=0;i<ENTRY_STEPS;i++){
     const a=ENTRY.edge+i*tread,b=a+tread,y=entryTop(mid(a,b));
-    box(m,rect(-ENTRY.half,ENTRY.half,a,b),y-1.08,y,SURFACE.tread,.92);
-    box(m,rect(-ENTRY.half-.05,ENTRY.half+.05,b-.092,b+.026),y-.094,y+.004,SURFACE.tread,1.08);
+    box(m,rect(-ENTRY.half,ENTRY.half,a,b),y-1.08,y,FABRIC.stoneSteps,.92);
+    box(m,rect(-ENTRY.half-.05,ENTRY.half+.05,b-.092,b+.026),y-.094,y+.004,FABRIC.stoneSteps,1.08);
     for(const side of [-1,1]){
       const x=side*(ENTRY.half+.13);
       block(m,rect(x-.14,x+.14,a-.008,b+.008),y-.36,y+.68,GRANITE,.87);
@@ -117,8 +120,10 @@ function pendant(m,x,y,z,size=1,chain=1.2){
 }
 
 function hall(m,decals){
-  const y=FLOORS[0];
-  deck(m,rect(-NAVE.x,NAVE.x,NAVE.back,NAVE.front-.72),y);
+  const y=FLOORS[0],cs=CRYPT_STAIR;
+  // The nave floor leaves an opening over the flight down to the crypt.
+  for(const r of [rect(-NAVE.x,NAVE.x,NAVE.back,cs.z0),rect(-NAVE.x,NAVE.x,cs.z1,NAVE.front-.72),
+    rect(-NAVE.x,cs.x0,cs.z0,cs.z1),rect(cs.x1,NAVE.x,cs.z0,cs.z1)])deck(m,r,y);
   deck(m,rect(-WING.x,-NAVE.x,WING.back,WING.front),y);
   deck(m,rect(NAVE.x,WING.x,WING.back,WING.front),y);
   deck(m,rect(-3.04*WIDTH,3.04*WIDTH,NAVE.front-.74,NAVE.front-.08),y);
@@ -176,6 +181,10 @@ function hall(m,decals){
   decorateNave(m,y,block);
   baptistery(m,kit);
   marinersChapel(m,kit);
+  naveHangings(m);
+  chapelCeilings(m,0);
+  nicheAndScreen(m,kit);
+  crypt(m,kit);
   for(const [x,z,w,d] of [[.05,15.7,5.5,6.7],[.05,5.3,5.1,5.9],[8.05,-3.79,7.6,5.4],[.85,-11.56,5.4,4.1],[1.39,-21.07,5.1,5]]){
     decals.quad([x-w*.5,y+.013,z+d*.4],[x+w*.5,y+.013,z+d*.21],
       [x+w*.44,y+.013,z-d*.55],[x-w*.56,y+.013,z-d*.30],3,.95);
@@ -188,9 +197,9 @@ function stairFlight(m,r,low,high,up){
   for(let i=1;i<=count;i++){
     const y=lerp(low,high,i/count);
     const z=r.z0+(up>0?i-1:count-i)*tread;
-    box(m,rect(r.x0,r.x1,z-.001,z+tread+.001),y-.29,y,SURFACE.tread,i%9===0?.88:1);
+    box(m,rect(r.x0,r.x1,z-.001,z+tread+.001),y-.29,y,FABRIC.stoneSteps,i%9===0?.88:1);
     const rim=up>0?z:z+tread;
-    box(m,rect(r.x0,r.x1,rim-.022,rim+.030),y-.052,y+.004,SURFACE.tread,1.12);
+    box(m,rect(r.x0,r.x1,rim-.022,rim+.030),y-.052,y+.004,FABRIC.stoneSteps,1.12);
   }
   for(const x of [r.x0,r.x1]){
     rail(m,[x,r.z0],[x,r.z1],up>0?low:high,up>0?high:low);
@@ -220,6 +229,7 @@ function gallery(m,index){
   if(index===1){
     treasury(m,kit);
     scriptorium(m,kit);
+    chapelCeilings(m,1);
   }
   guard(m,left,y,{west:[[wingLow,wingHigh]],east:bridgeRanges});
   guard(m,right,y,{east:[[wingLow,wingHigh]],west:bridgeRanges});
@@ -279,7 +289,7 @@ function upperRooms(m,index){
   const library=index===4;
   const room=UPPER_ROOM;
   deck(m,room,y,library?CRAFT.parquet:CRAFT.lichenSlate,.44);
-  aisleDeck(m,index,CRAFT.flags);
+  aisleDeck(m,index,FABRIC.terracottaTiles);
   const aisle=UPPER_AISLE;
   guard(m,aisle,y,{north:[connection],east:[[aisle.z0,aisle.z1]]});
   guard(m,room,y,{south:[connection],north:[[room.x0,room.x1]]});
@@ -288,6 +298,7 @@ function upperRooms(m,index){
     const hanger=library?y+2.73:y+2.92;
     pendant(m,x,hanger,z,.73,1.91);
   }
+  upperCeilings(m,index);
   if(library)chapterLibrary(m,y,block);
   else {
     bellChamber(m,y,block);
@@ -303,7 +314,7 @@ function hut(m,y){
   deck(m,inside,y+HUT_STEP,CRAFT.deck,.23);
   for(const wall of [rect(h.x0,h.x0+.19,h.z0,h.doorA),rect(h.x0,h.x0+.19,h.doorB,h.z1),
     rect(h.x1-.20,h.x1,h.z0,h.z1),rect(h.x0,h.x1,h.z0,h.z0+.20),rect(h.x0,h.x1,h.z1-.19,h.z1)]){
-    block(m,wall,y,y+2.52,CRAFT.fieldstone,.94);
+    block(m,wall,y,y+2.52,FABRIC.brickPeel,.94);
   }
   box(m,rect(h.x0,h.x0+.20,h.doorA,h.doorB),y+2.11,y+2.52,CRAFT.blackOak,.94);
   for(const [x,z] of [[h.x0,h.z0],[h.x0,h.z1],[h.x1,h.z0],[h.x1,h.z1],
@@ -313,7 +324,7 @@ function hut(m,y){
   box(m,rect(h.x0- .024,h.x0+.25,h.doorA,h.doorB),y,y+.074,CRAFT.deck,.93);
   const outerLeft=h.x0-.29,outerRight=h.x1+.29;
   for(const x of [outerLeft,outerRight]){
-    m.rod([x,y+2.405,rear-.024],[x,y+2.405,front+.045],.057,.057,SURFACE.lead,9,.97,0,true);
+    gutterTrough(m,[x,y+2.36,rear-.024],[x,y+2.36,front+.045],.075);
     const down=x<middle?h.x0-.10:h.x1+.10;
     m.rod([down,y+.11,front-.23],[down,y+2.28,front-.23],.029,.033,SURFACE.lead,9,1);
     m.rod([down,y+2.279,front-.23],[x,y+2.377,front-.23],.035,.039,SURFACE.lead,8,.97);
@@ -329,6 +340,9 @@ function hut(m,y){
   }
   for(const z of [h.z0+.005,h.z1-.005]){
     m.tri([h.x0,y+2.44,z],[h.x1,y+2.44,z],[middle,y+3.79,z],CRAFT.brick,.95);
+    // A louvred vent in each gable; the viewer outside sees u running to the right.
+    const out=z<(h.z0+h.z1)/2?-1:1, lx=out<0?[middle+.35,middle-.35]:[middle-.35,middle+.35], zz=z+out*.012;
+    m.quad([lx[0],y+2.62,zz],[lx[1],y+2.62,zz],[lx[1],y+3.2,zz],[lx[0],y+3.2,zz],FABRIC.louvre,1,[0,0,out],[[0,0],[1,0],[1,1],[0,1]]);
     m.rod([h.x0-.10,y+2.52,z],[middle,y+3.87,z],.052,.049,CRAFT.blackOak,5,.91);
     m.rod([middle,y+3.87,z],[h.x1+.10,y+2.52,z],.049,.052,CRAFT.blackOak,5,.91);
   }
@@ -367,6 +381,13 @@ function parapet(m,a,b,y){
   const z0=Math.min(a[1],b[1]),z1=Math.max(a[1],b[1]);
   const panel=flat?rect(x0,x1,z0-.151,z1+.151):rect(x0-.151,x1+.151,z0,z1);
   block(m,panel,y-.055,y+.82,CRAFT.fieldstone,.92);
+  // Battlement masonry dressed onto both faces of the panel (metre UVs, lower 80% of the picture).
+  for(const side of [-1,1]){
+    const off=.155*side;
+    const P=(t,h)=>flat?[lerp(x0,x1,t),h,(z0+z1)/2+off]:[(x0+x1)/2+off,h,lerp(z0,z1,t)];
+    m.quad(P(0,y-.05),P(1,y-.05),P(1,y+.815),P(0,y+.815),FABRIC.battlement,.96,undefined,
+      [[0,1/.42],[length,1/.42],[length,.2/.42],[0,.2/.42]]);
+  }
   const head=flat?rect(x0-.025,x1+.025,z0-.218,z1+.218):rect(x0-.218,x1+.218,z0-.025,z1+.025);
   box(m,head,y+.79,y+.93,CRAFT.flags,1.03);
   const count=Math.floor(length/1.04);
@@ -383,7 +404,7 @@ function parapet(m,a,b,y){
 
 function roofTerrace(m){
   const a=UPPER_AISLE,r=UPPER_ROOM,y=ROOF_HEIGHT;
-  deck(m,r,y,CRAFT.slate,.48);
+  deck(m,r,y,FABRIC.terraceSlabs,.48);
   aisleDeck(m,ROOF_INDEX,CRAFT.lichenSlate);
   parapet(m,[r.x0,r.z0],[r.x1,r.z0],y);
   parapet(m,[r.x1,r.z0],[r.x1,r.z1],y);
@@ -415,7 +436,13 @@ export function buildWalkways(){
   return {walkExterior,roofExterior,walkFloors,decals};
 }
 
+export const CRYPT_LEVEL=-1;
+// The crypt is not a storey of FLOORS: its walkers keep floor 0 and are told apart by height.
+export function levelOf(actor){
+  return actor.interior&&actor.y<FLOORS[0]-.21?CRYPT_LEVEL:actor.floor;
+}
 export function visitFloor(index,atEntrance=false){
+  if(index===CRYPT_LEVEL)return {x:-9.6,z:17.3,y:CRYPT.y,interior:true,floor:0};
   const y=FLOORS[index];
   if(index===0&&atEntrance)return {x:0,z:NAVE.front+1.74,y:entryTop(NAVE.front+1.74),interior:false,floor:0};
   if(index===0)return {x:0,z:24.9,y,interior:true,floor:0};
@@ -482,6 +509,7 @@ export function locationName(actor){
   if(actor.floor===ROOF_INDEX && actor.y>=ROOF_HEIGHT-.057)
     return actor.interior?'屋上 · 管理小屋':roomName(ROOF_INDEX,actor.x,actor.z)??names[ROOF_INDEX];
   if(!actor.interior)return roomName(0,actor.x,actor.z,true)??'島の外周';
+  if(levelOf(actor)===CRYPT_LEVEL)return actor.y>CRYPT.y+.21?'1階 ↔ 地下 · 階段':cryptName(actor.z);
   if(Math.abs(actor.y-FLOORS[actor.floor])>.21){
     const level=Math.max(0,FLOORS.findLastIndex(y=>y<=actor.y));
     return level===ROOF_INDEX-1?'6階 ↔ 屋上 · 階段':`${level+1}階 ↔ ${level+2}階 · 階段`;

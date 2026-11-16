@@ -1,0 +1,51 @@
+{
+  "sheet": "terrain-c-meadow",
+  "theme": "sheltered meadows and damp ground on a small Atlantic island, photographed straight down from above",
+  "tiles": [
+    {
+      "id": "clover",
+      "tile": true,
+      "prompt": "dense green clover lawn with a few white clover flowers"
+    },
+    {
+      "id": "dandelion_grass",
+      "tile": true,
+      "prompt": "grass with dandelion rosettes, yellow flowers and seed heads"
+    },
+    {
+      "id": "bracken",
+      "tile": true,
+      "prompt": "dense green bracken fern fronds"
+    },
+    {
+      "id": "gorse",
+      "tile": true,
+      "prompt": "yellow-flowering gorse bushes"
+    },
+    {
+      "id": "wild_thyme",
+      "tile": true,
+      "prompt": "a low mat of wild thyme with small purple flowers"
+    },
+    {
+      "id": "tall_grass",
+      "tile": true,
+      "prompt": "long green grass with seed heads"
+    },
+    {
+      "id": "leaf_litter",
+      "tile": true,
+      "prompt": "brown fallen oak leaves covering the ground"
+    },
+    {
+      "id": "root_soil",
+      "tile": true,
+      "prompt": "bare brown soil with exposed tree roots"
+    },
+    {
+      "id": "mud",
+      "tile": true,
+      "prompt": "wet churned brown mud with small puddles"
+    }
+  ]
+}

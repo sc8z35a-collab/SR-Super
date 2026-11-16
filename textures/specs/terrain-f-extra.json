@@ -1,0 +1,51 @@
+{
+  "sheet": "terrain-f-extra",
+  "theme": "more ground for a small Atlantic island",
+  "tiles": [
+    {
+      "id": "stony_grass",
+      "tile": true,
+      "prompt": "grass with scattered stones"
+    },
+    {
+      "id": "wet_grass",
+      "tile": true,
+      "prompt": "rain-soaked grass with puddles"
+    },
+    {
+      "id": "rubble",
+      "tile": true,
+      "prompt": "broken stone rubble"
+    },
+    {
+      "id": "mossy_boulders",
+      "tile": true,
+      "prompt": "moss-covered boulders"
+    },
+    {
+      "id": "guano_rock",
+      "tile": true,
+      "prompt": "rock streaked white by seabird droppings"
+    },
+    {
+      "id": "smooth_rock",
+      "tile": true,
+      "prompt": "tide-polished rounded rock"
+    },
+    {
+      "id": "lava_rock",
+      "tile": true,
+      "prompt": "black porous lava rock"
+    },
+    {
+      "id": "red_clay",
+      "tile": true,
+      "prompt": "red clay cliff face"
+    },
+    {
+      "id": "cave_rock",
+      "tile": true,
+      "prompt": "dark wet sea-cave rock"
+    }
+  ]
+}
