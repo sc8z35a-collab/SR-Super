@@ -19,7 +19,10 @@ function plane(x, z, dx, dz) {
   return (u, y, n = 0) => [x + dx * u - dz * n, y, z + dz * u + dx * n];
 }
 
-function arch(r, spring, rise, segments = 12) {
+// Segments per side of a pointed arch. pointedWall picks one count per opening so that every
+// outline of the same opening has the same number of points.
+let archSegments = 12;
+function arch(r, spring, rise, segments = archSegments) {
   const off = r * .68;
   const circle = r + off;
   const end = Math.acos(off / circle);
@@ -84,6 +87,12 @@ function sillBox(m, p, w, low, high, front, rear, mat = TRIM, shade = 1) {
 }
 
 function pointedWall(m, p, w, low, high, thick, shape, tone = 1) {
+  const previous = archSegments;
+  archSegments = shape.r < .5 ? 5 : shape.r < 1.2 ? 7 : 10;
+  try { openingWall(m, p, w, low, high, thick, shape, tone); } finally { archSegments = previous; }
+}
+
+function openingWall(m, p, w, low, high, thick, shape, tone) {
   const { r, sill, spring, rise, kind } = shape;
   const base = outline(r, sill, spring, rise);
   const inner = outline(r * .91, sill, spring, rise * .94);

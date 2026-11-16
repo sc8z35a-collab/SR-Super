@@ -1,6 +1,7 @@
 // New rooms and objects dressed with the GPT Image 2.5 Sunburst decor atlas (decor.js).
 // All coordinates are building-local metres (x across, z along the nave, y above the base).
 import { DECOR as D } from './decor.js';
+import { roundSides } from './mesh.js';
 import { FABRIC } from './fabric.js';
 import { PROPS } from './props.js';
 import { SURFACE as S } from './surfaces.js';
@@ -32,6 +33,7 @@ function inside(r, x, z) { return x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.
 
 // Surface of revolution; profile is [[height, radius], ...]. UVs are metres (arc length, profile length).
 export function lathe(m, x, y, z, profile, mat, segs = 16, shade = 1, phase = 0) {
+  if (segs > 8) segs = roundSides(segs, Math.max(...profile.map(([, r]) => r)) * .6);
   let v = 0;
   for (let j = 0; j < profile.length - 1; j++) {
     const [h0, r0] = profile[j], [h1, r1] = profile[j + 1];

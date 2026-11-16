@@ -14,6 +14,7 @@ const TINT=CRAFT;
 const bounds=(x,z,w,d)=>({x0:x-w/2,x1:x+w/2,z0:z-d/2,z1:z+d/2});
 
 function bands(m,x,z,profile,material,tint,segments=24){
+  segments=Math.max(12,Math.round(segments*.67));
   for(let j=0;j<profile.length-1;j++){
     const [h,a]=profile[j], [h1,b]=profile[j+1];
     for(let i=0;i<segments;i++){

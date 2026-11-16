@@ -1,4 +1,4 @@
-// Layers of the terrain atlas (terrain-128.webp / terrain-384.webp), generated with GPT Image 2.5 Sunburst.
+// Layers of the terrain atlas (terrain-68.webp / terrain-172.webp), generated with GPT Image 2.5 Sunburst.
 // The order matches "layers" in textures/terrain-atlas.json.
 const NAMES = [
   'coastalGrass', 'thrift', 'heather', 'moss', 'dirtPath', 'sand', 'shingle', 'dryGrass', 'lichenTop',

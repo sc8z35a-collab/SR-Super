@@ -10,6 +10,17 @@ const faceNormal = (a, b, c) => normal(cross(sub(b, a), sub(c, a)));
 const UV_TRI = [[0, 0], [1, 0], [1, 1]];
 const UV_QUAD = [[0, 0], [1, 0], [1, 1], [0, 1]];
 
+// Level of detail: round things get only as many sides as their size needs on screen.
+// The textures carry the surface detail, so thin rods and small turnings stay cheap.
+export function roundSides(sides, radius) {
+  if (radius < .025) return Math.min(sides, 3);
+  if (radius < .05) return Math.min(sides, 4);
+  if (radius < .1) return Math.min(sides, 5);
+  if (radius < .25) return Math.min(sides, 6);
+  if (radius < .6) return Math.min(sides, 10);
+  return Math.max(10, Math.min(sides, Math.ceil(sides * .75)));
+}
+
 export class Mesh {
   values = [];
 
@@ -41,6 +52,8 @@ export class Mesh {
 
   beveledBox(x,y,z,w,h,d,edge,material,shade=1) {
     const q=Math.min(edge,h*.42,w*.42,d*.42);
+    // A bevel smaller than a few centimetres, or on a small block, is not worth 52 extra triangles.
+    if(q<.012||Math.max(w,h,d)<.45)return this.box(x,y,z,w,h,d,material,shade);
     const rings=[
       [-h*.5,w*.5-q,d*.5-q],[-h*.5+q,w*.5,d*.5],
       [h*.5-q,w*.5,d*.5],[h*.5,w*.5-q,d*.5-q]
@@ -58,6 +71,7 @@ export class Mesh {
   }
 
   rod(a, b, ra, rb, material, sides = 8, shade = 1, phase = 0, caps = false) {
+    sides = roundSides(sides, Math.max(ra, rb));
     const line = normal(sub(b, a));
     const helper = Math.abs(line[1]) > .95 ? [0, 0, 1] : [0, 1, 0];
     const u = normal(cross(line, helper));

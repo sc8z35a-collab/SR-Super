@@ -278,7 +278,7 @@ export class Renderer {
     const terrain = new Mesh();
     const plants = new Mesh();
     islandMesh(terrain, true);
-    meadow(plants, 2950);
+    meadow(plants, 1900);
     this.high = terrain.upload(this.gl);
     this.vegetation = plants.upload(this.gl);
   }
