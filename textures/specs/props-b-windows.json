@@ -1,0 +1,51 @@
+{
+  "sheet": "props-b-windows",
+  "theme": "windows and glass of a Gothic cathedral",
+  "tiles": [
+    {
+      "id": "leaded_diamond",
+      "tile": true,
+      "prompt": "diamond leaded glass"
+    },
+    {
+      "id": "old_green_glass",
+      "tile": true,
+      "prompt": "old greenish crown glass"
+    },
+    {
+      "id": "saint_glass",
+      "tile": false,
+      "prompt": "stained glass of a bishop saint"
+    },
+    {
+      "id": "ship_glass",
+      "tile": false,
+      "prompt": "red stained glass of a ship"
+    },
+    {
+      "id": "rose_window",
+      "tile": false,
+      "prompt": "rose window"
+    },
+    {
+      "id": "geometric_glass",
+      "tile": false,
+      "prompt": "geometric stained glass"
+    },
+    {
+      "id": "rain_glass",
+      "tile": true,
+      "prompt": "rain on window glass"
+    },
+    {
+      "id": "cracked_glass",
+      "tile": true,
+      "prompt": "cracked glass"
+    },
+    {
+      "id": "tracery",
+      "tile": false,
+      "prompt": "stone window tracery"
+    }
+  ]
+}

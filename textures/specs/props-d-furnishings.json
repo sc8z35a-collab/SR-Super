@@ -1,0 +1,51 @@
+{
+  "sheet": "props-d-furnishings",
+  "theme": "church furnishings",
+  "tiles": [
+    {
+      "id": "pew_oak",
+      "tile": true,
+      "prompt": "dark oak pew wood"
+    },
+    {
+      "id": "kneeler_velvet",
+      "tile": false,
+      "prompt": "red velvet kneeler cushion"
+    },
+    {
+      "id": "green_vestment",
+      "tile": false,
+      "prompt": "green vestment with a gold cross"
+    },
+    {
+      "id": "pulpit_carving",
+      "tile": false,
+      "prompt": "carved oak pulpit panel"
+    },
+    {
+      "id": "organ_pipes",
+      "tile": false,
+      "prompt": "organ pipes"
+    },
+    {
+      "id": "sheet_music",
+      "tile": false,
+      "prompt": "old sheet music"
+    },
+    {
+      "id": "hymnal_cover",
+      "tile": false,
+      "prompt": "leather hymnal cover with a gold cross"
+    },
+    {
+      "id": "alms_box",
+      "tile": false,
+      "prompt": "iron-banded oak alms box"
+    },
+    {
+      "id": "stoup_marble",
+      "tile": false,
+      "prompt": "marble holy water stoup rim"
+    }
+  ]
+}

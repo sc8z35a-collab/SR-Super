@@ -1,0 +1,51 @@
+{
+  "sheet": "props-e-island",
+  "theme": "small props on a windswept island",
+  "tiles": [
+    {
+      "id": "old_fence",
+      "tile": false,
+      "prompt": "weathered wooden fence"
+    },
+    {
+      "id": "gravestone",
+      "tile": false,
+      "prompt": "mossy gravestone"
+    },
+    {
+      "id": "celtic_cross",
+      "tile": false,
+      "prompt": "carved Celtic cross"
+    },
+    {
+      "id": "red_boat",
+      "tile": true,
+      "prompt": "red painted boat planks"
+    },
+    {
+      "id": "bollard",
+      "tile": false,
+      "prompt": "rusty iron mooring bollard"
+    },
+    {
+      "id": "lighthouse_stripe",
+      "tile": true,
+      "prompt": "black and white lighthouse stripes"
+    },
+    {
+      "id": "stone_trough",
+      "tile": false,
+      "prompt": "stone water trough from above"
+    },
+    {
+      "id": "hay",
+      "tile": true,
+      "prompt": "loose hay"
+    },
+    {
+      "id": "log_pile",
+      "tile": true,
+      "prompt": "stacked firewood log ends"
+    }
+  ]
+}

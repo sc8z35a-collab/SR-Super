@@ -1,4 +1,4 @@
-// The cathedral's own stonework, floors, ceilings and roofs (fabric-128.webp / fabric-256.webp).
+// The cathedral's own stonework, floors, ceilings and roofs (fabric-68.webp / fabric-136.webp).
 // Order matches "layers" in textures/fabric-atlas.json. Meshes may use FABRIC.<name> as a material
 // (IDs from FABRIC_START), and the shader also dresses the older procedural materials with these layers.
 export const FABRIC_START = 177;

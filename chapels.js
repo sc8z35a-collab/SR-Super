@@ -1,7 +1,9 @@
 // New rooms and objects dressed with the GPT Image 2.5 Sunburst decor atlas (decor.js).
 // All coordinates are building-local metres (x across, z along the nave, y above the base).
 import { DECOR as D } from './decor.js';
+import { roundSides } from './mesh.js';
 import { FABRIC } from './fabric.js';
+import { PROPS } from './props.js';
 import { SURFACE as S } from './surfaces.js';
 import { CRAFT as C } from './ornament.js';
 import { FLOORS, ROOF_HEIGHT, BASE, world } from './layout.js';
@@ -31,6 +33,7 @@ function inside(r, x, z) { return x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.
 
 // Surface of revolution; profile is [[height, radius], ...]. UVs are metres (arc length, profile length).
 export function lathe(m, x, y, z, profile, mat, segs = 16, shade = 1, phase = 0) {
+  if (segs > 8) segs = roundSides(segs, Math.max(...profile.map(([, r]) => r)) * .6);
   let v = 0;
   for (let j = 0; j < profile.length - 1; j++) {
     const [h0, r0] = profile[j], [h1, r1] = profile[j + 1];
@@ -85,7 +88,7 @@ export function crossMark(m, x, y, z, size, mat, alongX = true) {
 }
 
 // A double-ended clinker boat. Length runs along z.
-function boat(m, x, y, z, L, B, D, shell, lining, trim) {
+export function boat(m, x, y, z, L, B, D, shell, lining, trim) {
   const N = 16, K = 7;
   const point = (t, f, side, inset = 0) => {
     const s = Math.sin(Math.PI * t);
@@ -387,12 +390,12 @@ function casket(m, x, y, z, w, d, h) {
 function chest(m, x, y, z, w, d, h, open, kit) {
   kit.block(m, around(x, z, w, d), y, y + h, D.bandedOak, .96);
   for (const t of [-.32, .32]) {
-    m.box(x + t * w, y + h / 2, z, .05, h + .012, d + .012, D.wroughtIron, 1);
+    m.box(x + t * w, y + h / 2, z, .06, h + .012, d + .012, PROPS.rivetBand, 1);
   }
   m.box(x, y + h * .78, z + d / 2 + .008, .12, .14, .012, D.wroughtIron, 1.04);
   if (!open) {
     m.beveledBox(x, y + h + .06, z, w + .03, .12, d + .03, .03, D.bandedOak, 1);
-    for (const t of [-.32, .32]) m.box(x + t * w, y + h + .06, z, .05, .132, d + .04, D.wroughtIron, 1);
+    for (const t of [-.32, .32]) m.box(x + t * w, y + h + .06, z, .06, .132, d + .04, PROPS.rivetBand, 1);
     return;
   }
   const back = z - d / 2, lidH = .1;
@@ -667,6 +670,7 @@ export function forecourt(m, kit) {
   }
   well(m, wx, wz, kit);
   gatehouse(m, kit);
+  islandProps(m, kit);
   islandWalls(m, kit);
   for (const [x, z] of [[-2.25, 36.6], [2.25, 36.0], [-1.9, 39.6], [2.15, 40.1]]) {
     const y = groundAt(x, z) - .04;
@@ -813,4 +817,188 @@ export function nicheAndScreen(m, kit) {
   for (const z of [z0, z1]) m.rod([sx, y1, z], [sx, y1 + 2.3, z], .04, .04, FABRIC.studdedDoor, 6, .9);
   m.rod([sx, y1 + 2.3, z0], [sx, y1 + 2.3, z1], .04, .04, FABRIC.studdedDoor, 6, .9);
   kit.solid(rect(sx - .08, sx + .08, z0, z1), y1, y1 + 2.3);
+}
+
+// ---------------------------------------------------------------- church furnishings (props atlas)
+
+// An eight-sided carved pulpit on a stem, with a sounding board above.
+function pulpit(m, kit, x, z) {
+  const y = FLOORS[0], r = .62, bowl = y + 1.15, top = y + 2.25;
+  lathe(m, x, y, z, [[0, .42], [.12, .36], [.2, .16], [1.05, .14], [bowl - y, r * .7]], PROPS.pewOak, 8, .95, Math.PI / 8);
+  for (let i = 0; i < 8; i++) {
+    const a0 = (i - .5) / 8 * TAU, a1 = (i + .5) / 8 * TAU;
+    const p = (a, h) => [x + Math.cos(a) * r, h, z + Math.sin(a) * r];
+    m.quad(p(a1, bowl), p(a0, bowl), p(a0, top), p(a1, top), PROPS.pulpitCarving, 1, undefined, [[0, 0], [1, 0], [1, 1], [0, 1]]);
+  }
+  disc(m, x, bowl, z, r, PROPS.pewOak, 8, .9, Math.PI / 8);
+  lathe(m, x, top, z, [[0, r + .04], [.08, r + .06]], PROPS.pewOak, 8, 1, Math.PI / 8);
+  m.rod([x - r * .9, y + 1.0, z], [x - r * .9, y + 4.4, z], .06, .05, PROPS.pewOak, 6, .95);
+  lathe(m, x, y + 4.3, z, [[0, .9], [.1, .95], [.22, .4], [.36, 0]], PROPS.pewOak, 8, .9, Math.PI / 8);
+  crossMark(m, x, y + 4.66, z, .3, PROPS.goldLeaf, false);
+  kit.solid(around(x, z, 1.5, 1.5), y, y + 2.4);
+}
+
+function organ(m, kit) {
+  const y = FLOORS[0], x0 = 10.35, x1 = 11.26, z0 = 21.0, z1 = 24.0;
+  kit.block(m, rect(x0, x1, z0, z1), y, y + 1.2, PROPS.pewOak, .9);
+  slab(m, rect(x0 + .25, x1, z0, z1), y + 1.2, y + 4.7, PROPS.pewOak, .85);
+  // Two tiers of pipes facing the nave, framed in carved oak.
+  const face = x0 + .24;
+  for (const [a, b, lo, hi] of [[z0 + .1, z1 - .1, y + 1.25, y + 3.25], [z0 + .55, z1 - .55, y + 3.3, y + 4.6]]) {
+    m.quad([face, lo, b], [face, lo, a], [face, hi, a], [face, hi, b], PROPS.organPipes, 1, [-1, 0, 0], [[0, 0], [1, 0], [1, 1], [0, 1]]);
+  }
+  m.beveledBox(x0 + .6, y + 4.78, (z0 + z1) / 2, .9, .2, z1 - z0 + .2, .04, PROPS.pewOak, 1);
+  m.beveledBox(x0 + .1, y + 1.22, (z0 + z1) / 2, .5, .08, z1 - z0, .02, PROPS.pewOak, 1);
+  m.quad([x0 - .005, y + .25, z1 - .2], [x0 - .005, y + .25, z0 + .2], [x0 - .005, y + 1.0, z0 + .2], [x0 - .005, y + 1.0, z1 - .2],
+    PROPS.pulpitCarving, 1, [-1, 0, 0], [[0, 0], [1, 0], [1, 1], [0, 1]]);
+  // A music stand and stool in front of the console.
+  const sx = 9.55, sz = 22.5;
+  m.rod([sx, y, sz], [sx, y + 1.05, sz], .025, .02, PROPS.castIron, 6, 1);
+  lathe(m, sx, y, sz, [[0, .2], [.04, .05]], PROPS.castIron, 8, 1);
+  const lo = [sx - .1, y + 1.0], hi = [sx + .06, y + 1.42];
+  m.quad([lo[0], lo[1], sz + .26], [lo[0], lo[1], sz - .26], [hi[0], hi[1], sz - .26], [hi[0], hi[1], sz + .26],
+    PROPS.sheetMusic, 1.05, undefined, [[0, 0], [1, 0], [1, 1], [0, 1]]);
+  lathe(m, 10.0, y, 22.5, [[0, .05], [.45, .05], [.47, .2], [.53, .2]], PROPS.pewOak, 10, .95);
+  kit.solid(around(sx, sz, .4, .6), y, y + 1.4);
+}
+
+function vestmentStand(m, kit, x, z) {
+  const y = FLOORS[0];
+  lathe(m, x, y, z, [[0, .3], [.06, .28], [.1, .05]], PROPS.pewOak, 10, .95);
+  m.rod([x, y + .1, z], [x, y + 1.85, z], .035, .03, PROPS.pewOak, 6, 1);
+  m.rod([x - .55, y + 1.8, z], [x + .55, y + 1.8, z], .03, .03, PROPS.brass, 6, 1);
+  for (const side of [-1, 1]) {
+    const zz = z + side * .02, a = x - side * .5, b = x + side * .5;
+    m.quad([a, y + .55, zz], [b, y + .55, zz], [b, y + 1.78, zz], [a, y + 1.78, zz], PROPS.greenVestment, 1, [0, 0, side],
+      [[0, 0], [1, 0], [1, 1], [0, 1]]);
+  }
+  kit.solid(around(x, z, 1.1, .5), y, y + 1.9);
+}
+
+function stoup(m, kit, x, z) {
+  const y = FLOORS[0];
+  lathe(m, x, y, z, [[0, .26], [.1, .22], [.16, .09], [.78, .08], [.86, .26], [.98, .32], [1.02, .3], [.94, .26]], PROPS.stoupMarble, 16, 1);
+  disc(m, x, y + .955, z, .27, D.fontWater, 16, 1);
+  kit.solid(around(x, z, .64, .64), y, y + 1.05);
+}
+
+function almsBox(m, kit, x, z) {
+  const y = FLOORS[0];
+  m.beveledBox(x, y + .45, z, .16, .9, .16, .02, PROPS.pewOak, .95);
+  m.box(x, y + 1.08, z, .42, .36, .34, PROPS.almsBox, 1);
+  m.box(x, y + 1.265, z, .1, .012, .02, PROPS.castIron, .6);
+  kit.solid(around(x, z, .45, .4), y, y + 1.3);
+}
+
+export function churchFurnishings(m, kit) {
+  const y = FLOORS[0];
+  pulpit(m, kit, -4.65, -7.9);
+  vestmentStand(m, kit, 4.9, -8.0);
+  organ(m, kit);
+  for (const x of [-2.2, 2.2]) stoup(m, kit, x, 28.55);
+  almsBox(m, kit, -2.75, 26.6);
+  // Hymnals left on the end of every other pew.
+  for (const side of [-1, 1]) {
+    for (let j = 0; j < 12; j += 2) {
+      const x = side * (4.63 - side * 1.55), z = 22.65 - j * 1.74;
+      m.box(x, y + .535, z - .05, .16, .045, .22, PROPS.pewOak, .7);
+      floorQuad(m, x - .08, x + .08, z - .16, z + .06, y + .5585, PROPS.hymnalCover, 1, [[1, 0], [1, 1], [0, 1], [0, 0]]);
+    }
+  }
+}
+
+// ---------------------------------------------------------------- island props (props atlas)
+
+function gravestone(m, kit, x, z, w = .62, h = .9, mat = PROPS.gravestone) {
+  const g = groundAt(x, z) - .05, t = .12;
+  m.box(x, g + h / 2, z, w, h, t, D.limestone, .9);
+  for (const side of [-1, 1]) picture(m, x, z + side * (t / 2 + .004), g, g + h, w, [0, side], mat);
+  kit.solid(around(x, z, w, .3), g, g + h);
+}
+
+function fenceRun(m, kit, a, b) {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.round(len / 1.4));
+  for (let i = 0; i < n; i++) {
+    const p = [lerp(a[0], b[0], i / n), lerp(a[1], b[1], i / n)], q = [lerp(a[0], b[0], (i + 1) / n), lerp(a[1], b[1], (i + 1) / n)];
+    const gp = groundAt(...p) - .05, gq = groundAt(...q) - .05;
+    for (const face of [p, q].length ? [1, -1] : []) {
+      const A = face > 0 ? p : q, B = face > 0 ? q : p, gA = face > 0 ? gp : gq, gB = face > 0 ? gq : gp;
+      const off = face * .01, dx = (B[0] - A[0]) / len * n, dz = (B[1] - A[1]) / len * n;
+      m.quad([A[0] - dz * off, gA, A[1] + dx * off], [B[0] - dz * off, gB, B[1] + dx * off],
+        [B[0] - dz * off, gB + 1.05, B[1] + dx * off], [A[0] - dz * off, gA + 1.05, A[1] + dx * off],
+        PROPS.oldFence, 1, undefined, [[0, 0], [1, 0], [1, 1], [0, 1]]);
+    }
+    m.rod([p[0], gp, p[1]], [p[0], gp + 1.12, p[1]], .05, .045, D.driftwood, 5, .9);
+  }
+  m.rod([b[0], groundAt(...b) - .05, b[1]], [b[0], groundAt(...b) + 1.07, b[1]], .05, .045, D.driftwood, 5, .9);
+  kit.solid({ segment: undefined, x0: Math.min(a[0], b[0]) - .05, x1: Math.max(a[0], b[0]) + .05, z0: Math.min(a[1], b[1]) - .05, z1: Math.max(a[1], b[1]) + .05 },
+    Math.min(groundAt(...a), groundAt(...b)) - .2, Math.max(groundAt(...a), groundAt(...b)) + 1.1);
+}
+
+function graveyard(m, kit) {
+  const x0 = -18.6, x1 = -13.8, z0 = 20.1, z1 = 25.6;
+  fenceRun(m, kit, [x0, z0], [x0, z1]);
+  fenceRun(m, kit, [x0, z1], [x1, z1]);
+  fenceRun(m, kit, [x0, z0], [-17.0, z0]);
+  fenceRun(m, kit, [-15.4, z0], [x1, z0]);
+  const rng = random(905);
+  for (const z of [21.4, 22.9, 24.4]) {
+    for (const x of [-17.95, -16.4, -14.85]) {
+      // Keep a path from the gate up the middle to the cross.
+      if (x === -16.4 && z < 24) continue;
+      gravestone(m, kit, x + (rng() - .5) * .2, z + (rng() - .5) * .15, .5 + rng() * .2, .7 + rng() * .3);
+    }
+  }
+  gravestone(m, kit, -16.4, 22.9, .95, 1.75, PROPS.celticCross);
+}
+
+function lighthouse(m, kit, x, z) {
+  const g = groundAt(x, z) - .3, h = 6.2;
+  lathe(m, x, g, z, [[0, 1.25], [.6, 1.2], [h, .92]], PROPS.lighthouseStripe, 24, 1);
+  lathe(m, x, g + h, z, [[0, 1.12], [.12, 1.12], [.12, .7]], PROPS.castIron, 24, .9);
+  lathe(m, x, g + h + .12, z, [[0, .62], [.9, .62]], D.lanternGlass, 16, 1);
+  for (let i = 0; i < 8; i++) {
+    const a = i / 8 * TAU;
+    m.rod([x + Math.cos(a) * .64, g + h + .12, z + Math.sin(a) * .64], [x + Math.cos(a) * .64, g + h + 1.02, z + Math.sin(a) * .64], .025, .025, PROPS.castIron, 4, 1);
+    m.rod([x + Math.cos(a) * 1.1, g + h + .12, z + Math.sin(a) * 1.1], [x + Math.cos(a) * 1.1, g + h + .62, z + Math.sin(a) * 1.1], .02, .02, PROPS.castIron, 4, 1);
+  }
+  lathe(m, x, g + h + 1.02, z, [[0, .78], [.45, .25], [.62, .05]], PROPS.copperSheet, 16, 1);
+  m.rod([x, g + h + 1.6, z], [x, g + h + 1.95, z], .03, .005, PROPS.castIron, 6, 1);
+  picture(m, x - 1.235, z, groundAt(x - 1.24, z) - .02, groundAt(x - 1.24, z) + 1.9, .85, [-1, 0], FABRIC.studdedDoor);
+  kit.solid(around(x, z, 2.5, 2.5), g, g + h + 1.2);
+}
+
+function bollard(m, kit, x, z) {
+  const g = groundAt(x, z) - .05;
+  m.box(x, g + .04, z, .5, .1, .5, PROPS.rivetBand, 1);
+  lathe(m, x, g + .09, z, [[0, .17], [.32, .13], [.4, .2], [.5, .2], [.55, 0]], PROPS.bollard, 14, 1);
+  kit.solid(around(x, z, .5, .5), g, g + .6);
+}
+
+export function islandProps(m, kit) {
+  graveyard(m, kit);
+  lighthouse(m, kit, 16.0, 24.4);
+  // A red rowing boat drawn up above the east shore, tied to a bollard.
+  const bx = 18.05, bz = 24.3, by = Math.max(groundAt(bx, bz - 1.2), groundAt(bx, bz + 1.2), groundAt(bx, bz)) - .05;
+  boat(m, bx, by, bz, 3.0, 1.05, .45, PROPS.redBoat, D.driftwood, D.bandedOak);
+  kit.solid(around(bx, bz, 1.1, 3.1), by, by + .8);
+  bollard(m, kit, 17.8, 21.6);
+  let last;
+  for (let i = 0; i <= 10; i++) {
+    const t = i / 10, p = [lerp(17.8, bx, t), lerp(groundAt(17.8, 21.6) + .45, by + .55, t) - .25 * Math.sin(Math.PI * t), lerp(21.6, bz - 1.45, t)];
+    if (last) m.rod(last, p, .018, .018, S.rope, 5, .9);
+    last = p;
+  }
+  // Water trough, hay and firewood about the lodge.
+  const tx = 9.3, tz = 36.4, tg = groundAt(tx, tz) - .05;
+  m.box(tx, tg + .3, tz, 1.3, .6, .62, D.limestone, .92);
+  floorQuad(m, tx - .65, tx + .65, tz - .31, tz + .31, tg + .604, PROPS.stoneTrough, 1, [[0, 0], [0, 1], [1, 1], [1, 0]]);
+  kit.solid(around(tx, tz, 1.3, .62), tg, tg + .6);
+  const hx = 9.4, hz = 38.3, hg = groundAt(hx, hz) - .1;
+  lathe(m, hx, hg, hz, [[0, .95], [.35, .9], [.7, .65], [.95, .3], [1.05, 0]], PROPS.hay, 14, 1);
+  kit.solid(around(hx, hz, 1.6, 1.6), hg, hg + 1.0);
+  const lg = Math.min(groundAt(7.0, 34.95), groundAt(8.6, 34.95)) - .05;
+  m.box(7.8, lg + .45, 34.95, 1.6, .9, .55, PROPS.logPile, 1);
+  m.box(7.8, lg + .93, 34.95, 1.7, .06, .65, PROPS.redBoat, .7);
+  kit.solid(rect(7.0, 8.6, 34.67, 35.23), lg, lg + 1.0);
 }

@@ -1,4 +1,4 @@
-import { Renderer } from './renderer.js';
+import { Renderer, reach } from './renderer.js';
 import { add, sub, normal } from './mesh.js';
 import { clamp, ground, lerp } from './terrain.js';
 import { BASE, ROOF_INDEX, world, worldNormal } from './layout.js';
@@ -7,6 +7,7 @@ import { SURFACE_LAYERS } from './surfaces.js';
 import { DECOR_LAYERS } from './decor.js';
 import { TERRAIN_LAYERS } from './landcover.js';
 import { FABRIC_LAYERS } from './fabric.js';
+import { PROPS_LAYERS } from './props.js';
 
 const el = id => document.getElementById(id);
 const canvas = el('scene');
@@ -41,19 +42,25 @@ let stride=0;
 let lastSimulation=0;
 let displayedLocation='';
 const qualityCopy = [
-  '簡易描画・人物の動きを停止。最大20 fps。',
-  '簡易地形・波と質感の負荷を抑制。最大24 fps。',
-  '高精細の石材・装飾・影・光芒を描画。最大30 fps。'
+  '簡易描画・人物の動きを停止。',
+  '簡易地形・波と質感の負荷を抑制。',
+  '高精細の石材・装飾・影・光芒を描画。'
 ];
+const RESOLUTIONS = { 240: '240p', 320: '320p', 400: '400p', 1080: 'FHD', 1440: '2K', 2160: '4K' };
+const FRAME_RATES = [30, 60, 120, 0];
 
 function preferences() {
-  const defaults = { resolution: 400, quality: 2, motion: !reducedMotion.matches };
+  const defaults = { resolution: 400, quality: 2, motion: !reducedMotion.matches, fps: 30, reflection: false, hdr: false, range: 7 };
   try {
     const saved = JSON.parse(localStorage.getItem('tidal-cathedral-display')) || {};
     return {
-      resolution: [400, 320, 240].includes(saved.resolution) ? saved.resolution : defaults.resolution,
+      resolution: saved.resolution in RESOLUTIONS ? Number(saved.resolution) : defaults.resolution,
       quality: [0, 1, 2].includes(saved.quality) ? saved.quality : defaults.quality,
-      motion: typeof saved.motion === 'boolean' ? saved.motion : defaults.motion
+      motion: typeof saved.motion === 'boolean' ? saved.motion : defaults.motion,
+      fps: FRAME_RATES.includes(saved.fps) ? saved.fps : defaults.fps,
+      reflection: typeof saved.reflection === 'boolean' ? saved.reflection : defaults.reflection,
+      hdr: typeof saved.hdr === 'boolean' ? saved.hdr : defaults.hdr,
+      range: Number.isInteger(saved.range) && saved.range >= 1 && saved.range <= 10 ? saved.range : defaults.range
     };
   } catch {
     return defaults;
@@ -76,12 +83,13 @@ let personTime = 0;
 let lastFrameInterior = false;
 let atlasRequest=0,atlasSizes={};
 const layerGroups=[
-  {name:'materials',sizes:[128,384],layers:40,cols:8,method:'installMaterials'},
-  {name:'craft',sizes:[112,288],layers:36,cols:6,method:'installCraft'},
-  {name:'surfaces',sizes:[96,256],layers:SURFACE_LAYERS,cols:6,method:'installSurfaces'},
-  {name:'decor',sizes:[96,256],layers:DECOR_LAYERS,cols:6,method:'installDecor'},
-  {name:'terrain',sizes:[128,320],layers:TERRAIN_LAYERS,cols:6,method:'installTerrain'},
-  {name:'fabric',sizes:[128,256],layers:FABRIC_LAYERS,cols:6,method:'installFabric'}
+  {name:'materials',sizes:[68,204],layers:40,cols:8,method:'installMaterials'},
+  {name:'craft',sizes:[46,118],layers:36,cols:6,method:'installCraft'},
+  {name:'surfaces',sizes:[40,104],layers:SURFACE_LAYERS,cols:6,method:'installSurfaces'},
+  {name:'decor',sizes:[52,136],layers:DECOR_LAYERS,cols:6,method:'installDecor'},
+  {name:'terrain',sizes:[68,172],layers:TERRAIN_LAYERS,cols:6,method:'installTerrain'},
+  {name:'fabric',sizes:[68,136],layers:FABRIC_LAYERS,cols:6,method:'installFabric'},
+  {name:'props',sizes:[68,136],layers:PROPS_LAYERS,cols:6,method:'installProps'}
 ];
 async function imagePixels(name,depth,columns=depth) {
   try {
@@ -136,7 +144,9 @@ function size() {
   if (!renderer || !active) return;
   const { width: w, height: h } = canvas.getBoundingClientRect();
   if (!h || !w) return;
-  const height = options.resolution;
+  // FHD / 2K / 4K are render heights; the GPU's largest framebuffer caps both sides.
+  const scale = Math.min(1, renderer.maxSize / options.resolution, renderer.maxSize / (w / h * options.resolution));
+  const height = Math.max(1, Math.round(options.resolution * scale));
   const width = Math.max(1, Math.round(w / h * height));
   if (renderer.canvas.width !== width || renderer.canvas.height !== height) renderer.dimensions(width, height);
   invalidate();
@@ -178,6 +188,7 @@ function initialize() {
         });
       }
       setUI(true);
+      updateOptions();
       size();
     } catch (error) {
       const unsupported = error.message === 'WebGL 2 is unavailable.';
@@ -327,7 +338,7 @@ function movement(){
 }
 function walk(dt,[x,z]){
   if(x||z){
-    const scale=(walker.interior?3.48:3.03)*dt;
+    const scale=(walker.interior?5.9:5.4)*dt;
     const s=Math.sin(look.yaw),c=Math.cos(look.yaw);
     const dx=(c*x+s*z)*scale,dz=(s*x-c*z)*scale;
     const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.085));
@@ -399,11 +410,11 @@ function draw(now){
     if(inside!==lastFrameInterior)personTime=0;
     else if(moving)personTime+=step;
     lastFrameInterior=inside;
-    const period=1000/Renderer.fps(options.quality);
+    const period=options.fps?1000/options.fps:0;
     nextFrameAt=Math.max(now+period*.65,(nextFrameAt||now)+period);
     lastDrawAt=animated?now:0;
     dirty=false;
-    renderer.render(pose(),options.quality,waterTime,personTime,moving);
+    renderer.render(pose(),options.quality,waterTime,personTime,moving,options);
     el('loading').hidden=true;
   }
   if(animated||animation||dirty||isWalking)schedule();
@@ -503,8 +514,18 @@ function updateOptions() {
   document.querySelector(`input[name="resolution"][value="${options.resolution}"]`).checked = true;
   document.querySelector(`input[name="quality"][value="${options.quality}"]`).checked = true;
   el('motion').checked = options.motion;
-  el('resolution-label').textContent = `${options.resolution}p`;
+  document.querySelector(`input[name="fps"][value="${options.fps}"]`).checked = true;
+  document.querySelector(`input[name="reflection"][value="${Number(options.reflection)}"]`).checked = true;
+  el('hdr').checked = options.hdr;
+  el('range').value = options.range;
+  const near = reach(options.range);
+  el('range-detail').textContent = `${options.range} / 10 · 半径 ${Math.round(near.radius)} m · 上下 ${near.floors} 階`;
+  el('resolution-label').textContent = RESOLUTIONS[options.resolution];
   el('quality-detail').textContent = qualityCopy[options.quality];
+  if (renderer && !renderer.floatTargets) {
+    el('hdr').disabled = true;
+    el('hdr-detail').textContent = 'この端末のWebGLは浮動小数点の描画に対応していないため使えません。';
+  }
 }
 
 enter.addEventListener('click', openScene);
@@ -536,16 +557,23 @@ settings.addEventListener('click', event => {
   if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) settings.close();
 });
 el('settings-close').addEventListener('click', () => settings.close());
-settings.addEventListener('change', event => {
+function changeSetting(event) {
   const { name, id, value, checked } = event.target;
   if (name === 'resolution') options.resolution = Number(value);
   if(name==='quality'){options.quality=Number(value);loadAtlas();}
   if (id === 'motion') options.motion = checked;
+  if (name === 'fps') options.fps = Number(value);
+  if (name === 'reflection') options.reflection = value === '1';
+  if (id === 'hdr') options.hdr = checked;
+  if (id === 'range') options.range = Number(value);
   if (!options.motion) lastDrawAt = 0;
   try { localStorage.setItem('tidal-cathedral-display', JSON.stringify(options)); } catch {}
   updateOptions();
   size();
-});
+  invalidate();
+}
+settings.addEventListener('change', changeSetting);
+el('range').addEventListener('input', changeSetting);
 
 floorButton.addEventListener('click',()=>{
   stopInput();

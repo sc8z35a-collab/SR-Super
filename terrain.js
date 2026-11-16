@@ -133,8 +133,9 @@ export function coastMap() {
 }
 
 export function islandMesh(mesh, detailed) {
-  const cols = detailed ? 164 : 82;
-  const rows = detailed ? 116 : 60;
+  // The photographic land cover carries the small-scale detail, so the grid can stay coarse.
+  const cols = detailed ? 128 : 74;
+  const rows = detailed ? 90 : 54;
   const points = [];
   const normals = [];
   const rng = random(288);

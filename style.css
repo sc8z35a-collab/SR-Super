@@ -220,3 +220,11 @@ legend { font-size: 12px; color: var(--dim); margin-bottom: 5px; padding: 0; }
 .floor-dialog { width:min(380px,calc(100vw - 24px)); }
 .floor-grid { grid-template-columns:repeat(3,1fr); }
 .floor-roof { grid-column:1 / -1; }
+
+/* Settings: more options than fit a landscape phone, so the dialog scrolls. */
+#settings { max-height: calc(100dvh - 24px); overflow-y: auto; }
+.options.four { grid-template-columns: repeat(4,1fr); }
+.options.two { grid-template-columns: repeat(2,1fr); }
+.setting-note { margin: 5px 0 0; font-size: 11px; line-height: 1.4; color: var(--dim); }
+.range-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--dim); }
+.range-row input { flex: 1; min-height: 44px; accent-color: #e5ca9b; }

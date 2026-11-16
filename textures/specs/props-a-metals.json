@@ -1,0 +1,51 @@
+{
+  "sheet": "props-a-metals",
+  "theme": "metals of a seaside cathedral",
+  "tiles": [
+    {
+      "id": "bell_bronze",
+      "tile": true,
+      "prompt": "bell bronze with green patina and rings"
+    },
+    {
+      "id": "cast_iron",
+      "tile": true,
+      "prompt": "black cast iron"
+    },
+    {
+      "id": "polished_brass",
+      "tile": true,
+      "prompt": "polished brass"
+    },
+    {
+      "id": "copper_sheet",
+      "tile": true,
+      "prompt": "verdigris copper sheet"
+    },
+    {
+      "id": "gold_leaf",
+      "tile": true,
+      "prompt": "gold leaf"
+    },
+    {
+      "id": "rusty_chain",
+      "tile": true,
+      "prompt": "rusty iron chain"
+    },
+    {
+      "id": "scroll_iron",
+      "tile": true,
+      "prompt": "scrolled wrought iron ornament"
+    },
+    {
+      "id": "pewter",
+      "tile": true,
+      "prompt": "old pewter"
+    },
+    {
+      "id": "rivet_band",
+      "tile": true,
+      "prompt": "riveted iron straps"
+    }
+  ]
+}

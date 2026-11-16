@@ -1,13 +1,13 @@
 ---
 name: sunburst-textures
-description: Generate game textures for 潮岬の大聖堂 with OpenAI GPT Image 2.5 Sunburst (gpt-image-2.5-sunburst) at 1:1, maximum resolution and quality "xhigh". Each image is a 3x3 sheet, so one API call yields 9 textures; the script slices them, makes them seamless and packs them into the game's texture-array atlases (decor-96.webp / decor-256.webp). Use when the user asks to generate, add or replace textures/materials for this game, or mentions GPT Image / Sunburst / テクスチャ生成.
+description: Generate game textures for 潮岬の大聖堂 with OpenAI GPT Image 2.5 Sunburst (gpt-image-2.5-sunburst) at 1:1, maximum resolution and quality "xhigh". Each image is a 3x3 sheet, so one API call yields 9 textures; the script slices them, makes them seamless and packs them into the game's texture-array atlases (decor-52.webp / decor-136.webp). Use when the user asks to generate, add or replace textures/materials for this game, or mentions GPT Image / Sunburst / テクスチャ生成.
 ---
 
 # Sunburst テクスチャ生成スキル
 
 GPT Image 2.5 Sunburst で **1:1・最高画質（quality `xhigh`、reasoning effort `xhigh`）** の画像を生成し、
 1 枚を 3×3 に分割して **1 枚あたり 9 枚のテクスチャ** を作ります。生成したテクスチャはゲームの
-`decor` アトラス（`decor-96.webp` / `decor-256.webp`）にまとめられ、シェーダーから使われます。
+`decor` アトラス（`decor-52.webp` / `decor-136.webp`）にまとめられ、シェーダーから使われます。
 
 ## 前提
 
@@ -68,9 +68,9 @@ GPT Image 2.5 Sunburst で **1:1・最高画質（quality `xhigh`、reasoning ef
    python3 .claude/skills/sunburst-textures/scripts/sunburst.py pack textures/decor-atlas.json
    ```
 
-   `decor-96.webp`（軽量用）と `decor-256.webp`（高品質用）が書き出され、最後に `DECOR_FALLBACK` 配列が表示される。
-   地形は `textures/terrain-atlas.json`（`terrain-128.webp` / `terrain-320.webp`、層の名前は `landcover.js`）、
-   大聖堂の壁・床・天井・屋根は `textures/fabric-atlas.json`（`fabric-128.webp` / `fabric-256.webp`、`fabric.js`）で同じようにパックする。
+   `decor-52.webp`（軽量用）と `decor-136.webp`（高品質用）が書き出され、最後に `DECOR_FALLBACK` 配列が表示される。
+   地形は `textures/terrain-atlas.json`（`terrain-68.webp` / `terrain-172.webp`、層の名前は `landcover.js`）、
+   大聖堂の壁・床・天井・屋根は `textures/fabric-atlas.json`（`fabric-68.webp` / `fabric-136.webp`、`fabric.js`）で同じようにパックする。
 
 5. **ゲームに組み込む**
    - `decor.js`: `NAMES` に名前を追加（アトラスと同じ順）、`DECOR_SHADING` に `[1m あたりの繰り返し数（0 = 一枚絵、負 = メッシュ UV をメートルとして使う）, 粗さ, 明るさ]`、`DECOR_FALLBACK` に pack の出力を貼る。
