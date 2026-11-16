@@ -72,10 +72,10 @@ python3 -m http.server 8000
 | `character.js` / `mesh.js` / `surfaces.js` | 人物、メッシュ用ユーティリティ、表面素材の定義 |
 | `chapels.js` | 新しい部屋とオブジェクト（洗礼堂・船乗りの礼拝堂・宝物庫・写字室・屋上庭園・前庭） |
 | `crypt.js` | 地下聖堂（潮の回廊・石棺の間・地下礼拝所）と 1 階からの階段 |
-| `landcover.js` / `terrain-128.webp` / `terrain-320.webp` | 地形の 72 種類のテクスチャ |
-| `fabric.js` / `fabric-128.webp` / `fabric-256.webp` | 大聖堂の壁・床・天井・屋根と塀の 63 種類のテクスチャ |
-| `props.js` / `props-128.webp` / `props-256.webp` | 金属・窓ガラス・海・調度・島の小物の 45 種類のテクスチャ |
-| `decor.js` / `decor-96.webp` / `decor-256.webp` | 部屋の素材 72 種類のアトラスと素材 ID |
+| `landcover.js` / `terrain-68.webp` / `terrain-172.webp` | 地形の 72 種類のテクスチャ |
+| `fabric.js` / `fabric-68.webp` / `fabric-136.webp` | 大聖堂の壁・床・天井・屋根と塀の 63 種類のテクスチャ |
+| `props.js` / `props-68.webp` / `props-136.webp` | 金属・窓ガラス・海・調度・島の小物の 45 種類のテクスチャ |
+| `decor.js` / `decor-52.webp` / `decor-136.webp` | 部屋の素材 72 種類のアトラスと素材 ID |
 | `textures/` | 生成に使ったシート定義（`specs/`）、生成画像（`sheets/`）、アトラス構成（`decor-atlas.json`） |
 | `.claude/skills/sunburst-textures/` | テクスチャ生成スキル（生成 → 3×3 分割 → シームレス化 → アトラス化） |
 | `*.webp` | 素材アトラス（低解像度・高解像度）、ステンドグラス、祭壇画、カバー画像 |

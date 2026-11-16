@@ -77,13 +77,13 @@ let personTime = 0;
 let lastFrameInterior = false;
 let atlasRequest=0,atlasSizes={};
 const layerGroups=[
-  {name:'materials',sizes:[128,384],layers:40,cols:8,method:'installMaterials'},
-  {name:'craft',sizes:[112,288],layers:36,cols:6,method:'installCraft'},
-  {name:'surfaces',sizes:[96,256],layers:SURFACE_LAYERS,cols:6,method:'installSurfaces'},
-  {name:'decor',sizes:[96,256],layers:DECOR_LAYERS,cols:6,method:'installDecor'},
-  {name:'terrain',sizes:[128,320],layers:TERRAIN_LAYERS,cols:6,method:'installTerrain'},
-  {name:'fabric',sizes:[128,256],layers:FABRIC_LAYERS,cols:6,method:'installFabric'},
-  {name:'props',sizes:[128,256],layers:PROPS_LAYERS,cols:6,method:'installProps'}
+  {name:'materials',sizes:[68,204],layers:40,cols:8,method:'installMaterials'},
+  {name:'craft',sizes:[46,118],layers:36,cols:6,method:'installCraft'},
+  {name:'surfaces',sizes:[40,104],layers:SURFACE_LAYERS,cols:6,method:'installSurfaces'},
+  {name:'decor',sizes:[52,136],layers:DECOR_LAYERS,cols:6,method:'installDecor'},
+  {name:'terrain',sizes:[68,172],layers:TERRAIN_LAYERS,cols:6,method:'installTerrain'},
+  {name:'fabric',sizes:[68,136],layers:FABRIC_LAYERS,cols:6,method:'installFabric'},
+  {name:'props',sizes:[68,136],layers:PROPS_LAYERS,cols:6,method:'installProps'}
 ];
 async function imagePixels(name,depth,columns=depth) {
   try {

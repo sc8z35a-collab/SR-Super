@@ -1,4 +1,4 @@
-// Metals, glass, sea, church furnishings and island props (props-128.webp / props-256.webp).
+// Metals, glass, sea, church furnishings and island props (props-68.webp / props-136.webp).
 // Order matches "layers" in textures/props-atlas.json. Meshes may use PROPS.<name> as a material
 // (IDs from PROPS_START; mesh.js stores 16-bit material IDs), and the shaders also dress older materials,
 // the windows and the sea with these layers.

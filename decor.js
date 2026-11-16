@@ -1,4 +1,4 @@
-// Material IDs for the decor atlas (decor-96.webp / decor-256.webp), generated with GPT Image 2.5 Sunburst.
+// Material IDs for the decor atlas (decor-52.webp / decor-136.webp), generated with GPT Image 2.5 Sunburst.
 // The order matches the "layers" list in textures/decor-atlas.json, beginning after the surface atlas.
 export const DECOR_START = 105;
 const NAMES = [

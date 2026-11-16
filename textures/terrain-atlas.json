@@ -2,8 +2,8 @@
   "name": "terrain",
   "columns": 6,
   "sizes": [
-    128,
-    320
+    68,
+    172
   ],
   "quality": 86,
   "sheets": [
