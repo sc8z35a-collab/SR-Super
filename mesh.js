@@ -128,3 +128,29 @@ export class Mesh {
     return { vao, buffer, count };
   }
 }
+
+// Splits a mesh into square chunks of the ground plan by triangle centre, so distant chunks can be
+// skipped. `place` maps mesh coordinates to world coordinates (identity when omitted).
+export function splitMesh(mesh, place = (x, y, z) => [x, y, z], cell = 12) {
+  const chunks = new Map();
+  const v = mesh.values;
+  for (let t = 0; t < v.length; t += 30) {
+    let cx = 0, cz = 0;
+    const corners = [];
+    for (let k = 0; k < 3; k++) {
+      const o = t + k * 10, [x, , z] = place(v[o], v[o + 1], v[o + 2]);
+      corners.push([x, z]);
+      cx += x / 3; cz += z / 3;
+    }
+    const key = `${Math.floor(cx / cell)},${Math.floor(cz / cell)}`;
+    let chunk = chunks.get(key);
+    if (!chunk) chunks.set(key, chunk = { mesh: new Mesh(), x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity });
+    for (let i = t; i < t + 30; i++) chunk.mesh.values.push(v[i]);
+    for (const [x, z] of corners) {
+      chunk.x0 = Math.min(chunk.x0, x); chunk.x1 = Math.max(chunk.x1, x);
+      chunk.z0 = Math.min(chunk.z0, z); chunk.z1 = Math.max(chunk.z1, z);
+    }
+  }
+  mesh.values.length = 0;
+  return [...chunks.values()];
+}

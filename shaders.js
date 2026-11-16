@@ -42,6 +42,9 @@ vec3 grade(vec3 c) {
   vec3 v = 1.0 - exp(-max(c, vec3(0)) * 1.31);
   return pow(v, vec3(.796));
 }
+// In HDR mode and in the reflection pass, scenes are written as linear light and graded later.
+uniform bool uLinearOut;
+vec3 outColor(vec3 c) { return uLinearOut ? max(c, vec3(0)) : grade(c); }
 vec3 skyBase(vec3 ray) {
   float y = clamp(ray.y, 0.0, 1.0);
   vec3 c = mix(HORIZON, vec3(.157, .337, .510), pow(smoothstep(0.0,.65,y),.56));
@@ -151,7 +154,7 @@ uniform float uEffect;
 uniform float uTime;
 void main() {
   vec3 ray = normalize(uForward + uRight * (vScreen.x*uLens.x) + uUp*(vScreen.y*uLens.y));
-  color = vec4(grade(sky(ray, uEffect, uTime)), 1.0);
+  color = vec4(outColor(sky(ray, uEffect, uTime)), 1.0);
 }
 `;
 
@@ -989,7 +992,9 @@ vec3 interiorScattering(vec3 p,float distanceEye) {
      + eastBeam*vec3(.169,.128,.103)*.59;
 }
 
+uniform float uClipBelow;
 void main() {
+  if (vWorld.y < uClipBelow) discard;
   float type = vMaterial.x;
   bool detailed = uEffect > .85;
   vec3 n = normalize(vNormal);
@@ -1047,7 +1052,7 @@ void main() {
       if(!uInterior) window += luminance(propsTex(${P.rainGlass}.0,fabricPlane(n)*.7))*vec3(.05,.06,.07)*(1.0-stone);
     }
     window += glint*vec3(.215,.216,.197)*.33;
-    color = vec4(grade(window),1.0);
+    color = vec4(outColor(window),1.0);
     return;
   }else if(type==4.0||type==30.0){
     vec2 local=buildingSpace(vWorld.xz);
@@ -1121,7 +1126,7 @@ void main() {
   } else if(type==${DECOR.lanternGlass}.0){
     vec2 glowUv = vec2(vWorld.x+vWorld.z,vWorld.y)*2.0;
     vec3 glow = uHasDecor ? texture(uDecor,vec3(glowUv,${DECOR.lanternGlass-DECOR_START}.0)).rgb : vec3(1.0,.62,.24);
-    color = vec4(grade(pow(glow,vec3(1.25))*vec3(1.55,1.12,.78)*shade),1.0);
+    color = vec4(outColor(pow(glow,vec3(1.25))*vec3(1.55,1.12,.78)*shade),1.0);
     return;
   } else if(type>=${PROPS_START}.0&&type<${PROPS_START+PROPS_LAYERS}.0){
     base=propsMaterial(type,n,bump,roughness);
@@ -1129,9 +1134,9 @@ void main() {
     base=fabricMaterial(type,n,bump,roughness);
   } else if(type>=${DECOR_START}.0&&type<${DECOR_START+DECOR_LAYERS}.0){
     base=decorMaterial(type,n,bump,roughness);
-${DECOR_GLOW.map(([name,gain])=>`    if(type==${DECOR[name]}.0){color=vec4(grade(base*vec3(${gain.join(',')})*shade),1.0);return;}`).join('\n')}
+${DECOR_GLOW.map(([name,gain])=>`    if(type==${DECOR[name]}.0){color=vec4(outColor(base*vec3(${gain.join(',')})*shade),1.0);return;}`).join('\n')}
   } else if (type == 11.0) {
-    color = vec4(grade(vec3(1.39,.80,.286)*shade),1.0);
+    color = vec4(outColor(vec3(1.39,.80,.286)*shade),1.0);
     return;
   } else {
     base = vec3(.022,.026,.028) * (.85 + .25*noise2(vWorld.xy*2.1));
@@ -1243,7 +1248,7 @@ ${DECOR_GLOW.map(([name,gain])=>`    if(type==${DECOR[name]}.0){color=vec4(grade
     float haze = 1.0 - exp(-distanceEye*.00137);
     c = mix(c, vec3(.444,.583,.638), haze*.66);
   }
-  color = vec4(grade(c),1.0);
+  color = vec4(outColor(c),1.0);
 }
 `;
 
@@ -1271,6 +1276,9 @@ uniform float uTime;
 uniform float uEffect;
 uniform highp sampler2DArray uProps;
 uniform bool uHasProps;
+uniform sampler2D uReflection;
+uniform bool uHasReflection;
+uniform vec2 uScreen;
 vec3 seaTex(float layer, vec2 uv) { return pow(texture(uProps,vec3(uv,layer)).rgb,vec3(1.48)); }
 float luminance(vec3 color){return dot(color,vec3(.24,.60,.16));}
 
@@ -1358,6 +1366,12 @@ void main() {
     float reflectedCloud = smoothstep(.45,.71,fbm(mat2(.83,-.55,.55,.83)*c*vec2(1.63,2.04)+vec2(5.47,12.3)));
     reflection = mix(reflection,vec3(.587,.636,.606),reflectedCloud*(.21+.43*fresnel));
   }
+  if (uHasReflection) {
+    // The island and cathedral mirrored in the sea, rippled by the waves.
+    vec2 screen = gl_FragCoord.xy/uScreen + vec2(n.x,n.z)*vec2(.05,.035)*(1.0-.6*outside);
+    vec4 mirror = texture(uReflection,clamp(screen,vec2(.002),vec2(.998)));
+    reflection = mix(reflection,mirror.rgb*vec3(.86,.93,.96),mirror.a*.92);
+  }
   float bright = max(0.0,dot(normalize(SUN+v),n));
   float diffuseGlint = pow(bright,28.0)*(.11+.30*raw);
   if(uHasProps) diffuseGlint *= .6+1.2*luminance(seaTex(${P.sunsetSea}.0,pos*.04+g*.6+vec2(uTime*.02,0.0)));
@@ -1391,7 +1405,7 @@ void main() {
   float air = 1.0-exp(-farAway*.0028);
   vec3 horizon = skyBase(normalize(vec3(-v.x,0.0,-v.z)));
   sea = mix(sea,horizon,air);
-  color = vec4(grade(sea),1.0);
+  color = vec4(outColor(sea),1.0);
 }
 `;
 
@@ -1435,7 +1449,7 @@ void main() {
   float mullion = smoothstep(.025,.060,abs(p.x)+.01);
   vec3 v = lancet(vUv*vec2(.95,.86)+vec2(.021,.072), vMaterial.y>1.5);
   float intensity = max(v.r,max(v.g,v.b));
-  color = vec4(grade(v*1.38), mask*mullion*(.04 + intensity*.49));
+  color = vec4(outColor(v*1.38), mask*mullion*(.04 + intensity*.49));
 }
 `;
 
@@ -1469,5 +1483,48 @@ void main() {
   vec3 outer = inner*.50+(texture(uSource,uv-dir*.5).rgb+texture(uSource,uv+dir*.5).rgb)*.25;
   float light = luma(outer);
   color = vec4(mix(center,(light < lo || light > hi) ? inner : outer,.76),1);
+}
+`;
+
+// HDR: keep the bright parts, blur them, then grade the scene with the glow added.
+export const brightFragment = header + `
+in vec2 vScreen;
+out vec4 color;
+uniform sampler2D uSource;
+uniform vec2 uPixel;
+void main() {
+  vec2 uv = vScreen*.5+.5;
+  vec3 c = vec3(0.0);
+  for (int i=-1; i<=1; i+=2) for (int j=-1; j<=1; j+=2) c += texture(uSource,uv+vec2(i,j)*uPixel).rgb;
+  c *= .25;
+  float peak = max(c.r,max(c.g,c.b));
+  color = vec4(c*smoothstep(.7,1.5,peak),1.0);
+}
+`;
+
+export const blurFragment = header + `
+in vec2 vScreen;
+out vec4 color;
+uniform sampler2D uSource;
+uniform vec2 uStep;
+void main() {
+  vec2 uv = vScreen*.5+.5;
+  const float w[5] = float[5](.227,.195,.122,.054,.016);
+  vec3 c = texture(uSource,uv).rgb*w[0];
+  for (int i=1; i<5; i++) c += (texture(uSource,uv+uStep*float(i)).rgb + texture(uSource,uv-uStep*float(i)).rgb)*w[i];
+  color = vec4(c,1.0);
+}
+`;
+
+export const compositeFragment = header + common + `
+in vec2 vScreen;
+out vec4 color;
+uniform sampler2D uSource;
+uniform sampler2D uBloom;
+uniform float uExposure;
+void main() {
+  vec2 uv = vScreen*.5+.5;
+  vec3 c = texture(uSource,uv).rgb*uExposure + texture(uBloom,uv).rgb*.8;
+  color = vec4(grade(c),1.0);
 }
 `;

@@ -85,10 +85,36 @@
       <fieldset>
         <legend>描画解像度</legend>
         <div class="options">
-          <label><input name="resolution" type="radio" value="400" checked><span>400p</span></label>
-          <label><input name="resolution" type="radio" value="320"><span>320p</span></label>
           <label><input name="resolution" type="radio" value="240"><span>240p</span></label>
+          <label><input name="resolution" type="radio" value="320"><span>320p</span></label>
+          <label><input name="resolution" type="radio" value="400" checked><span>400p</span></label>
+          <label><input name="resolution" type="radio" value="1080"><span>FHD</span></label>
+          <label><input name="resolution" type="radio" value="1440"><span>2K</span></label>
+          <label><input name="resolution" type="radio" value="2160"><span>4K</span></label>
         </div>
+      </fieldset>
+      <fieldset>
+        <legend>フレームレート</legend>
+        <div class="options four">
+          <label><input name="fps" type="radio" value="30" checked><span>30</span></label>
+          <label><input name="fps" type="radio" value="60"><span>60</span></label>
+          <label><input name="fps" type="radio" value="120"><span>120</span></label>
+          <label><input name="fps" type="radio" value="0"><span>無制限</span></label>
+        </div>
+        <p class="setting-note">上限は画面のリフレッシュレートまでです。</p>
+      </fieldset>
+      <fieldset>
+        <legend>反射</legend>
+        <div class="options two">
+          <label><input name="reflection" type="radio" value="0" checked><span>反射なし</span></label>
+          <label><input name="reflection" type="radio" value="1"><span>反射あり</span></label>
+        </div>
+        <p class="setting-note">反射ありでは大聖堂と島が海面に映ります（負荷が上がります）。</p>
+      </fieldset>
+      <fieldset>
+        <legend>描画距離（チャンク）</legend>
+        <div class="range-row"><span>最小</span><input id="range" type="range" min="1" max="10" step="1" value="7" aria-describedby="range-detail"><span>最大</span></div>
+        <p id="range-detail" class="setting-note"></p>
       </fieldset>
       <fieldset>
         <legend>描画品質</legend>
@@ -100,6 +126,8 @@
         <p id="quality-detail">高精細の石材・装飾・影・光芒を描画。最大30 fps。</p>
       </fieldset>
       <label class="waves-option"><span>波・雲・人物の動き</span><input id="motion" type="checkbox" role="switch" checked></label>
+      <label class="waves-option"><span>HDR（光のにじみとトーンマッピング）</span><input id="hdr" type="checkbox" role="switch" aria-describedby="hdr-detail"></label>
+      <p id="hdr-detail" class="setting-note">明るい窓や灯り・日差しを白飛びさせずに描き、光をにじませます。</p>
     </dialog>
   </main>
   <script type="module" src="main.js"></script>
