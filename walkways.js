@@ -8,7 +8,7 @@ import { ground, coast, clamp, lerp } from './terrain.js';
 import { baptistery, marinersChapel, treasury, scriptorium, roofGarden, forecourt, roomName } from './chapels.js';
 import { crypt, cryptName } from './crypt.js';
 import { FABRIC } from './fabric.js';
-import { naveHangings, chapelCeilings, upperCeilings, gutterTrough, nicheAndScreen } from './chapels.js';
+import { naveHangings, chapelCeilings, upperCeilings, gutterTrough, nicheAndScreen, churchFurnishings } from './chapels.js';
 
 const OAK=4, FLOOR=6, TRIM=9, LIGHT=11, BRONZE=22, LINEN=23;
 const GRANITE=25, MARBLE=26, DARK_MARBLE=27, COPPER=29, GILT=31;
@@ -184,6 +184,7 @@ function hall(m,decals){
   naveHangings(m);
   chapelCeilings(m,0);
   nicheAndScreen(m,kit);
+  churchFurnishings(m,kit);
   crypt(m,kit);
   for(const [x,z,w,d] of [[.05,15.7,5.5,6.7],[.05,5.3,5.1,5.9],[8.05,-3.79,7.6,5.4],[.85,-11.56,5.4,4.1],[1.39,-21.07,5.1,5]]){
     decals.quad([x-w*.5,y+.013,z+d*.4],[x+w*.5,y+.013,z+d*.21],

@@ -79,11 +79,12 @@ export class Mesh {
 
   upload(gl, transform, elevation = 0, normalTransform) {
     const count = this.values.length / 10;
-    const stride = 28;
+    // Material IDs passed 255, so material and shade are 16-bit integers at the end of each vertex.
+    const stride = 32;
     const packed = new ArrayBuffer(count * stride);
     const floats = new Float32Array(packed);
     const signed = new Int16Array(packed);
-    const bytes = new Uint8Array(packed);
+    const shorts = new Uint16Array(packed);
     for (let vertex = 0; vertex < count; vertex++) {
       const source = vertex * 10;
       const target = vertex * stride;
@@ -92,18 +93,18 @@ export class Mesh {
       const n=normalTransform?normal(normalTransform(nx,ny,nz,y)):[nx,ny,nz];
       floats.set([p[0], p[1] + elevation, p[2]], target / 4);
       for (let axis = 0; axis < 3; axis++) signed[(target + 12) / 2 + axis] = Math.round(n[axis] * 32767);
-      bytes[target + 18] = material;
-      bytes[target + 19] = Math.round(shade * 128);
+      shorts[(target + 28) / 2] = material;
+      shorts[(target + 30) / 2] = Math.round(shade * 128);
       floats.set([u, v], (target + 20) / 4);
     }
     const vao = gl.createVertexArray();
     const buffer = gl.createBuffer();
     gl.bindVertexArray(vao);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, bytes, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, packed, gl.STATIC_DRAW);
     for (const [index, width, type, normalize, offset] of [
       [0, 3, gl.FLOAT, false, 0], [1, 3, gl.SHORT, true, 12],
-      [2, 2, gl.FLOAT, false, 20], [3, 2, gl.UNSIGNED_BYTE, false, 18]
+      [2, 2, gl.FLOAT, false, 20], [3, 2, gl.UNSIGNED_SHORT, false, 28]
     ]) {
       gl.enableVertexAttribArray(index);
       gl.vertexAttribPointer(index, width, type, normalize, stride, offset);

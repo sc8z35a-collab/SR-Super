@@ -1,0 +1,51 @@
+{
+  "sheet": "props-c-sea",
+  "theme": "the sea around a small Atlantic island, seen from above",
+  "tiles": [
+    {
+      "id": "deep_sea",
+      "tile": true,
+      "prompt": "deep blue open sea"
+    },
+    {
+      "id": "shallow_reef",
+      "tile": true,
+      "prompt": "clear shallow water over rocks"
+    },
+    {
+      "id": "breaking_foam",
+      "tile": true,
+      "prompt": "breaking wave foam"
+    },
+    {
+      "id": "whirlpool",
+      "tile": false,
+      "prompt": "a swirling whirlpool"
+    },
+    {
+      "id": "sunset_sea",
+      "tile": true,
+      "prompt": "sea reflecting the sunset"
+    },
+    {
+      "id": "cascade",
+      "tile": true,
+      "prompt": "seawater pouring over rocks"
+    },
+    {
+      "id": "backwash",
+      "tile": true,
+      "prompt": "backwash over sand"
+    },
+    {
+      "id": "kelp_forest",
+      "tile": true,
+      "prompt": "kelp forest seen from above"
+    },
+    {
+      "id": "harbour_water",
+      "tile": true,
+      "prompt": "murky green harbour water"
+    }
+  ]
+}

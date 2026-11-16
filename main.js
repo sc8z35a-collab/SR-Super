@@ -7,6 +7,7 @@ import { SURFACE_LAYERS } from './surfaces.js';
 import { DECOR_LAYERS } from './decor.js';
 import { TERRAIN_LAYERS } from './landcover.js';
 import { FABRIC_LAYERS } from './fabric.js';
+import { PROPS_LAYERS } from './props.js';
 
 const el = id => document.getElementById(id);
 const canvas = el('scene');
@@ -81,7 +82,8 @@ const layerGroups=[
   {name:'surfaces',sizes:[96,256],layers:SURFACE_LAYERS,cols:6,method:'installSurfaces'},
   {name:'decor',sizes:[96,256],layers:DECOR_LAYERS,cols:6,method:'installDecor'},
   {name:'terrain',sizes:[128,320],layers:TERRAIN_LAYERS,cols:6,method:'installTerrain'},
-  {name:'fabric',sizes:[128,256],layers:FABRIC_LAYERS,cols:6,method:'installFabric'}
+  {name:'fabric',sizes:[128,256],layers:FABRIC_LAYERS,cols:6,method:'installFabric'},
+  {name:'props',sizes:[128,256],layers:PROPS_LAYERS,cols:6,method:'installProps'}
 ];
 async function imagePixels(name,depth,columns=depth) {
   try {

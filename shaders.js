@@ -2,6 +2,7 @@ import { SURFACE, SURFACE_START, SURFACE_LAYERS } from './surfaces.js';
 import { BASE, CRYPT, CRYPT_LIGHTS } from './layout.js';
 import { TERRAIN as T } from './landcover.js';
 import { FABRIC_START, FABRIC_LAYER as F, FABRIC_LAYERS, FABRIC_SHADING, FABRIC_FALLBACK } from './fabric.js';
+import { PROPS_START, PROPS_LAYER as P, PROPS_LAYERS, PROPS_SHADING, PROPS_FALLBACK } from './props.js';
 import { DECOR, DECOR_START, DECOR_LAYERS, DECOR_SHADING, DECOR_FALLBACK, DECOR_GLOW, DECOR_STANDIN } from './decor.js';
 
 const glslVec3 = rows => rows.map(r => `vec3(${r.map(v => Number(v).toFixed(3)).join(',')})`).join(',');
@@ -215,6 +216,8 @@ uniform highp sampler2DArray uTerrain;
 uniform bool uHasTerrain;
 uniform highp sampler2DArray uFabric;
 uniform bool uHasFabric;
+uniform highp sampler2DArray uProps;
+uniform bool uHasProps;
 uniform bool uHasAltarpiece;
 uniform bool uInterior;
 uniform vec3 uPerson;
@@ -411,6 +414,9 @@ vec3 landCover(vec3 p, vec3 n, bool detailed, float turf, float moss, float vari
     vec3 tidal = soilFaces(tideLayer,p,n,.55,detailed);
     float shelf = smoothstep(.55,.8,n.y);
     if(shelf>.02) tidal = mix(tidal,soil(${T.rockShelf}.0,g*.45),shelf);
+    // Seawater pouring off the steeper rocks at the waterline.
+    float pour = (1.0-smoothstep(.2,.45,p.y))*(1.0-smoothstep(.35,.6,n.y));
+    if(uHasProps&&pour>.02) tidal = mix(tidal,pow(texture(uProps,vec3(vec2(g.x+g.y,-p.y)*.6,${P.cascade}.0)).rgb,vec3(1.48)),pour*.8);
     photo = mix(photo,mix(tidal,beach,smoothstep(.6,.86,n.y)),shore);
   }
   return photo;
@@ -862,6 +868,55 @@ vec3 dressFabric(float type, vec3 n, inout float bump) {
   return c*gain;
 }
 
+// The props atlas (props.js): metals, glass, sea, furnishings and island props.
+vec3 propsTex(float layer, vec2 uv) { return pow(texture(uProps,vec3(uv,layer)).rgb,vec3(1.48)); }
+vec3 propsMaterial(float type, vec3 n, out float bump, out float roughness) {
+  const vec3 shading[${PROPS_LAYERS}] = vec3[${PROPS_LAYERS}](${glslVec3(PROPS_SHADING)});
+  const vec3 fallback[${PROPS_LAYERS}] = vec3[${PROPS_LAYERS}](${glslVec3(PROPS_FALLBACK)});
+  float layer = type-${PROPS_START}.0;
+  vec3 s = shading[int(layer)];
+  roughness = s.y;
+  bump = 0.0;
+  if(!uHasProps) return fallback[int(layer)];
+  vec2 uv = s.x==0.0 ? vec2(clamp(vUv.x,.006,.994),clamp(1.0-vUv.y,.006,.994)) : s.x<0.0 ? vUv*-s.x : fabricPlane(n)*s.x;
+  vec3 c = propsTex(layer,uv);
+  bump = (luminance(c)-.3)*(roughness<.4 ? .3 : .8);
+  return c*s.z;
+}
+// Photographic metal for the older procedural metals, bells, brass, chains and gate iron.
+float metalLayer(float type) {
+  if(type==5.0||type==61.0) return ${P.castIron}.0;
+  if(type==22.0||type==60.0) return ${P.bellBronze}.0;
+  if(type==28.0) return ${P.pewter}.0;
+  if(type==29.0) return ${P.copperSheet}.0;
+  if(type==31.0) return ${P.goldLeaf}.0;
+  if(type==${SURFACE.brass}.0) return ${P.brass}.0;
+  if(type==${SURFACE.chain}.0) return ${P.rustyChain}.0;
+  if(type==${SURFACE.gateIron}.0) return ${P.scrollIron}.0;
+  return -1.0;
+}
+// Stained, leaded and old glass in the windows, with tracery in the heads of the plain lancets.
+vec3 windowGlass(vec2 pane, bool rose, bool rows, out float stone) {
+  stone = 0.0;
+  if(rose) return pow(propsTex(${P.roseWindow}.0,vec2(vUv.x,1.0-vUv.y)),vec3(.93));
+  float h = vWorld.y-${BASE.toFixed(2)};
+  vec2 cell = floor(buildingSpace(vWorld.xz)/2.6);
+  float pick = hash21(cell+floor(h/6.5)*7.31);
+  vec2 uv = vec2(clamp(pane.x,.01,.99),clamp(1.0-pane.y,.01,.99));
+  vec3 v;
+  if(h>24.5) v = propsTex(pick<.18 ? ${P.crackedGlass}.0 : pick<.5 ? ${P.oldGreenGlass}.0 : ${P.leadedDiamond}.0,uv)*1.15;
+  else if(pick<.24) v = propsTex(${P.saintGlass}.0,uv);
+  else if(pick<.48) v = propsTex(${P.shipGlass}.0,uv);
+  else if(pick<.70) v = propsTex(${P.geometricGlass}.0,uv);
+  else v = lancet(pane,false);
+  if(!rows&&pane.y>.66) {
+    vec3 t = propsTex(${P.tracery}.0,vec2(uv.x,clamp((1.0-pane.y)/.34,.01,.99)));
+    stone = smoothstep(.16,.26,luminance(t));
+    v = mix(v,t,stone);
+  }
+  return v;
+}
+
 vec3 craftMaterial(float type, vec3 n, out float bump, out float roughness) {
   const vec3 palette[36] = vec3[36](
     vec3(.79,.49,.103), vec3(.737,.650,.470), vec3(.214,.112,.057),
@@ -982,8 +1037,15 @@ void main() {
       if(mod(floor(story),2.0)>.5)pane.x=1.0-pane.x;
     }
     vec3 v = lancet(pane,shade>1.13);
+    float stone = 0.0;
+    if(uHasProps) v = windowGlass(pane,shade>1.13,shade>.81&&shade<.90,stone);
     float glint = pow(max(0.0,dot(reflect(-view,n),SUN)),17.0);
     vec3 window = uInterior ? v*2.13+vec3(.030,.020,.018) : v*.47+vec3(.020,.028,.035);
+    if(uHasProps) {
+      // Tracery is backlit from inside and sunlit outside; rain runs down the outer face.
+      window = mix(window, v*(uInterior ? .28 : .95)*(.6+.4*max(0.0,dot(n,SUN))), stone);
+      if(!uInterior) window += luminance(propsTex(${P.rainGlass}.0,fabricPlane(n)*.7))*vec3(.05,.06,.07)*(1.0-stone);
+    }
     window += glint*vec3(.215,.216,.197)*.33;
     color = vec4(grade(window),1.0);
     return;
@@ -1016,6 +1078,10 @@ void main() {
       bump=(pores.a-.5)*.51;
     }
     roughness=type==28.0?.65:type==29.0?.49:.33;
+    if(uHasProps) {
+      base = propsTex(metalLayer(type),fabricPlane(n)*1.3)*(type==31.0||type==22.0 ? .8 : 1.0);
+      bump = (luminance(base)-.25)*.5;
+    }
   } else if (type == 8.0) {
     float t = clamp(vUv.y,0.0,1.0);
     vec3 grass = mix(vec3(.061,.107,.040),vec3(.301,.348,.135),pow(t,.73));
@@ -1038,6 +1104,7 @@ void main() {
     }
   } else if(type>=32.0&&type<68.0){
     base = craftMaterial(type,n,bump,roughness);
+    if(uHasProps&&(type==60.0||type==61.0)) base = propsTex(metalLayer(type),fabricPlane(n)*1.5)*(type==60.0 ? .85 : 1.0);
   } else if(type==68.0){
     vec3 paint = uHasAltarpiece ? texture(uAltarpiece,vec2(vUv.x,1.0-vUv.y)).rgb : vec3(.58,.37,.17);
     base = vec3(.016,.012,.01) + pow(paint,vec3(1.59)) * 1.18;
@@ -1045,11 +1112,19 @@ void main() {
   } else if((type>=${SURFACE_START}.0&&type<${SURFACE.skin}.0)||
       (type>=${SURFACE.parchment}.0&&type<${SURFACE_START+SURFACE_LAYERS}.0)){
     base=surfaceMaterial(type,n,bump,roughness);
+    if(uHasProps){
+      float metal = metalLayer(type);
+      if(metal>=0.0) base = propsTex(metal,fabricPlane(n)*2.2);
+      else if(type==${SURFACE.pewOak}.0) base = propsTex(${P.pewOak}.0,fabricPlane(n).yx*vec2(.9,1.6))*.85;
+      else if(type==${SURFACE.kneeler}.0) base = propsTex(${P.kneelerVelvet}.0,vec2(clamp(vUv.x,.05,.95),clamp(vUv.y,.05,.95)));
+    }
   } else if(type==${DECOR.lanternGlass}.0){
     vec2 glowUv = vec2(vWorld.x+vWorld.z,vWorld.y)*2.0;
     vec3 glow = uHasDecor ? texture(uDecor,vec3(glowUv,${DECOR.lanternGlass-DECOR_START}.0)).rgb : vec3(1.0,.62,.24);
     color = vec4(grade(pow(glow,vec3(1.25))*vec3(1.55,1.12,.78)*shade),1.0);
     return;
+  } else if(type>=${PROPS_START}.0&&type<${PROPS_START+PROPS_LAYERS}.0){
+    base=propsMaterial(type,n,bump,roughness);
   } else if(type>=${FABRIC_START}.0&&type<${FABRIC_START+FABRIC_LAYERS}.0){
     base=fabricMaterial(type,n,bump,roughness);
   } else if(type>=${DECOR_START}.0&&type<${DECOR_START+DECOR_LAYERS}.0){
@@ -1194,6 +1269,10 @@ uniform sampler2D uMap;
 uniform vec2 uLimits;
 uniform float uTime;
 uniform float uEffect;
+uniform highp sampler2DArray uProps;
+uniform bool uHasProps;
+vec3 seaTex(float layer, vec2 uv) { return pow(texture(uProps,vec3(uv,layer)).rgb,vec3(1.48)); }
+float luminance(vec3 color){return dot(color,vec3(.24,.60,.16));}
 
 vec2 bathymetry(vec2 v) {
   vec2 uv = v/uLimits*.5+.5;
@@ -1245,6 +1324,26 @@ void main() {
   vec3 tide = mix(vec3(.213,.379,.283),vec3(.281,.426,.335),raw);
   green = mix(green,tide,exp(-depth*.83)*.65);
   under = mix(under,green,shelf*.98);
+  if(uHasProps && uEffect > .1) {
+    // Photographic sea: deep water offshore, rocky shallows and kelp beds near the island,
+    // a whirlpool off the north-west point and murky water in the lee of the landing.
+    vec2 drift = pos + g*2.5 + vec2(uTime*.12,-uTime*.07);
+    float lum = luminance(under)+.02;
+    vec3 deep = seaTex(${P.deepSea}.0,drift*.035);
+    vec3 shallow = seaTex(${P.shallowReef}.0,(pos+g*1.2)*.09);
+    vec3 photo = mix(deep,shallow,shelf);
+    float kelp = smoothstep(.56,.7,noise2(pos*.05+3.0))*smoothstep(1.5,3.5,depth)*(1.0-smoothstep(9.0,13.0,depth));
+    if(kelp>.02) photo = mix(photo,seaTex(${P.kelpForest}.0,(pos+g)*.08),kelp*.85);
+    vec2 eddy = pos-vec2(-54.0,-22.0);
+    float swirl = 1.0-smoothstep(5.0,9.0,length(eddy));
+    if(swirl>.01) {
+      float a = atan(eddy.y,eddy.x)+uTime*.25, r = length(eddy);
+      photo = mix(photo,seaTex(${P.whirlpool}.0,vec2(cos(a),sin(a))*r/18.0+.5),swirl);
+    }
+    float lee = (1.0-smoothstep(4.0,10.0,length(pos-vec2(12.0,30.0))))*shelf;
+    if(lee>.02) photo = mix(photo,seaTex(${P.harbourWater}.0,drift*.12),lee*.7);
+    under = mix(under,photo*(lum/(luminance(photo)+.02))*.55+photo*.45,.75);
+  }
   if (uEffect > .65 && depth < 6.8) {
     float net = noise2(pos*.94+vec2(g.x,g.y)*1.72);
     float caustic = exp(-abs(net-.50)*26.9) * exp(-depth*.36);
@@ -1261,6 +1360,7 @@ void main() {
   }
   float bright = max(0.0,dot(normalize(SUN+v),n));
   float diffuseGlint = pow(bright,28.0)*(.11+.30*raw);
+  if(uHasProps) diffuseGlint *= .6+1.2*luminance(seaTex(${P.sunsetSea}.0,pos*.04+g*.6+vec2(uTime*.02,0.0)));
   float sparkles = noise2(pos*2.12 + g*1.2 + vec2(uTime*.22,-uTime*.39));
   float spark = pow(bright,157.0)*(.26+sparkles*.66);
   float scatter = smoothstep(.031,.16,max(.0,g.y+g.x*.72))*(.029+shelf*.033);
@@ -1281,6 +1381,11 @@ void main() {
     float bubble = smoothstep(.594,.735,noise2(pos*3.67-g*.33+uTime*.16))*trail;
     float foam = clamp(wash + breaks*.97 + bubble*(breaks*.61+wash*.18),0.0,.97);
     vec3 froth = mix(vec3(.367,.574,.563),vec3(.844,.904,.841),foam*.79 + .18*raw);
+    if(uHasProps) {
+      vec3 broken = seaTex(${P.breakingFoam}.0,foamUv*.18);
+      vec3 wash2 = seaTex(${P.backwash}.0,pos*.11+vec2(uTime*.03,0.0));
+      froth = mix(froth,mix(broken,wash2,exp(-depth*2.2)),.55)*1.05;
+    }
     sea = mix(sea,froth,foam*.97);
   }
   float air = 1.0-exp(-farAway*.0028);

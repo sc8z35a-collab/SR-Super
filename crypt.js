@@ -2,6 +2,7 @@
 // Building-local metres; reached by a flight down the west aisle of the nave.
 import { DECOR as D } from './decor.js';
 import { FABRIC } from './fabric.js';
+import { PROPS } from './props.js';
 import { SURFACE as S } from './surfaces.js';
 import { CRYPT, CRYPT_STAIR, CRYPT_COLUMNS, FLOORS } from './layout.js';
 import { lerp, random } from './terrain.js';
@@ -94,7 +95,7 @@ function channel(m) {
   slab(m, rect(c.x0, c.x1, c.z0, c.z1), bottom - .2, bottom, D.cisternPlaster, .9);
   for (const [a, b] of [[c.x0, c.x0 + .1], [c.x1 - .1, c.x1]]) slab(m, rect(a, b, c.z0, c.z1), bottom, Y - .33, D.glowAlgae, .8);
   slab(m, rect(c.x0, c.x1, c.z1 - .1, c.z1), bottom, Y - .33, D.cisternPlaster, .9);
-  floorQuad(m, c.x0 + .1, c.x1 - .1, c.z0, c.z1 - .1, Y - .5, D.seawater, 1);
+  floorQuad(m, c.x0 + .1, c.x1 - .1, c.z0, c.z1 - .1, Y - .5, PROPS.harbourWater, 1);
   // Basalt kerbs, broken by the bridges.
   let at = c.z0;
   for (const [a, b] of [...BRIDGES, [c.z1, c.z1]]) {
