@@ -11,7 +11,8 @@
     "textures/specs/terrain-b-cliffs.json",
     "textures/specs/terrain-c-meadow.json",
     "textures/specs/terrain-d-rocks.json",
-    "textures/specs/terrain-e-shore.json"
+    "textures/specs/terrain-e-shore.json",
+    "textures/specs/terrain-f-extra.json"
   ],
   "layers": [
     "coastal_grass",
@@ -58,6 +59,15 @@
     "rock_shelf",
     "saltmarsh",
     "marram_dune",
-    "foam_sand"
+    "foam_sand",
+    "stony_grass",
+    "wet_grass",
+    "rubble",
+    "mossy_boulders",
+    "guano_rock",
+    "smooth_rock",
+    "lava_rock",
+    "red_clay",
+    "cave_rock"
   ]
 }

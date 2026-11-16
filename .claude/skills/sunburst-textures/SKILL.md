@@ -69,7 +69,8 @@ GPT Image 2.5 Sunburst で **1:1・最高画質（quality `xhigh`、reasoning ef
    ```
 
    `decor-96.webp`（軽量用）と `decor-256.webp`（高品質用）が書き出され、最後に `DECOR_FALLBACK` 配列が表示される。
-   地形は `textures/terrain-atlas.json`（`terrain-128.webp` / `terrain-384.webp`、層の名前は `landcover.js`）で同じようにパックする。
+   地形は `textures/terrain-atlas.json`（`terrain-128.webp` / `terrain-384.webp`、層の名前は `landcover.js`）、
+   大聖堂の壁・床・天井・屋根は `textures/fabric-atlas.json`（`fabric-128.webp` / `fabric-256.webp`、`fabric.js`）で同じようにパックする。
 
 5. **ゲームに組み込む**
    - `decor.js`: `NAMES` に名前を追加（アトラスと同じ順）、`DECOR_SHADING` に `[1m あたりの繰り返し数（0 = 一枚絵、負 = メッシュ UV をメートルとして使う）, 粗さ, 明るさ]`、`DECOR_FALLBACK` に pack の出力を貼る。

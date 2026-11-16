@@ -7,6 +7,8 @@ import { bellWinch, sanctuaryObjects, weatheredCrate, workshopObjects } from './
 import { ground, coast, clamp, lerp } from './terrain.js';
 import { baptistery, marinersChapel, treasury, scriptorium, roofGarden, forecourt, roomName } from './chapels.js';
 import { crypt, cryptName } from './crypt.js';
+import { FABRIC } from './fabric.js';
+import { naveHangings, chapelCeilings, upperCeilings, gutterTrough } from './chapels.js';
 
 const OAK=4, FLOOR=6, TRIM=9, LIGHT=11, BRONZE=22, LINEN=23;
 const GRANITE=25, MARBLE=26, DARK_MARBLE=27, COPPER=29, GILT=31;
@@ -89,8 +91,8 @@ function foundation(m){
   const tread=ENTRY.length/ENTRY_STEPS;
   for(let i=0;i<ENTRY_STEPS;i++){
     const a=ENTRY.edge+i*tread,b=a+tread,y=entryTop(mid(a,b));
-    box(m,rect(-ENTRY.half,ENTRY.half,a,b),y-1.08,y,SURFACE.tread,.92);
-    box(m,rect(-ENTRY.half-.05,ENTRY.half+.05,b-.092,b+.026),y-.094,y+.004,SURFACE.tread,1.08);
+    box(m,rect(-ENTRY.half,ENTRY.half,a,b),y-1.08,y,FABRIC.stoneSteps,.92);
+    box(m,rect(-ENTRY.half-.05,ENTRY.half+.05,b-.092,b+.026),y-.094,y+.004,FABRIC.stoneSteps,1.08);
     for(const side of [-1,1]){
       const x=side*(ENTRY.half+.13);
       block(m,rect(x-.14,x+.14,a-.008,b+.008),y-.36,y+.68,GRANITE,.87);
@@ -179,6 +181,8 @@ function hall(m,decals){
   decorateNave(m,y,block);
   baptistery(m,kit);
   marinersChapel(m,kit);
+  naveHangings(m);
+  chapelCeilings(m,0);
   crypt(m,kit);
   for(const [x,z,w,d] of [[.05,15.7,5.5,6.7],[.05,5.3,5.1,5.9],[8.05,-3.79,7.6,5.4],[.85,-11.56,5.4,4.1],[1.39,-21.07,5.1,5]]){
     decals.quad([x-w*.5,y+.013,z+d*.4],[x+w*.5,y+.013,z+d*.21],
@@ -192,9 +196,9 @@ function stairFlight(m,r,low,high,up){
   for(let i=1;i<=count;i++){
     const y=lerp(low,high,i/count);
     const z=r.z0+(up>0?i-1:count-i)*tread;
-    box(m,rect(r.x0,r.x1,z-.001,z+tread+.001),y-.29,y,SURFACE.tread,i%9===0?.88:1);
+    box(m,rect(r.x0,r.x1,z-.001,z+tread+.001),y-.29,y,FABRIC.stoneSteps,i%9===0?.88:1);
     const rim=up>0?z:z+tread;
-    box(m,rect(r.x0,r.x1,rim-.022,rim+.030),y-.052,y+.004,SURFACE.tread,1.12);
+    box(m,rect(r.x0,r.x1,rim-.022,rim+.030),y-.052,y+.004,FABRIC.stoneSteps,1.12);
   }
   for(const x of [r.x0,r.x1]){
     rail(m,[x,r.z0],[x,r.z1],up>0?low:high,up>0?high:low);
@@ -224,6 +228,7 @@ function gallery(m,index){
   if(index===1){
     treasury(m,kit);
     scriptorium(m,kit);
+    chapelCeilings(m,1);
   }
   guard(m,left,y,{west:[[wingLow,wingHigh]],east:bridgeRanges});
   guard(m,right,y,{east:[[wingLow,wingHigh]],west:bridgeRanges});
@@ -283,7 +288,7 @@ function upperRooms(m,index){
   const library=index===4;
   const room=UPPER_ROOM;
   deck(m,room,y,library?CRAFT.parquet:CRAFT.lichenSlate,.44);
-  aisleDeck(m,index,CRAFT.flags);
+  aisleDeck(m,index,FABRIC.terracottaTiles);
   const aisle=UPPER_AISLE;
   guard(m,aisle,y,{north:[connection],east:[[aisle.z0,aisle.z1]]});
   guard(m,room,y,{south:[connection],north:[[room.x0,room.x1]]});
@@ -292,6 +297,7 @@ function upperRooms(m,index){
     const hanger=library?y+2.73:y+2.92;
     pendant(m,x,hanger,z,.73,1.91);
   }
+  upperCeilings(m,index);
   if(library)chapterLibrary(m,y,block);
   else {
     bellChamber(m,y,block);
@@ -317,7 +323,7 @@ function hut(m,y){
   box(m,rect(h.x0- .024,h.x0+.25,h.doorA,h.doorB),y,y+.074,CRAFT.deck,.93);
   const outerLeft=h.x0-.29,outerRight=h.x1+.29;
   for(const x of [outerLeft,outerRight]){
-    m.rod([x,y+2.405,rear-.024],[x,y+2.405,front+.045],.057,.057,SURFACE.lead,9,.97,0,true);
+    gutterTrough(m,[x,y+2.36,rear-.024],[x,y+2.36,front+.045],.075);
     const down=x<middle?h.x0-.10:h.x1+.10;
     m.rod([down,y+.11,front-.23],[down,y+2.28,front-.23],.029,.033,SURFACE.lead,9,1);
     m.rod([down,y+2.279,front-.23],[x,y+2.377,front-.23],.035,.039,SURFACE.lead,8,.97);
@@ -387,7 +393,7 @@ function parapet(m,a,b,y){
 
 function roofTerrace(m){
   const a=UPPER_AISLE,r=UPPER_ROOM,y=ROOF_HEIGHT;
-  deck(m,r,y,CRAFT.slate,.48);
+  deck(m,r,y,FABRIC.terraceSlabs,.48);
   aisleDeck(m,ROOF_INDEX,CRAFT.lichenSlate);
   parapet(m,[r.x0,r.z0],[r.x1,r.z0],y);
   parapet(m,[r.x1,r.z0],[r.x1,r.z1],y);

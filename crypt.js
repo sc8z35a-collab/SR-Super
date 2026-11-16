@@ -1,6 +1,7 @@
 // 地下 · 潮の地下聖堂: a crypt under the front of the nave where the sea seeps in.
 // Building-local metres; reached by a flight down the west aisle of the nave.
 import { DECOR as D } from './decor.js';
+import { FABRIC } from './fabric.js';
 import { SURFACE as S } from './surfaces.js';
 import { CRYPT, CRYPT_STAIR, CRYPT_COLUMNS, FLOORS } from './layout.js';
 import { lerp, random } from './terrain.js';
@@ -61,7 +62,7 @@ function columns(m, kit) {
       } else {
         lathe(m, x, Y + .28, z, [[0, .3], [1.78, .275]], D.limestone, 14, 1);
       }
-      m.beveledBox(x, Y + 2.2, z, .64, .34, .64, .05, D.carvedFrieze, 1);
+      m.box(x, Y + 2.2, z, .68, .36, .68, FABRIC.capital, 1);
       m.beveledBox(x, Y + 2.35, z, .8, .1, .8, .02, D.blackBasalt, 1);
       kit.solid(around(x, z, .8, .8), Y, Y + 2.4);
       if (Math.abs(x) < 5) {
@@ -305,6 +306,11 @@ function chapel(m, kit) {
   // Ex-votos of pressed tin on the east wall.
   slab(m, rect(CRYPT.x1 - .1, CRYPT.x1 - .04, 22.6, 25.4), Y + 1.15, Y + 2.65, D.cedar, .92);
   slab(m, rect(CRYPT.x1 - .12, CRYPT.x1 - .1, 22.75, 25.25), Y + 1.25, Y + 2.55, D.pressedTin, 1.05);
+  // Painted rib vaults over the chapel bays.
+  const xs = [CRYPT.x0, ...CRYPT_COLUMNS.x, CRYPT.x1];
+  for (let i = 0; i < xs.length - 1; i++) {
+    floorQuad(m, xs[i], xs[i + 1], CRYPT_COLUMNS.z[3], CRYPT.z1, TOP - .025, FABRIC.ribVault, 1);
+  }
   // Hanging oil lamps.
   for (const x of [-2.6, 2.6]) {
     m.rod([x, Y + 2.62, 24.6], [x, TOP - .02, 24.6], .012, .012, S.chain, 5, .95);

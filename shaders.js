@@ -1,6 +1,7 @@
 import { SURFACE, SURFACE_START, SURFACE_LAYERS } from './surfaces.js';
 import { BASE, CRYPT, CRYPT_LIGHTS } from './layout.js';
 import { TERRAIN as T } from './landcover.js';
+import { FABRIC_START, FABRIC_LAYER as F, FABRIC_LAYERS, FABRIC_SHADING, FABRIC_FALLBACK } from './fabric.js';
 import { DECOR, DECOR_START, DECOR_LAYERS, DECOR_SHADING, DECOR_FALLBACK, DECOR_GLOW, DECOR_STANDIN } from './decor.js';
 
 const glslVec3 = rows => rows.map(r => `vec3(${r.map(v => Number(v).toFixed(3)).join(',')})`).join(',');
@@ -212,6 +213,8 @@ uniform bool uHasDecor;
 uniform int uDecorLayers;
 uniform highp sampler2DArray uTerrain;
 uniform bool uHasTerrain;
+uniform highp sampler2DArray uFabric;
+uniform bool uHasFabric;
 uniform bool uHasAltarpiece;
 uniform bool uInterior;
 uniform vec3 uPerson;
@@ -311,26 +314,34 @@ vec3 landCover(vec3 p, vec3 n, bool detailed, float turf, float moss, float vari
     // Moss, peat and mud where water collects.
     float damp = smoothstep(.57,.75,coarse)*(1.0-dry);
     if(damp>.02) cover = mix(cover,soilBand(spread(noise2(g*.08-6.0)),
-      float[6](${T.moss}.0,${T.moss}.0,${T.peat}.0,${T.mud}.0,${T.peat}.0,${T.moss}.0),g*.5,true),damp*.75);
+      float[6](${T.moss}.0,${T.wetGrass}.0,${T.peat}.0,${T.mud}.0,${T.wetGrass}.0,${T.moss}.0),g*.5,true),damp*.75);
     // Marram on the dunes and samphire on the salt flats just above the beach.
     float backshore = smoothstep(.9,1.5,p.y)*(1.0-smoothstep(2.4,3.6,p.y))*bank*smoothstep(.42,.58,noise2(g*.11-2.6));
     if(backshore>.02) cover = mix(cover,soilBand(spread(noise2(g*.06+8.8)),
       float[6](${T.marram}.0,${T.marram}.0,${T.marram}.0,${T.saltmarsh}.0,${T.saltmarsh}.0,${T.marram}.0),g*.45,true),backshore);
+    // Stones breaking through the turf on the gentler slopes.
+    float stony = smoothstep(.56,.72,noise2(g*.1+9.1))*(1.0-smoothstep(.86,.95,n.y));
+    if(stony>.02) cover = mix(cover,soil(${T.stonyGrass}.0,g*.45),stony*.85);
     cover *= .82+.36*luminance(soil(${T.coastalGrass}.0,g*.051));
   }
   // Earth, roots, mud and wind-blown leaves worn into the ground round the building.
   float worn = (1.0-smoothstep(.1,2.4,footprintDistance(p)))*bank;
   if(worn>.02) cover = mix(cover,soilBand(spread(noise2(g*.09+3.3)),
-    float[6](${T.dirtPath}.0,${T.dirtPath}.0,${T.rootSoil}.0,${T.mud}.0,${T.leafLitter}.0,${T.dirtPath}.0),g*.6,detailed),worn*.85);
+    float[6](${T.dirtPath}.0,${T.rubble}.0,${T.rootSoil}.0,${T.mud}.0,${T.leafLitter}.0,${T.dirtPath}.0),g*.6,detailed),worn*.85);
 
   // Each headland shows its own stone; chalk breaks through in one place.
   vec3 stone = rockBand(spread(noise2(g*.028+vec2(3.7,-1.2))),
     float[6](${T.cliff}.0,${T.sandstone}.0,${T.gneiss}.0,${T.granite}.0,${T.slate}.0,${T.karst}.0),p,n,detailed);
   float chalk = smoothstep(.70,.80,noise2(g*.02-9.0));
   if(chalk>.02) stone = mix(stone,soilFaces(${T.chalk}.0,p,n,.3,false),chalk);
+  // A lava flow and a red clay bank break the cliffs elsewhere.
+  float lava = smoothstep(.72,.82,noise2(g*.02+17.0));
+  if(lava>.02) stone = mix(stone,soilFaces(${T.lavaRock}.0,p,n,.35,false),lava);
+  float clay = smoothstep(.72,.82,noise2(g*.022-23.0))*(1.0-smoothstep(.55,.8,n.y));
+  if(clay>.02) stone = mix(stone,soilFaces(${T.redClay}.0,p,n,.35,false),clay);
   float top = smoothstep(.55,.82,n.y);
   if(top>.02) stone = mix(stone,soilBand(spread(noise2(g*.06+.4)),
-    float[6](${T.lichenTop}.0,${T.lichenTop}.0,${T.basalt}.0,${T.basalt}.0,${T.grus}.0,${T.lichenTop}.0),g*.45,detailed),top*.75);
+    float[6](${T.lichenTop}.0,${T.mossyBoulders}.0,${T.basalt}.0,${T.basalt}.0,${T.grus}.0,${T.lichenTop}.0),g*.45,detailed),top*.75);
   if(detailed) {
     float lichen = smoothstep(.62,.78,grit+coarse*.3)*smoothstep(2.0,4.5,p.y);
     if(lichen>.02) stone = mix(stone,soilFaces(${T.orangeLichen}.0,p,n,.5,false),lichen*.55);
@@ -342,9 +353,14 @@ vec3 landCover(vec3 p, vec3 n, bool detailed, float turf, float moss, float vari
     if(iron>.02) stone = mix(stone,soilFaces(${T.ironRock}.0,p,n,.4,false),iron*.7);
     float spray = smoothstep(1.2,1.8,p.y)*(1.0-smoothstep(2.4,3.6,p.y))*smoothstep(.45,.6,grit);
     if(spray>.02) stone = mix(stone,soilFaces(${T.saltRock}.0,p,n,.5,false),spray*.6);
+    // Seabird ledges high on the cliffs, dark sea-cave rock at their foot.
+    float guano = (1.0-smoothstep(.3,.6,n.y))*smoothstep(4.0,6.0,p.y)*smoothstep(.6,.75,noise2(g*.09+12.0));
+    if(guano>.02) stone = mix(stone,soilFaces(${T.guanoRock}.0,p,n,.45,false),guano*.8);
+    float cave = (1.0-smoothstep(.25,.5,n.y))*smoothstep(.3,.8,p.y)*(1.0-smoothstep(1.8,3.0,p.y));
+    if(cave>.02) stone = mix(stone,soilFaces(${T.caveRock}.0,p,n,.4,false),cave*.75);
   }
   float scree = smoothstep(.42,.6,n.y)*(1.0-smoothstep(.6,.78,n.y));
-  if(scree>.02) stone = mix(stone,soilBand(spread(noise2(g*.1-1.7)),float[6](${T.scree}.0,${T.scree}.0,${T.grus}.0,${T.scree}.0,${T.grus}.0,${T.scree}.0),g*.6,detailed),scree*.75);
+  if(scree>.02) stone = mix(stone,soilBand(spread(noise2(g*.1-1.7)),float[6](${T.scree}.0,${T.rubble}.0,${T.grus}.0,${T.scree}.0,${T.grus}.0,${T.rubble}.0),g*.6,detailed),scree*.75);
   stone *= .82+.36*stripes;
   vec3 photo = mix(stone,cover,turf+(1.0-turf)*moss);
 
@@ -359,7 +375,8 @@ vec3 landCover(vec3 p, vec3 n, bool detailed, float turf, float moss, float vari
       float strand = smoothstep(.5,.7,p.y)*(1.0-smoothstep(.8,1.05,p.y))*smoothstep(.4,.55,noise2(g*.3));
       if(strand>.02) beach = mix(beach,soil(${T.wrack}.0,g*.6),strand*.75);
     }
-    vec3 tidal = soilFaces(p.y<.6 ? ${T.barnacleRock}.0 : ${T.seaweedRock}.0,p,n,.55,detailed);
+    float tideLayer = p.y<.6 ? (noise2(g*.15+2.0)>.55 ? ${T.smoothRock}.0 : ${T.barnacleRock}.0) : ${T.seaweedRock}.0;
+    vec3 tidal = soilFaces(tideLayer,p,n,.55,detailed);
     float shelf = smoothstep(.55,.8,n.y);
     if(shelf>.02) tidal = mix(tidal,soil(${T.rockShelf}.0,g*.45),shelf);
     photo = mix(photo,mix(tidal,beach,smoothstep(.6,.86,n.y)),shore);
@@ -687,6 +704,99 @@ vec3 decorMaterial(float type, vec3 n, out float bump, out float roughness) {
   return max(base,vec3(.008));
 }
 
+// The cathedral's fabric atlas (fabric.js): photographic stone, floors, ceilings and roofs.
+vec3 fabricTex(float layer, vec2 uv) { return pow(texture(uFabric,vec3(uv,layer)).rgb,vec3(1.48)); }
+vec2 fabricPlane(vec3 n) {
+  vec2 local = buildingSpace(vWorld.xz);
+  vec2 axis = abs(buildingDirection(n.xz));
+  return abs(n.y)>.7 ? local : vec2(axis.x>axis.y ? local.y : local.x,-vWorld.y);
+}
+// Meshes that name a fabric layer as their material.
+vec3 fabricMaterial(float type, vec3 n, out float bump, out float roughness) {
+  const vec3 shading[${FABRIC_LAYERS}] = vec3[${FABRIC_LAYERS}](${glslVec3(FABRIC_SHADING)});
+  const vec3 fallback[${FABRIC_LAYERS}] = vec3[${FABRIC_LAYERS}](${glslVec3(FABRIC_FALLBACK)});
+  float layer = type-${FABRIC_START}.0;
+  vec3 s = shading[int(layer)];
+  roughness = s.y;
+  bump = 0.0;
+  if(!uHasFabric) return fallback[int(layer)];
+  vec2 uv = s.x==0.0 ? vec2(clamp(vUv.x,.006,.994),clamp(1.0-vUv.y,.006,.994)) : s.x<0.0 ? vUv*-s.x : fabricPlane(n)*s.x;
+  vec3 c = fabricTex(layer,uv);
+  bump = (luminance(c)-.3)*(roughness<.4 ? .3 : .8);
+  return c*s.z;
+}
+// Dresses the older procedural stone, paving, marble, roofs and oak in photographic fabric.
+vec3 dressFabric(float type, vec3 n, inout float bump) {
+  vec2 uv = fabricPlane(n);
+  float h = vWorld.y-${BASE.toFixed(2)};
+  float level = mod(h-.015,6.5);
+  vec2 pos = buildingSpace(vWorld.xz);
+  vec3 c;
+  float gain = 1.0;
+  if(type==1.0) {
+    if(!uInterior) {
+      // Grey ashlar: buttress stone on the slopes, rubble in the belfry stage,
+      // rain streaks and moss on the walls and grime from the sea along the foot.
+      c = fabricTex(${F.extAshlar}.0,uv*.42);
+      float slope = smoothstep(.2,.35,abs(n.y))*(1.0-smoothstep(.7,.8,abs(n.y)));
+      if(slope>.02) c = mix(c,fabricTex(${F.buttress}.0,uv*.4),slope);
+      float belfry = smoothstep(46.0,50.0,h)*(1.0-smoothstep(68.0,72.0,h));
+      if(belfry>.02) c = mix(c,fabricTex(${F.belfryRubble}.0,uv*.5),belfry*.85);
+      float streak = smoothstep(.56,.72,noise2(vec2(uv.x*.11,h*.015)+3.0))*smoothstep(4.0,9.0,h);
+      if(streak>.02) c = mix(c,fabricTex(${F.extStreaked}.0,uv*.42),streak);
+      float mossy = smoothstep(.1,-.3,dot(n,SUN))*smoothstep(.5,.66,noise2(uv*.09-4.0))*(1.0-smoothstep(18.0,40.0,h));
+      if(mossy>.02) c = mix(c,fabricTex(${F.extMossy}.0,uv*.42),mossy);
+      float grime = 1.0-smoothstep(2.0,7.5,h+2.5*noise2(uv*.2));
+      if(grime>.02) c = mix(c,fabricTex(${F.extSooty}.0,uv*.42),grime);
+      c *= .7+.3*luminance(fabricTex(${F.extAshlar}.0,uv*.047))/.35;
+      gain = 1.25;
+    } else if(n.y<-.45) {
+      c = fabricTex(${F.stainedCeiling}.0,uv*.35);
+    } else if(h>25.9&&h<39.0) {
+      c = fabricTex(${F.whitePlaster}.0,uv*.4);
+      gain = .75;
+    } else {
+      // Pale ashlar, clustered shafts along the arcades and soot above the altar.
+      c = fabricTex(${F.intAshlar}.0,uv*.45);
+      float column = (1.0-smoothstep(.85,1.15,abs(abs(pos.x)-6.45)))*(1.0-smoothstep(11.0,11.8,h));
+      if(column>.02) c = mix(c,fabricTex(${F.columnStone}.0,vec2(uv.x*.6,uv.y*.35)),column);
+      float soot = smoothstep(-16.0,-21.0,pos.y)*smoothstep(2.5,8.0,h);
+      if(soot>.02) c = mix(c,fabricTex(${F.sootyStone}.0,uv*.4),soot*.85);
+      gain = .72;
+    }
+    // Oak panelling round the lower walls of the upper storeys.
+    if(uInterior&&abs(n.y)<.35&&h>6.0&&level<1.15) {
+      c = fabricTex(${F.oakWainscot}.0,vec2(uv.x*.62,clamp(1.0-level/1.15,.01,.99)));
+      gain = .8;
+    }
+  } else if(type==6.0) {
+    c = fabricTex(${F.naveFlags}.0,uv*.42);
+  } else if(type==9.0) {
+    c = uInterior ? fabricTex(${F.archVoussoir}.0,uv*.8) : fabricTex(h>48.0 ? ${F.spireCarving}.0 : ${F.windowMoulding}.0,uv*.7);
+    gain = uInterior ? .72 : 1.2;
+  } else if(type==25.0) {
+    c = fabricTex(${F.granitePlinth}.0,uv*.55);
+  } else if(type==26.0) {
+    c = fabricTex(${F.whiteMarble}.0,uv*.6);
+  } else if(type==27.0) {
+    c = fabricTex(${F.greenMarble}.0,uv*.6);
+    gain = 1.3;
+  } else if(type==2.0) {
+    c = fabricTex(${F.slateRoof}.0,uv*.7);
+    float moss = smoothstep(.52,.7,noise2(uv*.12+1.3))*(1.0-smoothstep(14.0,30.0,h));
+    if(moss>.02) c = mix(c,fabricTex(${F.mossyRoof}.0,uv*.6),moss);
+    gain = .7;
+  } else if(type==12.0) {
+    c = fabricTex(${F.leadRoof}.0,uv*.6);
+    gain = .55;
+  } else {
+    c = fabricTex(${F.oakFloor}.0,uv*.8);
+    gain = .55;
+  }
+  bump = (luminance(c)-.3)*.85;
+  return c*gain;
+}
+
 vec3 craftMaterial(float type, vec3 n, out float bump, out float roughness) {
   const vec3 palette[36] = vec3[36](
     vec3(.79,.49,.103), vec3(.737,.650,.470), vec3(.214,.112,.057),
@@ -775,6 +885,7 @@ void main() {
     roughness = mix(.37,.86,smoothstep(.06,1.45,vWorld.y));
   } else if (type==1.0||type==6.0||type==9.0||(type>=25.0&&type<=27.0)) {
     base = masonry(vWorld,n,type,detailed,bump);
+    if(uHasFabric) base = dressFabric(type,n,bump);
     if(type==6.0)roughness=.59;
     if(type==26.0||type==27.0)roughness=.28;
   } else if (type == 2.0 || type == 12.0) {
@@ -796,6 +907,7 @@ void main() {
       base*=1.0+(slate.rgb-.5)*2.09;
       bump+=(slate.a-.5)*.73;
     }
+    if(uHasFabric) base = dressFabric(type,n,bump);
     roughness = type == 12.0 ? .37 : .53;
   } else if (type == 3.0) {
     vec2 pane = vUv;
@@ -825,6 +937,7 @@ void main() {
       base*=1.0+(oak.rgb-.5)*2.12;
       bump=(oak.a-.5)*.84+.08*boards;
     }
+    if(uHasFabric&&type==4.0) base = dressFabric(type,n,bump);
     roughness=type==30.0?.38:.47;
   }else if(type==5.0||type==22.0||type==28.0||type==29.0||type==31.0){
     float grain=noise2(vWorld.xy*2.73+vWorld.z*.78);
@@ -871,6 +984,8 @@ void main() {
     vec3 glow = uHasDecor ? texture(uDecor,vec3(glowUv,${DECOR.lanternGlass-DECOR_START}.0)).rgb : vec3(1.0,.62,.24);
     color = vec4(grade(pow(glow,vec3(1.25))*vec3(1.55,1.12,.78)*shade),1.0);
     return;
+  } else if(type>=${FABRIC_START}.0&&type<${FABRIC_START+FABRIC_LAYERS}.0){
+    base=fabricMaterial(type,n,bump,roughness);
   } else if(type>=${DECOR_START}.0&&type<${DECOR_START+DECOR_LAYERS}.0){
     base=decorMaterial(type,n,bump,roughness);
 ${DECOR_GLOW.map(([name,gain])=>`    if(type==${DECOR[name]}.0){color=vec4(grade(base*vec3(${gain.join(',')})*shade),1.0);return;}`).join('\n')}

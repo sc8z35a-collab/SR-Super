@@ -6,6 +6,7 @@ import { visitFloor, nextPosition, locationName, levelOf, CRYPT_LEVEL } from './
 import { SURFACE_LAYERS } from './surfaces.js';
 import { DECOR_LAYERS } from './decor.js';
 import { TERRAIN_LAYERS } from './landcover.js';
+import { FABRIC_LAYERS } from './fabric.js';
 
 const el = id => document.getElementById(id);
 const canvas = el('scene');
@@ -79,7 +80,8 @@ const layerGroups=[
   {name:'craft',sizes:[112,288],layers:36,cols:6,method:'installCraft'},
   {name:'surfaces',sizes:[96,256],layers:SURFACE_LAYERS,cols:6,method:'installSurfaces'},
   {name:'decor',sizes:[96,256],layers:DECOR_LAYERS,cols:6,method:'installDecor'},
-  {name:'terrain',sizes:[128,384],layers:TERRAIN_LAYERS,cols:6,method:'installTerrain'}
+  {name:'terrain',sizes:[128,384],layers:TERRAIN_LAYERS,cols:6,method:'installTerrain'},
+  {name:'fabric',sizes:[128,256],layers:FABRIC_LAYERS,cols:6,method:'installFabric'}
 ];
 async function imagePixels(name,depth,columns=depth) {
   try {

@@ -1,6 +1,7 @@
 // New rooms and objects dressed with the GPT Image 2.5 Sunburst decor atlas (decor.js).
 // All coordinates are building-local metres (x across, z along the nave, y above the base).
 import { DECOR as D } from './decor.js';
+import { FABRIC } from './fabric.js';
 import { SURFACE as S } from './surfaces.js';
 import { CRAFT as C } from './ornament.js';
 import { FLOORS, ROOF_HEIGHT, BASE, world } from './layout.js';
@@ -675,5 +676,68 @@ export function forecourt(m, kit) {
     const y = groundAt(x, z) - .05;
     pot(m, x, y, z, r, h);
     kit.solid(around(x, z, r * 2.2, r * 2.2), y, y + h);
+  }
+}
+
+// ---------------------------------------------------------------- fabric pictures in the nave and rooms
+
+// A picture hung on an aisle wall; `side` is the wall's sign of x. Viewed from the nave, u runs to the right.
+function wallPicture(m, side, z, y0, y1, w, mat, frame) {
+  const x = side * 11.28, a = z - side * w / 2, b = z + side * w / 2;
+  m.quad([x, y0, a], [x, y0, b], [x, y1, b], [x, y1, a], mat, 1, [-side, 0, 0], [[0, 0], [1, 0], [1, 1], [0, 1]]);
+  if (frame) {
+    for (const [p, q] of [[[a, y0], [b, y0]], [[a, y1], [b, y1]], [[a, y0], [a, y1]], [[b, y0], [b, y1]]]) {
+      m.rod([x - side * .03, p[1], p[0]], [x - side * .03, q[1], q[0]], .04, .04, D.gildedGesso, 6, 1);
+    }
+  } else {
+    m.rod([x - side * .06, y1 + .05, a - side * .12], [x - side * .06, y1 + .05, b + side * .12], .025, .025, D.wroughtIron, 6, 1);
+  }
+}
+
+export function naveHangings(m) {
+  const y = FLOORS[0];
+  // Tapestries between the windows of the west aisle, murals on the east piers.
+  for (const z of [-15.63, 9.0, 15.04]) wallPicture(m, -1, z, y + 1.75, y + 4.55, 2.15, FABRIC.tapestry, false);
+  wallPicture(m, 1, -15.63, y + 1.75, y + 4.55, 2.15, FABRIC.muralPlaster, true);
+  for (const side of [-1, 1]) wallPicture(m, side, -15.63, FLOORS[1] + 1.6, FLOORS[1] + 4.4, 2.15, FABRIC.muralPlaster, true);
+  // Ledger stones in the aisles near the apse and a chequered pavement under the crossing.
+  for (const side of [-1, 1]) {
+    for (const z of [-12.4, -18.9]) floorQuad(m, side * 9.5 - .55, side * 9.5 + .55, z - 1.0, z + 1.0, y + .009, FABRIC.tombSlab, 1);
+  }
+  floorQuad(m, -3.8, 3.8, -7.1, .5, y + .004, FABRIC.checkerMarble, 1);
+}
+
+// Ceilings under the decks above the transept chapels (1F) and the treasury and scriptorium (2F).
+export function chapelCeilings(m, floor) {
+  for (const room of ROOMS.filter(r => r.floor === floor)) {
+    const y = FLOORS[floor + 1] - (floor === 0 ? .33 : .33) - .02;
+    if (floor === 0) {
+      const mid = (room.z0 + room.z1) / 2;
+      for (const [a, b] of [[room.z0, mid], [mid, room.z1]]) floorQuad(m, room.x0, room.x1, a, b, y, FABRIC.plasterVault, 1);
+    } else {
+      floorQuad(m, room.x0, room.x1, room.z0, room.z1, y, FABRIC.beamCeiling, 1);
+    }
+  }
+}
+
+// Stained plaster over the library and soot-black beams over the bell chamber.
+export function upperCeilings(m, index) {
+  const room = { x0: 7.17, x1: 19.5, z0: -8.74, z1: 2.97 };
+  if (index === 4) floorQuad(m, room.x0, room.x1, room.z0, room.z1, FLOORS[5] - .46, FABRIC.stainedCeiling, 1);
+  if (index === 5) floorQuad(m, room.x0, room.x1, room.z0, room.z1, ROOF_HEIGHT - .5, FABRIC.sootBeams, 1);
+}
+
+// A lead half-pipe gutter from a to b (level), UVs in metres.
+export function gutterTrough(m, a, b, r) {
+  const length = Math.hypot(b[0] - a[0], b[2] - a[2]), n = 10;
+  const dz = (b[2] - a[2]) / length, dx = (b[0] - a[0]) / length;
+  const at = (p, t) => [p[0] - dz * Math.cos(t) * r, p[1] - Math.sin(t) * r, p[2] + dx * Math.cos(t) * r];
+  for (let i = 0; i < n; i++) {
+    const t0 = Math.PI * i / n, t1 = Math.PI * (i + 1) / n;
+    m.quad(at(a, t0), at(b, t0), at(b, t1), at(a, t1), FABRIC.gutter, 1, undefined,
+      [[0, t0 * r], [length, t0 * r], [length, t1 * r], [0, t1 * r]]);
+  }
+  for (const p of [a, b]) {
+    for (let i = 0; i < n; i++) m.tri(p, at(p, Math.PI * i / n), at(p, Math.PI * (i + 1) / n), D.wroughtIron, .9);
   }
 }
