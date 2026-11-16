@@ -268,43 +268,100 @@ vec3 soilFaces(float layer, vec3 p, vec3 n, float scale, bool detailed) {
   if(w.y>0.0) c += w.y*soil(layer,p.xz*scale+.71);
   return c/(w.x+w.y+w.z);
 }
+// Picks one of six layers along t in [0,1), blending into the next near each boundary.
+vec3 soilBand(float t, float layers[6], vec2 uv, bool blend) {
+  float f = clamp(t,0.0,.9999)*6.0;
+  int i = int(f);
+  vec3 c = soil(layers[i],uv);
+  float w = smoothstep(.76,1.0,fract(f));
+  if(blend&&w>.01&&i<5) c = mix(c,soil(layers[i+1],uv),w);
+  return c;
+}
+vec3 rockBand(float t, float layers[6], vec3 p, vec3 n, bool detailed) {
+  float f = clamp(t,0.0,.9999)*6.0;
+  int i = int(f);
+  vec3 c = soilFaces(layers[i],p,n,.3,detailed);
+  float w = smoothstep(.76,1.0,fract(f));
+  if(detailed&&w>.01&&i<5) c = mix(c,soilFaces(layers[i+1],p,n,.3,false),w);
+  return c;
+}
+// Value noise gathers near .5; stretch it so every band gets its share.
+float spread(float v) { return clamp((v-.22)/.56,0.0,.9999); }
+
 vec3 landCover(vec3 p, vec3 n, bool detailed, float turf, float moss, float variation, float coarse, float grit,
     float elevation, float bank, float stripes) {
   vec2 g = p.xz;
-  // Wind-cropped grass that dries out in patches; thrift, heather and moss where the fields allow.
-  vec3 cover = soil(${T['coastalGrass']}.0,g*.42);
+  // Wind-cropped turf that dries out in patches.
+  vec3 cover = soil(${T.coastalGrass}.0,g*.42);
   float dry = smoothstep(.42,.72,variation);
-  if(dry>.02) cover = mix(cover,soil(${T['dryGrass']}.0,g*.37+.31),dry);
+  if(dry>.02) cover = mix(cover,soil(${T.dryGrass}.0,g*.37+.31),dry);
   if(detailed) {
+    // Clover, dandelions and long grass in the sheltered hollows.
+    float meadow = smoothstep(.58,.74,noise2(g*.11+1.9))*(1.0-dry)*(1.0-smoothstep(7.0,9.5,p.y));
+    if(meadow>.02) cover = mix(cover,soilBand(spread(noise2(g*.05+7.3)),
+      float[6](${T.clover}.0,${T.clover}.0,${T.dandelion}.0,${T.tallGrass}.0,${T.tallGrass}.0,${T.clover}.0),g*.45,true),meadow*.9);
+    // Thrift and wild thyme scattered over the open turf.
     float flowers = smoothstep(.63,.78,noise2(g*.13+5.7))*elevation;
+    if(flowers>.02) cover = mix(cover,soilBand(spread(noise2(g*.07+2.2)),
+      float[6](${T.thrift}.0,${T.thrift}.0,${T.thyme}.0,${T.thyme}.0,${T.thrift}.0,${T.thyme}.0),g*.45,true),flowers*.85);
+    // Heather, gorse and bracken on the high ground.
     float heath = smoothstep(.58,.74,noise2(g*.09-3.1))*smoothstep(5.0,8.6,p.y);
+    if(heath>.02) cover = mix(cover,soilBand(spread(noise2(g*.06+4.4)),
+      float[6](${T.heather}.0,${T.heather}.0,${T.gorse}.0,${T.bracken}.0,${T.bracken}.0,${T.heather}.0),g*.4+.53,true),heath);
+    // Moss, peat and mud where water collects.
     float damp = smoothstep(.57,.75,coarse)*(1.0-dry);
-    if(flowers>.02) cover = mix(cover,soil(${T['thrift']}.0,g*.45),flowers*.85);
-    if(heath>.02) cover = mix(cover,soil(${T['heather']}.0,g*.4+.53),heath);
-    if(damp>.02) cover = mix(cover,soil(damp>.5 ? ${T['moss']}.0 : ${T['peat']}.0,g*.5),damp*.75);
-    cover *= .82+.36*luminance(soil(${T['coastalGrass']}.0,g*.051));
+    if(damp>.02) cover = mix(cover,soilBand(spread(noise2(g*.08-6.0)),
+      float[6](${T.moss}.0,${T.moss}.0,${T.peat}.0,${T.mud}.0,${T.peat}.0,${T.moss}.0),g*.5,true),damp*.75);
+    // Marram on the dunes and samphire on the salt flats just above the beach.
+    float backshore = smoothstep(.9,1.5,p.y)*(1.0-smoothstep(2.4,3.6,p.y))*bank*smoothstep(.42,.58,noise2(g*.11-2.6));
+    if(backshore>.02) cover = mix(cover,soilBand(spread(noise2(g*.06+8.8)),
+      float[6](${T.marram}.0,${T.marram}.0,${T.marram}.0,${T.saltmarsh}.0,${T.saltmarsh}.0,${T.marram}.0),g*.45,true),backshore);
+    cover *= .82+.36*luminance(soil(${T.coastalGrass}.0,g*.051));
   }
+  // Earth, roots, mud and wind-blown leaves worn into the ground round the building.
   float worn = (1.0-smoothstep(.1,2.4,footprintDistance(p)))*bank;
-  if(worn>.02) cover = mix(cover,soil(${T['dirtPath']}.0,g*.6),worn*.85);
-  // Bare rock: strata on the cliffs, granite and slate in the harder bands, lichen on the drier tops.
-  float kind = noise2(g*.045+vec2(p.y*.05,0.0));
-  float layer = coarse>.62 ? ${T['granite']}.0 : coarse>.52 ? ${T['slate']}.0 : kind>.58 ? ${T['sandstone']}.0 : ${T['cliff']}.0;
-  vec3 stone = soilFaces(layer,p,n,.3,detailed);
+  if(worn>.02) cover = mix(cover,soilBand(spread(noise2(g*.09+3.3)),
+    float[6](${T.dirtPath}.0,${T.dirtPath}.0,${T.rootSoil}.0,${T.mud}.0,${T.leafLitter}.0,${T.dirtPath}.0),g*.6,detailed),worn*.85);
+
+  // Each headland shows its own stone; chalk breaks through in one place.
+  vec3 stone = rockBand(spread(noise2(g*.028+vec2(3.7,-1.2))),
+    float[6](${T.cliff}.0,${T.sandstone}.0,${T.gneiss}.0,${T.granite}.0,${T.slate}.0,${T.karst}.0),p,n,detailed);
+  float chalk = smoothstep(.70,.80,noise2(g*.02-9.0));
+  if(chalk>.02) stone = mix(stone,soilFaces(${T.chalk}.0,p,n,.3,false),chalk);
   float top = smoothstep(.55,.82,n.y);
-  if(top>.02) stone = mix(stone,soil(${T['lichenTop']}.0,g*.45),top*.7);
-  float lichen = smoothstep(.62,.78,grit+coarse*.3)*smoothstep(2.0,4.5,p.y);
-  if(detailed&&lichen>.02) stone = mix(stone,soilFaces(${T['orangeLichen']}.0,p,n,.5,false),lichen*.55);
+  if(top>.02) stone = mix(stone,soilBand(spread(noise2(g*.06+.4)),
+    float[6](${T.lichenTop}.0,${T.lichenTop}.0,${T.basalt}.0,${T.basalt}.0,${T.grus}.0,${T.lichenTop}.0),g*.45,detailed),top*.75);
+  if(detailed) {
+    float lichen = smoothstep(.62,.78,grit+coarse*.3)*smoothstep(2.0,4.5,p.y);
+    if(lichen>.02) stone = mix(stone,soilFaces(${T.orangeLichen}.0,p,n,.5,false),lichen*.55);
+    float shady = smoothstep(.15,-.35,dot(n,SUN))*smoothstep(.45,.7,coarse)*(1.0-top);
+    if(shady>.02) stone = mix(stone,soilFaces(${T.mossyRock}.0,p,n,.4,false),shady*.8);
+    float seep = (1.0-smoothstep(.3,.6,n.y))*smoothstep(.56,.7,noise2(vec2(g.x*.15+g.y*.1,p.y*.05)))*(1.0-smoothstep(2.5,5.0,p.y));
+    if(seep>.02) stone = mix(stone,soilFaces(${T.wetCliff}.0,p,n,.35,false),seep*.85);
+    float iron = smoothstep(.66,.8,noise2(g*.07+vec2(0.0,p.y*.12)))*(1.0-top);
+    if(iron>.02) stone = mix(stone,soilFaces(${T.ironRock}.0,p,n,.4,false),iron*.7);
+    float spray = smoothstep(1.2,1.8,p.y)*(1.0-smoothstep(2.4,3.6,p.y))*smoothstep(.45,.6,grit);
+    if(spray>.02) stone = mix(stone,soilFaces(${T.saltRock}.0,p,n,.5,false),spray*.6);
+  }
   float scree = smoothstep(.42,.6,n.y)*(1.0-smoothstep(.6,.78,n.y));
-  if(scree>.02) stone = mix(stone,soil(${T['scree']}.0,g*.6),scree*.75);
+  if(scree>.02) stone = mix(stone,soilBand(spread(noise2(g*.1-1.7)),float[6](${T.scree}.0,${T.scree}.0,${T.grus}.0,${T.scree}.0,${T.grus}.0,${T.scree}.0),g*.6,detailed),scree*.75);
   stone *= .82+.36*stripes;
   vec3 photo = mix(stone,cover,turf+(1.0-turf)*moss);
-  // The shore: sand and shingle on the flats, weed and barnacles on wet rock.
+
+  // The shore: each cove its own beach, foam at the waterline, a strandline of wrack above it.
   float shore = 1.0-smoothstep(.15,1.55,p.y);
   if(shore>.02) {
-    vec3 beach = soil(${T['sand']}.0,g*.5);
-    float pebbles = smoothstep(.45,.62,noise2(g*.21));
-    if(detailed&&pebbles>.02) beach = mix(beach,soil(${T['shingle']}.0,g*.8),pebbles);
-    vec3 tidal = soilFaces(p.y<.6 ? ${T['barnacleRock']}.0 : ${T['seaweedRock']}.0,p,n,.55,detailed);
+    vec3 beach = soilBand(spread(noise2(g*.045+4.1)),
+      float[6](${T.sand}.0,${T.shingle}.0,${T.shellBeach}.0,${T.driftwood}.0,${T.mudflat}.0,${T.blackSand}.0),g*.5,detailed);
+    if(detailed) {
+      float wet = 1.0-smoothstep(.12,.45,p.y);
+      if(wet>.02) beach = mix(beach,soil(${T.foamSand}.0,g*.55),wet*.8);
+      float strand = smoothstep(.5,.7,p.y)*(1.0-smoothstep(.8,1.05,p.y))*smoothstep(.4,.55,noise2(g*.3));
+      if(strand>.02) beach = mix(beach,soil(${T.wrack}.0,g*.6),strand*.75);
+    }
+    vec3 tidal = soilFaces(p.y<.6 ? ${T.barnacleRock}.0 : ${T.seaweedRock}.0,p,n,.55,detailed);
+    float shelf = smoothstep(.55,.8,n.y);
+    if(shelf>.02) tidal = mix(tidal,soil(${T.rockShelf}.0,g*.45),shelf);
     photo = mix(photo,mix(tidal,beach,smoothstep(.6,.86,n.y)),shore);
   }
   return photo;

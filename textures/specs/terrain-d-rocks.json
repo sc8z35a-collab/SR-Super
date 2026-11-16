@@ -1,0 +1,51 @@
+{
+  "sheet": "terrain-d-rocks",
+  "theme": "the rock types of a small Atlantic island's cliffs and outcrops",
+  "tiles": [
+    {
+      "id": "basalt_columns",
+      "tile": true,
+      "prompt": "the tops of hexagonal basalt columns, dark grey with lichen"
+    },
+    {
+      "id": "karst_limestone",
+      "tile": true,
+      "prompt": "pale grey limestone with deep solution grooves and pits"
+    },
+    {
+      "id": "mossy_rock",
+      "tile": true,
+      "prompt": "a rock slope covered with green moss and small plants"
+    },
+    {
+      "id": "granite_grus",
+      "tile": true,
+      "prompt": "coarse weathered granite sand and grit"
+    },
+    {
+      "id": "gneiss",
+      "tile": true,
+      "prompt": "banded grey and pink gneiss with wavy foliation"
+    },
+    {
+      "id": "wet_cliff",
+      "tile": true,
+      "prompt": "a dark cliff face wet with running water and streaks"
+    },
+    {
+      "id": "iron_rock",
+      "tile": true,
+      "prompt": "rock stained rust red and orange by iron oxide"
+    },
+    {
+      "id": "salt_rock",
+      "tile": true,
+      "prompt": "grey rock crusted with white salt crystals"
+    },
+    {
+      "id": "chalk",
+      "tile": true,
+      "prompt": "white chalk cliff face with angular fractures"
+    }
+  ]
+}
