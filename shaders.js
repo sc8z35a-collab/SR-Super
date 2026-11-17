@@ -7,6 +7,7 @@ import { TERRAIN as T } from './landcover.js';
 import { FABRIC_START, FABRIC_LAYER as F, FABRIC_LAYERS, FABRIC_SHADING, FABRIC_FALLBACK } from './fabric.js';
 import { PROPS_START, PROPS_LAYER as P, PROPS_LAYERS, PROPS_SHADING, PROPS_FALLBACK } from './props.js';
 import { UNDER, UNDER_START, UNDER_LAYERS, UNDER_SHADING, UNDER_FALLBACK, UNDER_GLOW } from './under.js';
+import { CITY, CITY_START, CITY_LAYERS, CITY_SHADING, CITY_FALLBACK, CITY_GLOW, CITY_FIRE } from './city.js';
 import { DECOR, DECOR_START, DECOR_LAYERS, DECOR_SHADING, DECOR_FALLBACK, DECOR_GLOW, DECOR_STANDIN } from './decor.js';
 
 const glslVec3 = rows => rows.map(r => `vec3(${r.map(v => Number(v).toFixed(3)).join(',')})`).join(',');
@@ -227,6 +228,9 @@ uniform highp sampler2DArray uProps;
 uniform bool uHasProps;
 uniform highp sampler2DArray uUnder;
 uniform bool uHasUnder;
+uniform highp sampler2DArray uCity;
+uniform bool uHasCity;
+uniform vec4 uCityLamps[16];
 uniform bool uHasAltarpiece;
 uniform bool uInterior;
 uniform vec3 uPerson;
@@ -926,6 +930,21 @@ vec3 windowGlass(vec2 pane, bool rose, bool rows, out float stone) {
   return v;
 }
 
+// The ancient city's atlas (city.js).
+vec3 cityMaterial(float type, vec3 n, out float bump, out float roughness) {
+  const vec3 shading[${CITY_LAYERS}] = vec3[${CITY_LAYERS}](${glslVec3(CITY_SHADING)});
+  const vec3 fallback[${CITY_LAYERS}] = vec3[${CITY_LAYERS}](${glslVec3(CITY_FALLBACK)});
+  float layer = type-${CITY_START}.0;
+  vec3 s = shading[int(layer)];
+  roughness = s.y;
+  bump = 0.0;
+  if(!uHasCity) return fallback[int(layer)];
+  vec2 uv = s.x==0.0 ? vec2(clamp(vUv.x,.006,.994),clamp(1.0-vUv.y,.006,.994)) : fabricPlane(n)*s.x;
+  vec3 c = pow(texture(uCity,vec3(uv,layer)).rgb,vec3(1.48));
+  bump = (luminance(c)-.3)*(roughness<.4 ? .3 : .8);
+  return c*s.z;
+}
+
 // The underground levels' atlas (under.js).
 vec3 underMaterial(float type, vec3 n, out float bump, out float roughness) {
   const vec3 shading[${UNDER_LAYERS}] = vec3[${UNDER_LAYERS}](${glslVec3(UNDER_SHADING)});
@@ -1149,6 +1168,15 @@ void main() {
     vec3 glow = uHasDecor ? texture(uDecor,vec3(glowUv,${DECOR.lanternGlass-DECOR_START}.0)).rgb : vec3(1.0,.62,.24);
     color = vec4(outColor(pow(glow,vec3(1.25))*vec3(1.55,1.12,.78)*shade),1.0);
     return;
+  } else if(type>=${CITY_START}.0&&type<${CITY_START+CITY_LAYERS}.0){
+${CITY_FIRE.map(name=>`    if(type==${CITY[name]}.0){
+      vec3 fire = uHasCity ? texture(uCity,vec3(clamp(vUv.x,.01,.99),clamp(1.0-vUv.y,.01,.99),${CITY[name]-CITY_START}.0)).rgb : vec3(1.0,.5,.15);
+      if(luminance(fire)<.16) discard;
+      color=vec4(outColor(pow(fire,vec3(1.2))*1.9),1.0);
+      return;
+    }`).join('\n')}
+    base=cityMaterial(type,n,bump,roughness);
+${CITY_GLOW.map(([name,gain])=>`    if(type==${CITY[name]}.0){color=vec4(outColor(base*vec3(${gain.join(',')})*shade),1.0);return;}`).join('\n')}
   } else if(type>=${UNDER_START}.0&&type<${UNDER_START+UNDER_LAYERS}.0){
     base=underMaterial(type,n,bump,roughness);
 ${UNDER_GLOW.map(([name,gain])=>`    if(type==${UNDER[name]}.0){color=vec4(outColor(base*vec3(${gain.join(',')})*shade),1.0);return;}`).join('\n')}
@@ -1240,6 +1268,23 @@ ${DECOR_GLOW.map(([name,gain])=>`    if(type==${DECOR[name]}.0){color=vec4(outCo
         *(1.0-smoothstep(-.8,1.6,at.y-(${CRYPT.y.toFixed(2)})));
       ambient = mix(ambient,vec3(.082,.090,.100),crypt);
       direct = mix(direct,vec3(.98,.60,.29)*flame+vec3(.05,.34,.38)*tide,crypt);
+    }
+    else if(crypt>0.0&&pos.x>11.35&&vWorld.y-${BASE.toFixed(2)}>-34.0&&vWorld.y-${BASE.toFixed(2)}<-23.5){
+      // The ancient city: lit only by its everlasting torches, the nearest of which the renderer sends.
+      vec3 at = vec3(pos.x,vWorld.y-${BASE.toFixed(2)},pos.y);
+      vec2 nl = buildingDirection(n.xz);
+      vec3 normalLocal = vec3(nl.x,n.y,nl.y);
+      vec3 fire = vec3(0.0);
+      for(int i=0;i<16;i++){
+        vec4 l = uCityLamps[i];
+        if(l.w==0.0) continue;
+        vec3 d = l.xyz-at;
+        float r = length(d);
+        float k = abs(l.w)*(.22+.78*max(0.0,dot(normalLocal,d/max(r,.001))))/(1.0+r*r*.30);
+        fire += (l.w<0.0 ? vec3(.30,.55,1.15) : vec3(1.0,.60,.28))*k;
+      }
+      ambient = vec3(.040,.034,.030);
+      direct = fire;
     }
     else if(crypt>0.0){
       // 地下2階〜地下7階: each level's own lamps, picked by height band.

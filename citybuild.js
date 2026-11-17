@@ -53,7 +53,9 @@ function segDist(x, z, ax, az, bx, bz) {
   const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / l2));
   return [Math.hypot(x - ax - dx * t, z - az - dz * t), t];
 }
-const parse = s => (s || '').split(';').map(t => t.trim()).filter(Boolean).map(t => t.split(/\s+/));
+// Linear interpolation of numbers or of points.
+const mix = (a, b, t) => Array.isArray(a) ? a.map((v, i) => v + (b[i] - v) * t) : a + (b - a) * t;
+export const parse = s => (s || '').split(';').map(t => t.trim()).filter(Boolean).map(t => t.split(/\s+/));
 
 // ---------------------------------------------------------------- 3-D helpers
 
@@ -407,7 +409,7 @@ const ITEMS = {
 // ---------------------------------------------------------------- house walls
 
 // The frame of a house record: its plan corners, and a map from the record's own axes to the plan.
-function frameOf(H) {
+export function frameOf(H) {
   if (H.q) {
     const [cx, cz, w, d, deg] = H.q, a = (deg ?? 0) * DEG, ca = Math.cos(a), sa = Math.sin(a);
     const k = H.k ?? [[0, 0], [0, 0], [0, 0], [0, 0]];
@@ -652,7 +654,7 @@ function buildTunnel(m, T) {
     }
     if (start !== null) runs.push([start, 1]);
     for (const [s0, s1] of runs) {
-      const l0 = lerp(Lw[i], Lw[i + 1], s0), l1 = lerp(Lw[i], Lw[i + 1], s1), r0 = lerp(Rw[i], Rw[i + 1], s0), r1 = lerp(Rw[i], Rw[i + 1], s1);
+      const l0 = mix(Lw[i], Lw[i + 1], s0), l1 = mix(Lw[i], Lw[i + 1], s1), r0 = mix(Rw[i], Rw[i + 1], s0), r1 = mix(Rw[i], Rw[i + 1], s1);
       const y0 = lerp(ys[i], ys[i + 1], s0), y1 = lerp(ys[i], ys[i + 1], s1), h = T.h;
       const dir = [pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]], dl = Math.hypot(...dir), nx = -dir[1] / dl, nz = dir[0] / dl;
       quad(m, [l0[0], y0, l0[1]], [l1[0], y1, l1[1]], [r1[0], y1, r1[1]], [r0[0], y0, r0[1]], M(T.floor), [0, 1, 0]);
@@ -666,18 +668,19 @@ function buildTunnel(m, T) {
   // Torches on the tunnel walls: segment s side(l|r) [flame].
   for (const [si, s, side, fl] of parse(T.t)) {
     const i = +si, k = +s, line = side === 'l' ? Lw : Rw;
-    const p = lerp(line[i], line[i + 1], k);
+    const p = mix(line[i], line[i + 1], k);
     const dir = [pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]], dl = Math.hypot(...dir);
     const f = side === 'l' ? [dir[1] / dl, -dir[0] / dl] : [-dir[1] / dl, dir[0] / dl];
     torch(m, p[0] + f[0] * .22, p[1] + f[1] * .22, lerp(ys[i], ys[i + 1], k), f, fl ?? 'o', .8);
   }
   // Pictures on the tunnel walls: kind segment s side.
   for (const [kind, si, s, side] of parse(T.x)) {
-    const i = +si, k = +s, line = side === 'l' ? Lw : Rw, p = lerp(line[i], line[i + 1], k);
+    const i = +si, k = +s, line = side === 'l' ? Lw : Rw, p = mix(line[i], line[i + 1], k);
     const dir = [pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]], dl = Math.hypot(...dir);
     const f = side === 'l' ? [dir[1] / dl, -dir[0] / dl] : [-dir[1] / dl, dir[0] / dl];
     const yy = lerp(ys[i], ys[i + 1], k);
-    const pic = { paint: 'cavePainting', graffiti: 'graffiti', glyphs: 'glyphs', web: 'cobweb', drip: 'dripMoss2', hole: 'wallHole2', relief: 'shrineRelief2', tally: 'tally' }[kind];
+    const pic = { paint: 'cavePainting', graffiti: 'graffiti', glyphs: 'glyphs', web: 'cobweb', drip: 'dripMoss2', hole: 'wallHole2', relief: 'shrineRelief2', tally: 'tally', hands: 'handprints', cloth: 'dyedCloth' }[kind];
+    if (!pic) throw new Error(`city: unknown tunnel picture ${kind}`);
     stand(m, p[0] + f[0] * .015, p[1] + f[1] * .015, f, .9, yy + .45, yy + 1.45, M(pic));
   }
 }
@@ -741,7 +744,7 @@ const FEATURE = {
         }, [[0, 1]])) : [[0, 1]];
         for (const [s0, s1] of pieces) {
           if (s1 - s0 < .01) continue;
-          const A = lerp(line[i], line[i + 1], s0), B = lerp(line[i], line[i + 1], s1);
+          const A = mix(line[i], line[i + 1], s0), B = mix(line[i], line[i + 1], s1);
           slab(m, A, B, y - .05, y + .32, .3, M(F.kerb ?? 'roughBlock'));
           wallBlock(A, B, .15, y - .05, y + .4);
         }
@@ -818,8 +821,8 @@ const FEATURE = {
       stand(m, x + f[0] * s / 2, z + f[1] * s / 2, f, s, y0, y0 + s * 1.3, M('cage'));
       stand(m, x + f[0] * s / 2, z + f[1] * s / 2, [-f[0], -f[1]], s, y0, y0 + s * 1.3, M('cage'));
     }
-    flat(m, x, z, [0, 1], s, s, y0 + s * 1.3, M('rustPlate', 'u'), 1);
-    flat(m, x, z, [0, 1], s, s, y0 + .02, M('rustPlate', 'u'), 1);
+    flat(m, x, z, [0, 1], s, s, y0 + s * 1.3, M('u:rustPlate'), 1);
+    flat(m, x, z, [0, 1], s, s, y0 + .02, M('u:rustPlate'), 1);
     if (F.up) rod(m, [x, y0 + s * 1.3, z], [x, y + (C.cc ?? C.ceil + .5), z], .03, S.chain, 4);
     if ((F.up ?? 0) < 1.4) roundBlock(x, z, s * .7, y0, y0 + s * 1.3);
   },

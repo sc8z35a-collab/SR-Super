@@ -8,6 +8,7 @@ import { SURFACE as S } from './surfaces.js';
 import { DEPTHS, DEPTH_FLIGHTS as F, CRYPT } from './layout.js';
 import { TAU, lerp, random } from './terrain.js';
 import { lathe, disc, floorQuad, slab, candle, candlestand, crossMark, picture } from './chapels.js';
+import { LAKE_BREACH } from './citydata.js';
 
 const LIGHT = 11;
 const X0 = -11.3, X1 = 11.3;
@@ -78,12 +79,18 @@ function ceilingQuad(m, r, y, mat, shade = .9, uv = [[0, 0], [1, 0], [1, 1], [0,
   m.quad([r.x0, y, r.z0], [r.x1, y, r.z0], [r.x1, y, r.z1], [r.x0, y, r.z1], mat, shade, [0, -1, 0], uv);
 }
 
-function shell(m, kit, L, { floor, wall, ceiling, floorHoles = [], ceilingHoles = [], walls = {} }) {
+function shell(m, kit, L, { floor, wall, ceiling, floorHoles = [], ceilingHoles = [], walls = {}, breachE = null }) {
   const room = rect(X0, X1, L.z0, L.z1);
   for (const r of subtract(room, floorHoles)) kit.deck(m, r, L.y, floor, .33);
   const t = .5, top = L.ceiling + .05;
   kit.block(m, rect(X0 - t, X0, L.z0 - t, L.z1 + t), L.y - .4, top, walls.W ?? wall, .95);
-  kit.block(m, rect(X1, X1 + t, L.z0 - t, L.z1 + t), L.y - .4, top, walls.E ?? wall, .95);
+  if (breachE) {
+    // The east wall has fallen in: a ragged gap into the ancient city, with rock bridging over it.
+    const [a, b] = breachE;
+    kit.block(m, rect(X1, X1 + t, L.z0 - t, a), L.y - .4, top, walls.E ?? wall, .95);
+    kit.block(m, rect(X1, X1 + t, b, L.z1 + t), L.y - .4, top, walls.E ?? wall, .95);
+    slab(m, rect(X1, X1 + t, a, b), L.y + 2.0, top, U.wetBlackRock, .9);
+  } else kit.block(m, rect(X1, X1 + t, L.z0 - t, L.z1 + t), L.y - .4, top, walls.E ?? wall, .95);
   kit.block(m, rect(X0, X1, L.z0 - t, L.z0), L.y - .4, top, walls.N ?? wall, .95);
   kit.block(m, rect(X0, X1, L.z1, L.z1 + t), L.y - .4, top, walls.S ?? wall, .95);
   for (const r of subtract(room, ceilingHoles)) ceilingQuad(m, r, L.ceiling, ceiling);
@@ -359,7 +366,7 @@ function crystalCave(m, kit) {
 function lakeCave(m, kit) {
   const L = LAKE, y = L.y;
   const lake = rect(-6, 6, -13, 5);
-  shell(m, kit, L, { floor: U.caveMud, wall: U.flowstone, ceiling: U.stalactites, floorHoles: [OPEN.G, lake], ceilingHoles: [OPEN.E] });
+  shell(m, kit, L, { floor: U.caveMud, wall: U.flowstone, ceiling: U.stalactites, floorHoles: [OPEN.G, lake], ceilingHoles: [OPEN.E], breachE: LAKE_BREACH });
   flightBetween(m, kit, CRYSTAL, L, F.E, 1, U.flowstone);
   openingRails(kit, m, y, 'G');
   // The lake: a sandy bed under clear water, a beach round it and a rope rail along the shore.
@@ -381,7 +388,11 @@ function lakeCave(m, kit) {
   // Rimstone terraces, flowstone and wet rock walls, stalagmites and hanging stalactites.
   floorQuad(m, 3, 9, 8, 14, y + .02, U.rimstone, 1);
   wallBand(m, L, 'W', -11, 2, y, y + 2.2, U.wetBlackRock);
-  wallBand(m, L, 'E', -19, 3.5, y, y + 1.6, U.wetBlackRock);
+  wallBand(m, L, 'E', -19, LAKE_BREACH[0] - .4, y, y + 1.6, U.wetBlackRock);
+  wallBand(m, L, 'E', LAKE_BREACH[1] + .4, 3.5, y, y + 1.6, U.wetBlackRock);
+  // Rubble spilled through the breach and a torch beside it.
+  for (const [x, z, r] of [[10.3, -9.3, .55], [10.6, -6.4, .45], [9.4, -8.6, .35]]) lathe(m, x, y - .05, z, [[0, r], [r * .5, r * .6], [r * .8, .1]], U.crackedRock, 7, 1);
+  wallTorch(m, L, 10.9, y + 1.8, -10.2);
   wallBand(m, L, 'S', X0, X1, y + 2.2, y + 3.4, U.sediment);
   const rng = random(73);
   for (const [x, z] of [[-8, -6], [-7.5, 8], [8, -10], [7.5, -2], [3, 10], [-4, 13], [6.5, 15]]) {

@@ -9,6 +9,7 @@ import { TERRAIN_LAYERS } from './landcover.js';
 import { FABRIC_LAYERS } from './fabric.js';
 import { PROPS_LAYERS } from './props.js';
 import { UNDER_LAYERS } from './under.js';
+import { CITY_LAYERS } from './city.js';
 
 const el = id => document.getElementById(id);
 const canvas = el('scene');
@@ -91,7 +92,8 @@ const layerGroups=[
   {name:'terrain',sizes:[68,172],layers:TERRAIN_LAYERS,cols:6,method:'installTerrain'},
   {name:'fabric',sizes:[68,136],layers:FABRIC_LAYERS,cols:6,method:'installFabric'},
   {name:'props',sizes:[68,136],layers:PROPS_LAYERS,cols:6,method:'installProps'},
-  {name:'under',sizes:[68,136],layers:UNDER_LAYERS,cols:6,method:'installUnder'}
+  {name:'under',sizes:[68,136],layers:UNDER_LAYERS,cols:6,method:'installUnder'},
+  {name:'city',sizes:[68,136],layers:CITY_LAYERS,cols:6,method:'installCity'}
 ];
 async function imagePixels(name,depth,columns=depth) {
   try {

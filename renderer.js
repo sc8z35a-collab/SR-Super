@@ -1,7 +1,9 @@
 import { Mesh, add, sub, mul, dot, cross, normal, splitMesh } from './mesh.js';
 import { BASE, LIMITS, coastMap, islandMesh, shorelineRocks, meadow } from './terrain.js';
 import { cathedral } from './cathedral.js';
-import { ANGLE, CENTER, ROOF_INDEX, SPIRE_HEIGHT, envelopeNormal, envelopeTransform, world, worldNormal } from './layout.js';
+import { ANGLE, CENTER, ROOF_INDEX, SPIRE_HEIGHT, envelopeNormal, envelopeTransform, world, worldNormal, local } from './layout.js';
+
+const CITY_LEVEL = -8, CITY_LIGHTS = 16;
 import { buildPerson, personPose } from './character.js';
 import * as shader from './shaders.js';
 
@@ -164,6 +166,12 @@ export class Renderer {
     this.pendingFloors=architecture.walkFloors;
     this.floors=Array(this.pendingFloors.length).fill(null);
     this.pendingUnder=architecture.underFloors;
+    // The ancient city is uploaded the first time it comes into view, in 20 m chunks.
+    this.pendingCity=architecture.cityMesh;
+    this.cityParts=null;
+    this.cityLamps=architecture.cityLamps;
+    this.cityLight=new Float32Array(CITY_LIGHTS*4);
+    this.cityAtlas=null;
     this.under=Array(this.pendingUnder.length).fill(null);
     this.underAtlas=null;
     this.glassLight=architecture.decals.upload(gl,world,BASE,worldNormal);
@@ -244,6 +252,38 @@ export class Renderer {
     const next=this.installLayerArray(pixels);
     if(this.props)this.gl.deleteTexture(this.props);
     this.props=next;
+  }
+
+  city() {
+    if(!this.cityParts){
+      this.cityParts=splitMesh(this.pendingCity,world,20).map(({mesh,x0,x1,z0,z1})=>({...mesh.upload(this.gl,world,BASE,worldNormal),x0,x1,z0,z1}));
+      this.pendingCity=null;
+    }
+    return this.cityParts;
+  }
+
+  // The torches nearest the eye light the city (building-local x, height, z, strength), flickering.
+  nearestCityLamps(eye, time) {
+    const [lx, lz] = local(eye[0], eye[2]);
+    const best = [];
+    for (const l of this.cityLamps) {
+      const d = Math.hypot(l[0] - lx, l[2] - lz);
+      if (d > 45) continue;
+      if (best.length < CITY_LIGHTS) { best.push([d, l]); best.sort((a, b) => a[0] - b[0]); }
+      else if (d < best[CITY_LIGHTS - 1][0]) { best[CITY_LIGHTS - 1] = [d, l]; best.sort((a, b) => a[0] - b[0]); }
+    }
+    this.cityLight.fill(0);
+    best.forEach(([, l], i) => {
+      const flicker = .86 + .1 * Math.sin(time * 7.3 + l[0] * 1.7) + .05 * Math.sin(time * 13.1 + l[2]);
+      this.cityLight.set([l[0], l[1], l[2], l[3] * flicker * (l[4] ? -1 : 1)], i * 4);
+    });
+    return this.cityLight;
+  }
+
+  installCity(pixels) {
+    const next=this.installLayerArray(pixels);
+    if(this.cityAtlas)this.gl.deleteTexture(this.cityAtlas);
+    this.cityAtlas=next;
   }
 
   installUnder(pixels) {
@@ -402,6 +442,8 @@ export class Renderer {
     const {eye,forward,interior,fov,floor=0,walking=false}=pose;
     // Level -1 is the crypt, -2 to -7 the levels below; from 地下2階 down nothing above ground shows.
     const lv = pose.level ?? floor;
+    const nearCity = lv === CITY_LEVEL || lv === -6;
+    const cityLight = nearCity ? this.nearestCityLamps(eye, time) : this.cityLight.fill(0);
     const deep = lv <= -2;
     const { width, height } = this.canvas;
     const aspect = width/height;
@@ -441,6 +483,8 @@ export class Renderer {
       gl.bindTexture(gl.TEXTURE_2D_ARRAY,this.props??this.decor??this.materials);
       gl.activeTexture(gl.TEXTURE0+14);
       gl.bindTexture(gl.TEXTURE_2D_ARRAY,this.underAtlas??this.decor??this.materials);
+      gl.activeTexture(gl.TEXTURE0+15);
+      gl.bindTexture(gl.TEXTURE_2D_ARRAY,this.cityAtlas??this.decor??this.materials);
     };
     const setupMaterials = (program, m = matrix, viewer = eye, clip = NO_CLIP, linear = hdr) => {
       const mat = program.use();
@@ -475,6 +519,9 @@ export class Renderer {
       mat.i('uHasProps',!!this.props);
       mat.i('uUnder',14);
       mat.i('uHasUnder',!!this.underAtlas);
+      mat.i('uCity',15);
+      mat.i('uHasCity',!!this.cityAtlas);
+      mat.v4('uCityLamps',cityLight);
       mat.f('uFloor',floor);
       mat.i('uShadow', 1);
       mat.v2('uShadowStep', shadow ? [1/shadow.size,1/shadow.size] : [0,0]);
@@ -541,8 +588,10 @@ export class Renderer {
       }
       // Underground levels are closed rooms, so only the level itself and the next up or down show.
       for(let i=0;i<this.under.length;i++){
-        if(lv<=-1&&Math.abs(lv+i+2)<Math.min(near.floors,2))this.draw(this.underFloor(i));
+        // From the city only the lake cave it opens from can be seen.
+        if(lv===CITY_LEVEL ? i===4 : lv<=-1&&Math.abs(lv+i+2)<Math.min(near.floors,2))this.draw(this.underFloor(i));
       }
+      if(nearCity)this.drawChunks(this.city(), eye, Math.min(near.radius, 120));
       if(interior&&floor<2&&quality>0&&lv>=0){
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
