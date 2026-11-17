@@ -708,7 +708,81 @@ const BATH = [
     d: '3 .5 .95 cloth', i: 'bed .4 .2 0;candles -.8 1.0;jar -.9 -1.0 0 .8', x: 'mold 1 .5 i' },
 ];
 
-export const HOUSES = [...GATE, ...LAKESIDE, ...MUD, ...MAZE, ...MARKET, ...TIMBER, ...CANAL, ...SMITHY, ...ASHLAR, ...BATH];
+// 岩窟区: rooms cut back into the rock. Under the high south roof four stone terraces carry a row of
+// rock dwellings reached by steps; below them the ground houses stand back to back, the rear rooms
+// opening only through the front ones.
+const ROCKCUT = [
+  { c: 'rockcut', n: '岩棚の家・西', base: 1.3, p: [[651.6, -181.0], [655.6, -183.3], [655.6, -179.9], [652.0, -178.6]], h: 2.2, w: 'bedrock', ew: { 2: 'roughBlock' }, f: 'pebbleFloor', r: 'bedrock2', top: 'bedrock2',
+    d: '2 .5 .9 open', i: 'bed -.6 -.6 120;hearth .9 .4 300;pots -1.0 .7 0', t: '2 .85 o', x: 'paint 0 .5 i' },
+  { c: 'rockcut', n: '岩棚の家・洞の間', base: 1.3, p: [[656.2, -183.6], [660.2, -185.2], [661.0, -181.6], [656.2, -180.1]], h: 2.2, w: 'bedrock2', ew: { 2: 'flatStone' }, f: 'pebbleFloor', r: 'bedrock',
+    d: '2 .5 .9 cloth', i: 'bed .6 -.8 110;straw -1.0 .3 20;jar 1.4 .9;candles -.4 -1.4', x: 'glyphs 0 .5 i' },
+  { c: 'rockcut', n: '岩棚の家・壺の間', base: 1.3, p: [[661.6, -185.4], [666.0, -186.0], [666.2, -182.2], [661.6, -181.8]], h: 2.25, w: 'bedrock', ew: { 2: 'roughBlock' }, f: 'pebbleFloor', r: 'bedrock2',
+    d: '2 .5 .9 open', i: 'jar -1.4 -1.2 0 1.1;jar -.6 -1.5 0 .9;jar 1.5 -1.4 0 1.0;bed .4 .4 90', t: '2 .1 o', x: 'paint 0 .4 i' },
+  { c: 'rockcut', n: '岩棚の家・祈祷師', base: 1.3, p: [[666.8, -186.2], [671.4, -187.0], [671.6, -183.0], [666.8, -182.4]], h: 2.25, w: 'bedrock2', ew: { 2: 'flatStone' }, f: 'pebbleFloor', r: 'bedrock',
+    d: '2 .5 .9 open', i: 'relief2 @0 .5 .1 1.3;candles -1.0 -.6;candles 1.2 -.8;mat 0 .3 90;bed 1.6 .6 90', t: '2 .9 o', x: 'paint 0 .2 i;hands 2 .2 o' },
+  { c: 'rockcut', n: '岩棚の家・東の間', base: 1.3, p: [[672.6, -187.0], [677.2, -186.1], [677.4, -182.8], [672.6, -183.0]], h: 2.2, w: 'bedrock', ew: { 2: 'roughBlock' }, f: 'pebbleFloor', r: 'bedrock2',
+    d: '2 .5 .9 open', i: 'bed -1.2 -.2 90;table .9 0 0;stool .9 .7;pots -.2 -1.2 0', x: 'glyphs 0 .7 i' },
+  { c: 'rockcut', n: '岩棚の家・突き当たり', base: 1.3, p: [[678.0, -185.9], [682.6, -185.0], [682.8, -181.6], [678.2, -182.4]], h: 2.2, w: 'bedrock2', ew: { 2: 'flatStone' }, f: 'pebbleFloor', r: 'bedrock',
+    d: '2 .5 .9 cloth', i: 'bed .6 -.4 80;straw -1.2 .2 0;jar 1.6 .8', t: '2 .1 o', x: 'paint 0 .5 i' },
+  { c: 'rockcut', n: '岩際の西の家', p: [[644.4, -170.8], [648.6, -171.4], [649.0, -167.0], [645.6, -166.4]], h: 2.2, w: 'roughBlock', ew: { 3: 'bedrock' }, f: 'pebbleFloor', r: 'bedrock2',
+    d: '1 .5 .9 open', i: 'bed -.8 .4 10;pots .9 -1.2 0;jar -1.2 -1.2', t: '1 .9 o', x: 'drip 3 .5 i' },
+  { c: 'rockcut', n: '岩際の奥の家', p: [[646.4, -175.6], [650.2, -175.0], [649.6, -171.8], [645.4, -171.4]], h: 2.15, w: 'bedrock', ew: { 1: 'roughBlock' }, f: 'pebbleFloor', r: 'bedrock2',
+    d: '1 .5 .9 open', i: 'straw -.6 0 0;hearth .8 -.9 330;pots -1.0 1.2 0', x: 'paint 3 .5 i' },
+  { c: 'rockcut', n: '岩棚の下の家', p: [[657.0, -176.4], [661.4, -177.2], [661.0, -173.4], [657.4, -172.2]], h: 2.2, w: 'flatStone', ew: { 0: 'roughBlock' }, f: 'pebbleFloor', r: 'slabCeil',
+    d: '0 .5 .9 open;3 .5 .9 cloth', i: 'bed .9 .6 10;table -.6 -.4 15;stool -.6 .4;jar 1.5 -1.4', t: '0 .1 o', x: 'glyphs 1 .5 i' },
+  { c: 'rockcut', n: '石段脇の細い家', p: [[661.8, -175.6], [664.4, -176.0], [664.6, -171.6], [662.4, -171.2]], h: 2.15, w: 'roughBlock', f: 'pebbleFloor', r: 'bedrock2',
+    d: '1 .5 .9 open', i: 'bed 0 .4 0;pots -.4 -1.6 0', x: 'drip 3 .5 i' },
+  { c: 'rockcut', n: '小径沿いの家', p: [[657.8, -171.4], [661.6, -172.6], [661.2, -168.6], [658.4, -168.2]], h: 2.2, w: 'flatStone', f: 'pebbleFloor', r: 'slabCeil',
+    d: '2 .5 .9 open', i: 'bed -.8 -.4 20;hearth .8 -.8 0;stool .4 .6', t: '2 .1 o', x: 'hands 2 .7 o' },
+  { c: 'rockcut', n: '中の石段下の家', p: [[667.6, -178.2], [672.2, -178.6], [672.6, -174.6], [667.8, -174.0]], h: 2.2, w: 'roughBlock', ew: { 3: 'flatStone' }, f: 'pebbleFloor', r: 'bedrock2',
+    d: '0 .5 .9 open;3 .5 .9 open', i: 'bed 1.2 .4 0;loom -.6 .9 0;basket -1.4 -1.2;pots .6 -1.4 0', t: '0 .85 o', x: 'paint 1 .5 i' },
+  { c: 'rockcut', n: '東の石段脇の家', p: [[673.0, -177.6], [676.2, -178.0], [676.6, -173.8], [673.2, -174.2]], h: 2.15, w: 'bedrock2', ew: { 1: 'roughBlock' }, f: 'pebbleFloor', r: 'bedrock',
+    d: '1 .5 .9 open', i: 'bed -.5 .2 0;jar .8 1.3;pots .7 -1.4 0', x: 'glyphs 3 .5 i' },
+  { c: 'rockcut', n: '小径の南の家', p: [[667.4, -172.8], [671.6, -173.4], [672.0, -169.8], [667.6, -169.6]], h: 2.2, w: 'flatStone', f: 'pebbleFloor', r: 'slabCeil',
+    d: '2 .5 .9 open', i: 'bed -1.1 -.2 0;table .8 -.4 0;stool .8 .3', t: '2 .9 o', x: 'hands 2 .2 o' },
+  { c: 'rockcut', n: '狭間の家', p: [[672.6, -173.2], [676.4, -172.8], [676.0, -170.6], [673.0, -170.2]], h: 2.1, w: 'roughBlock', f: 'pebbleFloor', r: 'bedrock2',
+    d: '2 .5 .9 cloth', i: 'straw 0 0 90;pots 1.2 .2 0', x: 'drip 0 .5 i' },
+  { c: 'rockcut', n: '二間の岩屋', p: [[680.0, -176.6], [684.6, -177.4], [684.4, -171.8], [680.2, -171.4]], h: 2.25, w: 'bedrock', ew: { 2: 'flatStone', 3: 'flatStone' }, f: 'pebbleFloor', r: 'bedrock2',
+    d: '2 .5 .9 open;3 .5 .9 open', i: 'partition .2 -.6 0 2.8;curtain -1.8 -.6 0 .8;bed -.4 -2.0 90;bed 1.4 1.0 0;hearth -1.2 1.4 90;pots .6 2.0 0', t: '2 .15 o', x: 'paint 0 .5 i' },
+  { c: 'rockcut', n: '東の岩際の家', p: [[685.4, -175.0], [689.0, -174.0], [689.4, -171.0], [685.8, -171.6]], h: 2.2, w: 'roughBlock', ew: { 0: 'bedrock2' }, f: 'pebbleFloor', r: 'bedrock2',
+    d: '2 .5 .9 open', i: 'bed .4 -.4 80;jar -1.1 .6;stool .9 .7', t: '2 .85 o', x: 'drip 0 .5 i' },
+  { c: 'rockcut', n: '坑口の家', p: [[655.8, -166.6], [659.8, -167.0], [660.4, -162.8], [656.4, -162.0]], h: 2.2, w: 'flatStone', ew: { 3: 'roughBlock' }, f: 'pebbleFloor', r: 'slabCeil',
+    d: '0 .5 .95 open;2 .45 .9 open', i: 'bed 1.2 .4 0;table -.6 .6 0;stool -.6 -.1;jar -1.4 -1.4', t: '0 .1 o', x: 'sign 0 .85 o' },
+  { c: 'rockcut', n: '石切りの家', p: [[660.8, -167.2], [664.8, -167.6], [665.2, -163.6], [661.0, -163.0]], h: 2.2, w: 'roughBlock', f: 'pebbleFloor', r: 'slabCeil',
+    d: '0 .5 .95 open;2 .38 .9 open', i: 'mill .9 .6;sacks -1.1 .8 0;bed -.6 -.8 90', t: '0 .9 o', x: 'glyphs 1 .5 i' },
+  { c: 'rockcut', n: '五角の岩屋', p: [[665.8, -168.4], [669.6, -168.0], [670.6, -165.4], [669.4, -162.6], [665.6, -163.4]], h: 2.2, w: 'bedrock2', ew: { 0: 'flatStone' }, f: 'pebbleFloor', r: 'bedrock',
+    d: '0 .5 .95 open;3 .32 .9 open', i: 'bed -.9 .3 0;hearth .9 .2 270;pots .4 -1.6 0', x: 'paint 4 .5 i' },
+  { c: 'rockcut', n: '小径の北の家', p: [[671.2, -167.6], [675.6, -168.2], [675.8, -164.0], [671.6, -163.4]], h: 2.2, w: 'flatStone', f: 'pebbleFloor', r: 'slabCeil',
+    d: '0 .5 .95 open;2 .48 .9 open', i: 'bed 1.3 .2 0;table -.4 .4 0;stool -.4 -.3;pots -1.6 -1.4 0', t: '0 .1 o', x: 'hands 0 .85 o' },
+  { c: 'rockcut', n: '縄綯いの岩屋', p: [[676.6, -168.8], [680.4, -168.0], [680.8, -164.6], [676.6, -164.0]], h: 2.2, w: 'roughBlock', f: 'pebbleFloor', r: 'bedrock2',
+    d: '0 .5 .95 open;2 .43 .9 open', i: 'net @3 .5 .12;basket .9 .9;bed -.6 -.2 0', x: 'drip 1 .5 i' },
+  { c: 'rockcut', n: '東口前の岩屋', p: [[681.4, -169.0], [685.8, -169.6], [686.2, -165.2], [681.6, -164.8]], h: 2.2, w: 'flatStone', ew: { 1: 'roughBlock' }, f: 'pebbleFloor', r: 'slabCeil',
+    d: '0 .5 .95 open;2 .41 .9 open', i: 'bed -1.2 .2 0;hearth .9 -1.0 0;jar 1.6 1.4', t: '0 .9 o', x: 'glyphs 0 .2 o' },
+  { c: 'rockcut', n: '東口の番小屋', p: [[686.8, -169.2], [690.4, -168.6], [690.8, -165.6], [687.0, -165.4]], h: 2.15, w: 'roughBlock', f: 'pebbleFloor', r: 'bedrock2',
+    d: '0 .5 .95 open;2 .37 .9 open', i: 'bed .2 .4 80;tally @1 .5 .12;stool -.9 -.6', t: '0 .85 o', x: 'tally 0 .3 o' },
+  { c: 'rockcut', n: '坑口の奥の間', p: [[657.0, -161.4], [661.2, -162.4], [661.4, -158.2], [657.6, -156.8]], h: 2.15, w: 'bedrock', f: 'pebbleFloor', r: 'bedrock2',
+    d: '0 .38 .9 open', i: 'bed .9 .4 0;straw -.8 .6 0;jar -1.2 -1.0', x: 'paint 2 .5 i' },
+  { c: 'rockcut', n: '石切りの奥の間', p: [[662.0, -162.6], [666.4, -162.4], [666.2, -155.0], [662.2, -155.4]], h: 2.2, w: 'bedrock2', f: 'pebbleFloor', r: 'bedrock',
+    d: '0 .36 .9 open', i: 'partition .4 .4 0 2.6;curtain -1.6 .4 0 .9;bed -.4 2.6 90;sacks 1.2 2.4 0;bed .9 -1.8 0;pots -1.4 -2.4 0', x: 'glyphs 2 .5 i' },
+  { c: 'rockcut', n: '五角の岩屋の奥', p: [[667.0, -162.2], [670.6, -161.8], [671.2, -155.6], [667.2, -155.0]], h: 2.15, w: 'bedrock', f: 'pebbleFloor', r: 'bedrock2',
+    d: '0 .33 .9 open', i: 'bed .8 1.2 0;straw -.8 -.6 0;candles -1.0 2.2', x: 'paint 3 .5 i' },
+  { c: 'rockcut', n: '北の岩屋', p: [[671.8, -162.6], [676.4, -163.0], [676.0, -158.2], [672.2, -157.4]], h: 2.2, w: 'bedrock2', f: 'pebbleFloor', r: 'bedrock',
+    d: '0 .43 .9 open;2 .45 .9 open', i: 'bed 1.2 .2 0;hearth -1.2 -.6 90;jar -1.4 1.4', x: 'paint 1 .5 i' },
+  { c: 'rockcut', n: '北の岩屋の奥', p: [[672.6, -156.8], [676.2, -157.6], [676.6, -154.2], [672.8, -154.0]], h: 2.1, w: 'bedrock', f: 'pebbleFloor', r: 'bedrock2',
+    d: '0 .47 .9 open', i: 'straw .2 .4 90;pots -1.2 .2 0', x: 'drip 2 .5 i' },
+  { c: 'rockcut', n: '縄綯いの奥の間', p: [[677.2, -163.4], [681.6, -163.8], [681.2, -158.4], [677.4, -158.0]], h: 2.2, w: 'bedrock2', f: 'pebbleFloor', r: 'bedrock',
+    d: '0 .41 .9 open;2 .45 .9 open', i: 'bed -1.2 .6 0;loom .9 1.6 0;basket 1.4 -1.4', x: 'glyphs 1 .5 i' },
+  { c: 'rockcut', n: '岩天井の小部屋', p: [[677.8, -157.4], [682.0, -157.6], [681.4, -155.4], [677.6, -154.2]], h: 2.0, w: 'bedrock', f: 'pebbleFloor', r: 'bedrock2',
+    d: '0 .4 .9 open', i: 'straw .2 .3 90;candles 1.2 .2', x: 'paint 2 .5 i' },
+  { c: 'rockcut', n: '東口前の奥の間', p: [[682.4, -163.6], [686.6, -164.2], [687.0, -159.8], [682.6, -159.2]], h: 2.2, w: 'bedrock2', f: 'pebbleFloor', r: 'bedrock',
+    d: '0 .45 .9 open;2 .45 .9 open', i: 'bed .9 -.2 0;table -.8 .4 90;stool -.2 .4', x: 'glyphs 3 .5 i' },
+  { c: 'rockcut', n: '東の行き止まりの間', p: [[683.0, -158.6], [687.2, -159.2], [686.6, -157.0], [683.2, -155.8]], h: 2.0, w: 'bedrock', f: 'pebbleFloor', r: 'bedrock2',
+    d: '0 .48 .9 open', i: 'straw 0 .2 80;jar 1.2 -.4', x: 'drip 2 .5 i' },
+  { c: 'rockcut', n: '番小屋の奥', p: [[687.8, -164.6], [691.2, -165.2], [691.8, -161.8], [688.2, -160.4]], h: 2.15, w: 'roughBlock', f: 'pebbleFloor', r: 'bedrock2',
+    d: '0 .47 .9 open', i: 'bed .3 .5 80;shackles @1 .5 .12', x: 'tally 2 .5 i' },
+];
+
+export const HOUSES = [...GATE, ...LAKESIDE, ...MUD, ...MAZE, ...MARKET, ...TIMBER, ...CANAL, ...SMITHY, ...ASHLAR, ...BATH, ...ROCKCUT];
 
 // ---------------------------------------------------------------- prison cells
 export const CELLS = [];
@@ -796,6 +870,15 @@ export const FEATURES = [
   { k: 'bath', c: 'bath', x: 557.6, z: -12.6, a: 0, w: 8.4, d: 6.6, edge: 'polWorn' },
   { k: 'well', c: 'bath', x: 571.0, z: -14.0, r: 2.0 },
   { k: 'items', c: 'bath', i: 'jar 553.2 -21.2 0 1.1;rubble 575.6 -16.8 0 .9 .4;cloth 566.4 -20.6 0;sherds2 558 -4.6 0;puddle 561.6 -19.8 0;basket 552.0 -3.6' },
+  // 岩窟区: four stone terraces along the high south wall, each with its own steps but the last.
+  { k: 'terrace', c: 'rockcut', h: 1.3, floor: 'flatStone', wall: 'roughBlock', p: [[650.0, -180.6], [658.6, -185.6], [660.4, -179.6], [655.0, -178.1], [653.6, -177.7], [651.6, -176.8]],
+    free: [1, 3], parapet: [2, 4, 5], steps: [[654.57, -176.94, 196, 1.2, 2.0]] },
+  { k: 'terrace', c: 'rockcut', h: 1.3, floor: 'flatStone', wall: 'roughBlock', p: [[658.6, -185.6], [672.0, -187.6], [672.0, -181.4], [666.6, -180.6], [664.8, -180.4], [660.4, -179.6]],
+    free: [1, 3, 5], parapet: [2, 4], steps: [[665.81, -179.51, 186, 1.2, 2.0]] },
+  { k: 'terrace', c: 'rockcut', h: 1.3, floor: 'flatStone', wall: 'roughBlock', p: [[672.0, -187.6], [685.4, -184.8], [684.0, -179.6], [678.6, -180.8], [676.8, -181.0], [672.0, -181.4]],
+    free: [1, 3, 5], parapet: [2, 4], steps: [[677.59, -179.91, 174, 1.2, 2.0]] },
+  { k: 'terrace', c: 'rockcut', h: 1.3, floor: 'flatStone', wall: 'roughBlock', p: [[685.4, -184.8], [692.4, -178.6], [690.0, -175.6], [684.0, -179.6]], free: [3], parapet: [1, 2] },
+  { k: 'items', c: 'rockcut', i: 'sacks 651.2 -168.4 0;rubble 652.0 -173.6 0 .7 .3;jar 663.4 -169.6 0 1.0;crate 678.4 -172.6 20;puddle 673.6 -169.2 0;basket 684.6 -170.2;sherds 668 -176 0;jar 688.4 -182.6 0 1.1;candles 690.6 -177.4' },
 ];
 
 // ---------------------------------------------------------------- free-standing torches: x z chamber [flame]
@@ -814,5 +897,7 @@ export const TORCHES = [
   [434.0, 97.8, 'smithy'], [447.8, 96.6, 'smithy'], [441.0, 88.8, 'smithy', 'w'], [440.0, 100.6, 'smithy'],
   [527.0, 115.6, 'ashlar'], [539.8, 102.0, 'ashlar'], [539.9, 111.4, 'ashlar'], [546.0, 117.0, 'ashlar'], [555.4, 119.0, 'ashlar'], [529.6, 124.0, 'ashlar'], [534.6, 118.4, 'ashlar', 'b'],
   [549.6, -15.4, 'bath'], [565.6, -12.6, 'bath'], [557.6, -20.6, 'bath'], [557.6, -4.4, 'bath'], [563.0, -2.0, 'bath'], [574.0, -21.6, 'bath'], [576.4, -9.4, 'bath', 'b'], [567.6, -14.0, 'bath'],
+  [653.0, -164.0, 'rockcut'], [658.4, -167.4, 'rockcut'], [666.0, -169.0, 'rockcut'], [672.4, -169.6, 'rockcut'], [679.0, -170.2, 'rockcut'], [688.0, -170.4, 'rockcut'],
+  [656.2, -177.6, 'rockcut', 'w'], [666.8, -179.0, 'rockcut'], [678.8, -178.8, 'rockcut'], [651.2, -175.0, 'rockcut'], [686.6, -176.6, 'rockcut', 'b'],
   [173.8, -48.0, 'maze'], [196.8, -46.0, 'maze'], [197.4, -60.6, 'maze'], [183.2, -56.8, 'maze'], [178.0, -27.0, 'maze'], [193.5, -20.4, 'maze'], [201.6, -60.0, 'maze'], [209.6, -52.0, 'maze', 'b'],
 ];
