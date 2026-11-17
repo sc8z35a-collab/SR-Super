@@ -163,6 +163,9 @@ export class Renderer {
     this.interior=architecture.interior.upload(gl,envelopeTransform,BASE,envelopeNormal);
     this.pendingFloors=architecture.walkFloors;
     this.floors=Array(this.pendingFloors.length).fill(null);
+    this.pendingUnder=architecture.underFloors;
+    this.under=Array(this.pendingUnder.length).fill(null);
+    this.underAtlas=null;
     this.glassLight=architecture.decals.upload(gl,world,BASE,worldNormal);
     const target=[CENTER[0],SPIRE_HEIGHT*.40,CENTER[1]];
     const toLight=camera(add(target,mul(SUN,183)),mul(SUN,-1));
@@ -241,6 +244,12 @@ export class Renderer {
     const next=this.installLayerArray(pixels);
     if(this.props)this.gl.deleteTexture(this.props);
     this.props=next;
+  }
+
+  installUnder(pixels) {
+    const next=this.installLayerArray(pixels);
+    if(this.underAtlas)this.gl.deleteTexture(this.underAtlas);
+    this.underAtlas=next;
   }
 
   installArt(name,{width,height,data}) {
@@ -333,6 +342,15 @@ export class Renderer {
     this.gl.drawArrays(this.gl.TRIANGLES, 0, item.count);
   }
 
+  // The levels below the crypt (index 0 is 地下2階), uploaded the first time they come into range.
+  underFloor(index) {
+    if(!this.under[index]){
+      this.under[index]=this.pendingUnder[index].upload(this.gl,world,BASE,worldNormal);
+      this.pendingUnder[index]=null;
+    }
+    return this.under[index];
+  }
+
   floor(index) {
     if(!this.floors[index]){
       this.floors[index]=this.pendingFloors[index].upload(this.gl,world,BASE,worldNormal);
@@ -382,6 +400,9 @@ export class Renderer {
     const gl = this.gl;
     const level = LEVELS[quality];
     const {eye,forward,interior,fov,floor=0,walking=false}=pose;
+    // Level -1 is the crypt, -2 to -7 the levels below; from 地下2階 down nothing above ground shows.
+    const lv = pose.level ?? floor;
+    const deep = lv <= -2;
     const { width, height } = this.canvas;
     const aspect = width/height;
     const tan = Math.tan(fov * Math.PI / 360);
@@ -399,7 +420,7 @@ export class Renderer {
     const aa = level.antialias ? this.antialias(width, height) : null;
     if (!aa) this.releasePixels();
     if (!hdr) for (const name of ['hdr','bloomA','bloomB']) this.releaseTarget(name);
-    const person=floor<2?personPose(interior,personTime,moving):null;
+    const person=floor<2&&lv>=0?personPose(interior,personTime,moving):null;
     const bindTextures = () => {
       bind(gl, 1, shadow?.depth ?? this.map);
       gl.activeTexture(gl.TEXTURE0 + 3);
@@ -418,6 +439,8 @@ export class Renderer {
       gl.bindTexture(gl.TEXTURE_2D_ARRAY,this.fabric??this.decor??this.materials);
       gl.activeTexture(gl.TEXTURE0+11);
       gl.bindTexture(gl.TEXTURE_2D_ARRAY,this.props??this.decor??this.materials);
+      gl.activeTexture(gl.TEXTURE0+14);
+      gl.bindTexture(gl.TEXTURE_2D_ARRAY,this.underAtlas??this.decor??this.materials);
     };
     const setupMaterials = (program, m = matrix, viewer = eye, clip = NO_CLIP, linear = hdr) => {
       const mat = program.use();
@@ -450,6 +473,8 @@ export class Renderer {
       mat.i('uHasFabric',!!this.fabric);
       mat.i('uProps',11);
       mat.i('uHasProps',!!this.props);
+      mat.i('uUnder',14);
+      mat.i('uHasUnder',!!this.underAtlas);
       mat.f('uFloor',floor);
       mat.i('uShadow', 1);
       mat.v2('uShadowStep', shadow ? [1/shadow.size,1/shadow.size] : [0,0]);
@@ -501,16 +526,24 @@ export class Renderer {
       this.drawChunks(this.rocks, origin, near.radius);
       this.stone.i('uInterior',true);
     }
-    this.draw(this.exterior);
-    this.draw(this.roof);
+    if(!deep){
+      this.draw(this.exterior);
+      this.draw(this.roof);
+    }
     if(interior||walking){
-      this.draw(this.interior);
+      if(!deep)this.draw(this.interior);
+      const ref = Math.max(lv, 0);
       for(let level=0;level<this.floors.length;level++){
         // Storeys are vertical chunks: only those within the chosen distance are uploaded and drawn.
-        if(Math.abs(floor-level)<near.floors || (floor===0&&level===4&&near.floors>=4&&quality===2))
+        // From 地下2階 only the ground floor (which holds the crypt) can be seen, up the stairwell.
+        if(lv===-2 ? level===0 : lv>-2 && (Math.abs(ref-level)<near.floors || (ref===0&&level===4&&near.floors>=4&&quality===2)))
           this.draw(this.floor(level));
       }
-      if(interior&&floor<2&&quality>0){
+      // Underground levels are closed rooms, so only the level itself and the next up or down show.
+      for(let i=0;i<this.under.length;i++){
+        if(lv<=-1&&Math.abs(lv+i+2)<Math.min(near.floors,2))this.draw(this.underFloor(i));
+      }
+      if(interior&&floor<2&&quality>0&&lv>=0){
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         gl.depthMask(false);
@@ -535,6 +568,7 @@ export class Renderer {
     }
 
     gl.bindVertexArray(this.screen);
+    if (!deep) {
     const water=this.water.use();
     water.mat('uMatrix',matrix);
     water.v3('uEye',eye);
@@ -562,6 +596,7 @@ export class Renderer {
     sky.i('uLinearOut',hdr);
     gl.drawArrays(gl.TRIANGLES,0,3);
     gl.depthMask(true);
+    }
 
     if (scene) this.finishHdr(scene, aa, width, height, settings.exposure ?? 1);
     if (aa) {

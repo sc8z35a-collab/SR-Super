@@ -39,7 +39,7 @@ function shell(m, kit) {
     rect(x0, x1, z0 - t, z0), rect(x0, x1, z1, z1 + t)]) slab(m, r, Y - 1.4, TOP, D.rubbleWall, .95);
   // Brick vault under the nave floor, open above the stair.
   for (const r of [rect(x0, x1, z0, s.z0), rect(x0, x1, s.z1, z1), rect(x0, s.x0, s.z0, s.z1), rect(s.x1, x1, s.z0, s.z1)]) {
-    floorQuad(m, r.x0, r.x1, r.z0, r.z1, TOP - .012, D.vaultBrick, .9);
+    m.quad([r.x0, TOP - .012, r.z0], [r.x1, TOP - .012, r.z0], [r.x1, TOP - .012, r.z1], [r.x0, TOP - .012, r.z1], D.vaultBrick, .9, [0, -1, 0]);
   }
 }
 

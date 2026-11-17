@@ -73,6 +73,11 @@ function flightBetween(m, kit, upper, lower, f, up, wall) {
 }
 
 // Floor, walls and ceiling of a level. Walls are blocks outside the room, so they also stop walkers.
+// A ceiling rectangle facing down; tiled layers take world-projected UVs from the shader.
+function ceilingQuad(m, r, y, mat, shade = .9, uv = [[0, 0], [1, 0], [1, 1], [0, 1]]) {
+  m.quad([r.x0, y, r.z0], [r.x1, y, r.z0], [r.x1, y, r.z1], [r.x0, y, r.z1], mat, shade, [0, -1, 0], uv);
+}
+
 function shell(m, kit, L, { floor, wall, ceiling, floorHoles = [], ceilingHoles = [], walls = {} }) {
   const room = rect(X0, X1, L.z0, L.z1);
   for (const r of subtract(room, floorHoles)) kit.deck(m, r, L.y, floor, .33);
@@ -81,7 +86,7 @@ function shell(m, kit, L, { floor, wall, ceiling, floorHoles = [], ceilingHoles 
   kit.block(m, rect(X1, X1 + t, L.z0 - t, L.z1 + t), L.y - .4, top, walls.E ?? wall, .95);
   kit.block(m, rect(X0, X1, L.z0 - t, L.z0), L.y - .4, top, walls.N ?? wall, .95);
   kit.block(m, rect(X0, X1, L.z1, L.z1 + t), L.y - .4, top, walls.S ?? wall, .95);
-  for (const r of subtract(room, ceilingHoles)) floorQuad(m, r.x0, r.x1, r.z0, r.z1, L.ceiling, ceiling, .9);
+  for (const r of subtract(room, ceilingHoles)) ceilingQuad(m, r, L.ceiling, ceiling);
 }
 
 // A picture on one of the level's walls: side W/E at z = pos, side N/S at x = pos.
@@ -289,6 +294,9 @@ function mine(m, kit) {
     for (const f of [0, .02]) strip(m, [a[0] + f, a[1] + f], [b[0] + f, b[1] + f], y, y + .95, U.ropeRail, 1.5);
   }
   kit.solid(rect(-7.7, -4.5, 14.2, 17.4), y, y + 1);
+  // Side drifts blocked off behind timber sets.
+  for (const [side, z] of [['W', -16], ['W', -2], ['E', -16], ['E', 0]]) wallPicture(m, L, side, z, y, y + 3.2, 3.0, U.timberFrame);
+  wallPicture(m, L, 'S', -2.5, y, y + 3.2, 3.0, U.timberFrame);
   wallPicture(m, L, 'N', 0, y, y + 2.5, 1.5, U.studdedDoor);
   lamps(m, L);
 }
@@ -445,7 +453,7 @@ function cathedral(m, kit) {
   }
   for (const side of ['E', 'N', 'S']) wallBand(m, L, side, side === 'E' ? L.z0 : X0, side === 'E' ? L.z1 : X1, y + 9.5, top, U.chiselledRock);
   wallBand(m, L, 'W', L.z0, L.z1, y + 9.5, top, U.chiselledRock);
-  for (const r of subtract(rect(X0, X1, L.z0, L.z1), [OPEN.G])) floorQuad(m, r.x0, r.x1, r.z0, r.z1, top, U.chiselledRock, .9);
+  for (const r of subtract(rect(X0, X1, L.z0, L.z1), [OPEN.G])) ceilingQuad(m, r, top, U.chiselledRock);
   // The stairwell up to the lake level.
   for (const r of [rect(F.G.x1, F.G.x1 + .3, F.G.z0, F.G.z0 + 6), rect(X0, F.G.x1 + .3, F.G.z0 + 6, F.G.z0 + 6.3)]) slab(m, r, top, LAKE.y - .33, U.saltWall, .9);
   // The processional stair from the lake down the west aisle, its wedge carved with reliefs.
@@ -457,8 +465,13 @@ function cathedral(m, kit) {
     m.rod([X0, top - .15, z], [X1, top - .15, z], .14, .14, U.ivoryCarving, 6, 1);
   }
   for (const z of [21, 26]) for (const x of [-5.5, 5.5]) column(m, kit, x, z, s, top - s, .45, U.redMarble, U.blackGoldMarble, U.ivoryCarving);
-  for (const z of [-12, -1, 10]) floorQuad(m, -2.6, 2.6, z - 2.6, z + 2.6, top - .03, U.starFresco, 1, [[1, 0], [0, 0], [0, 1], [1, 1]]);
-  disc(m, 0, top - .04, 23, 4.4, U.rockDome, 32, 1);
+  // Starry frescoes between the ribs and a salt dome over the sanctuary, facing down into the nave.
+  for (const z of [-11, -5, 1, 7, 13]) ceilingQuad(m, rect(-2.8, 2.8, z - 2.8, z + 2.8), top - .03, U.starFresco, 1);
+  for (let i = 0; i < 32; i++) {
+    const a0 = i / 32 * TAU, a1 = (i + 1) / 32 * TAU, uv = a => [.5 + .5 * Math.cos(a), .5 + .5 * Math.sin(a)];
+    m.tri([0, top - .04, 23], [Math.cos(a0) * 4.4, top - .04, 23 + Math.sin(a0) * 4.4], [Math.cos(a1) * 4.4, top - .04, 23 + Math.sin(a1) * 4.4],
+      U.rockDome, 1, [[0, -1, 0], [0, -1, 0], [0, -1, 0]], [[.5, .5], uv(a0), uv(a1)]);
+  }
   // Side walls: amber windows high on the east, saints in niches, salt reliefs and a blind arch.
   for (const z of [-11, -5, 1, 7]) wallPicture(m, L, 'E', z, y + 6, y + 10.5, 2.8, U.amberWindow);
   for (const z of [-14, -2, 10]) wallPicture(m, L, 'E', z, y + 1, y + 4.4, 2.0, U.rockSaint);

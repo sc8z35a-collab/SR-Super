@@ -33,7 +33,7 @@ export const DEPTHS=[
       LAMP(-4,-23.4,9,.9),LAMP(5,-23.6,13,.8),LAMP(-8,-24.2,-14,.7),LAMP(2,-24.2,-2,.7),LAMP(-3,-24.2,13,.7),LAMP(-9.9,-22.4,6,.8)]},
   {key:'lake',name:'地下6階 · 地底湖',y:-29.6,ceiling:-25.15,z0:-20,z1:18.5,color:[.55,.8,.9],ambient:[.04,.07,.08],falloff:.16,
     lamps:[LAMP(0,-27.6,-17,1.3),LAMP(-8,-28.8,14,1.1),LAMP(-7.5,-27.2,-8),LAMP(7.5,-27.2,-8),LAMP(-7.5,-27.2,4),LAMP(7.5,-27.2,4),LAMP(0,-27,10),LAMP(-9.5,-27,-19,.8)]},
-  {key:'cathedral',name:'地下7階 · 地下大聖堂',y:-46,ceiling:-30.4,z0:-20,z1:28,color:[1,.8,.55],ambient:[.09,.075,.06],falloff:.035,
+  {key:'cathedral',name:'地下7階 · 地下大聖堂',y:-46,ceiling:-31.4,z0:-20,z1:28,color:[1,.8,.55],ambient:[.09,.075,.06],falloff:.035,
     lamps:[-12,-3,6,15].map(z=>LAMP(0,-37.7,z,2.2)).concat([-11,-5,1,7].map(z=>LAMP(10.8,-38,z,.9)),[LAMP(0,-43.4,24,1.6),LAMP(-6.5,-41,27.5,1.3),LAMP(6.5,-41,27.5,1.3),LAMP(-9.9,-37,-2,.7)])}
 ];
 // Stair flights between levels: E and W run along the walls, G is the cathedral's processional stair.

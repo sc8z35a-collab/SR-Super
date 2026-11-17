@@ -2,12 +2,13 @@ import { Renderer, reach } from './renderer.js';
 import { add, sub, normal } from './mesh.js';
 import { clamp, ground, lerp } from './terrain.js';
 import { BASE, ROOF_INDEX, world, worldNormal } from './layout.js';
-import { visitFloor, nextPosition, locationName, levelOf, CRYPT_LEVEL } from './walkways.js';
+import { visitFloor, nextPosition, locationName, levelOf, arrivalYaw, CRYPT_LEVEL } from './walkways.js';
 import { SURFACE_LAYERS } from './surfaces.js';
 import { DECOR_LAYERS } from './decor.js';
 import { TERRAIN_LAYERS } from './landcover.js';
 import { FABRIC_LAYERS } from './fabric.js';
 import { PROPS_LAYERS } from './props.js';
+import { UNDER_LAYERS } from './under.js';
 
 const el = id => document.getElementById(id);
 const canvas = el('scene');
@@ -89,7 +90,8 @@ const layerGroups=[
   {name:'decor',sizes:[52,136],layers:DECOR_LAYERS,cols:6,method:'installDecor'},
   {name:'terrain',sizes:[68,172],layers:TERRAIN_LAYERS,cols:6,method:'installTerrain'},
   {name:'fabric',sizes:[68,136],layers:FABRIC_LAYERS,cols:6,method:'installFabric'},
-  {name:'props',sizes:[68,136],layers:PROPS_LAYERS,cols:6,method:'installProps'}
+  {name:'props',sizes:[68,136],layers:PROPS_LAYERS,cols:6,method:'installProps'},
+  {name:'under',sizes:[68,136],layers:UNDER_LAYERS,cols:6,method:'installUnder'}
 ];
 async function imagePixels(name,depth,columns=depth) {
   try {
@@ -290,7 +292,7 @@ function pose(){
     const forward=worldNormal(Math.sin(look.yaw)*f,Math.sin(look.pitch),-Math.cos(look.yaw)*f);
     const bob=reducedMotion.matches?0:Math.sin(stride*9.7)*.018;
     const eye=world(walker.x,BASE+cameraFloor+1.66+bob,walker.z);
-    return {eye,forward,interior:walker.interior,walking:true,floor:walker.floor,fov:61};
+    return {eye,forward,interior:walker.interior,walking:true,floor:walker.floor,level:levelOf(walker),fov:61};
   }
   const across=Math.cos(view.pitch);
   const offset=[Math.sin(view.yaw)*across*view.radius,Math.sin(view.pitch)*view.radius,Math.cos(view.yaw)*across*view.radius];
@@ -321,7 +323,7 @@ function setFloor(index){
   walker=visitFloor(index);
   cameraFloor=walker.y;
   const poses=[[0,.09],[-.035,-.14],[-.035,-.14],[-.035,-.14],[.93,.055],[1.14,.155],[1.25,.012]];
-  const [yaw,pitch]=index===CRYPT_LEVEL?[.86,.02]:poses[index];
+  const [yaw,pitch]=index===CRYPT_LEVEL?[.86,.02]:index<CRYPT_LEVEL?[arrivalYaw(index),.04]:poses[index];
   look={yaw,pitch};
   stopInput();
   refreshMode();

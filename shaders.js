@@ -1,8 +1,12 @@
 import { SURFACE, SURFACE_START, SURFACE_LAYERS } from './surfaces.js';
-import { BASE, CRYPT, CRYPT_LIGHTS } from './layout.js';
+import { BASE, CRYPT, CRYPT_LIGHTS, DEPTHS } from './layout.js';
+
+const DEEP_LAMPS = 12;
+const deepLamps = DEPTHS.flatMap(d => Array.from({length: DEEP_LAMPS}, (_, i) => d.lamps[i] ?? [0, 0, 0, 0]));
 import { TERRAIN as T } from './landcover.js';
 import { FABRIC_START, FABRIC_LAYER as F, FABRIC_LAYERS, FABRIC_SHADING, FABRIC_FALLBACK } from './fabric.js';
 import { PROPS_START, PROPS_LAYER as P, PROPS_LAYERS, PROPS_SHADING, PROPS_FALLBACK } from './props.js';
+import { UNDER, UNDER_START, UNDER_LAYERS, UNDER_SHADING, UNDER_FALLBACK, UNDER_GLOW } from './under.js';
 import { DECOR, DECOR_START, DECOR_LAYERS, DECOR_SHADING, DECOR_FALLBACK, DECOR_GLOW, DECOR_STANDIN } from './decor.js';
 
 const glslVec3 = rows => rows.map(r => `vec3(${r.map(v => Number(v).toFixed(3)).join(',')})`).join(',');
@@ -221,6 +225,8 @@ uniform highp sampler2DArray uFabric;
 uniform bool uHasFabric;
 uniform highp sampler2DArray uProps;
 uniform bool uHasProps;
+uniform highp sampler2DArray uUnder;
+uniform bool uHasUnder;
 uniform bool uHasAltarpiece;
 uniform bool uInterior;
 uniform vec3 uPerson;
@@ -920,6 +926,21 @@ vec3 windowGlass(vec2 pane, bool rose, bool rows, out float stone) {
   return v;
 }
 
+// The underground levels' atlas (under.js).
+vec3 underMaterial(float type, vec3 n, out float bump, out float roughness) {
+  const vec3 shading[${UNDER_LAYERS}] = vec3[${UNDER_LAYERS}](${glslVec3(UNDER_SHADING)});
+  const vec3 fallback[${UNDER_LAYERS}] = vec3[${UNDER_LAYERS}](${glslVec3(UNDER_FALLBACK)});
+  float layer = type-${UNDER_START}.0;
+  vec3 s = shading[int(layer)];
+  roughness = s.y;
+  bump = 0.0;
+  if(!uHasUnder) return fallback[int(layer)];
+  vec2 uv = s.x==0.0 ? vec2(clamp(vUv.x,.006,.994),clamp(1.0-vUv.y,.006,.994)) : s.x<0.0 ? vUv*-s.x : fabricPlane(n)*s.x;
+  vec3 c = pow(texture(uUnder,vec3(uv,layer)).rgb,vec3(1.48));
+  bump = (luminance(c)-.3)*(roughness<.4 ? .3 : .8);
+  return c*s.z;
+}
+
 vec3 craftMaterial(float type, vec3 n, out float bump, out float roughness) {
   const vec3 palette[36] = vec3[36](
     vec3(.79,.49,.103), vec3(.737,.650,.470), vec3(.214,.112,.057),
@@ -1128,6 +1149,9 @@ void main() {
     vec3 glow = uHasDecor ? texture(uDecor,vec3(glowUv,${DECOR.lanternGlass-DECOR_START}.0)).rgb : vec3(1.0,.62,.24);
     color = vec4(outColor(pow(glow,vec3(1.25))*vec3(1.55,1.12,.78)*shade),1.0);
     return;
+  } else if(type>=${UNDER_START}.0&&type<${UNDER_START+UNDER_LAYERS}.0){
+    base=underMaterial(type,n,bump,roughness);
+${UNDER_GLOW.map(([name,gain])=>`    if(type==${UNDER[name]}.0){color=vec4(outColor(base*vec3(${gain.join(',')})*shade),1.0);return;}`).join('\n')}
   } else if(type>=${PROPS_START}.0&&type<${PROPS_START+PROPS_LAYERS}.0){
     base=propsMaterial(type,n,bump,roughness);
   } else if(type>=${FABRIC_START}.0&&type<${FABRIC_START+FABRIC_LAYERS}.0){
@@ -1201,7 +1225,7 @@ ${DECOR_GLOW.map(([name,gain])=>`    if(type==${DECOR[name]}.0){color=vec4(outCo
     }
     // The crypt is lit only by its torches, candles and the glowing tide channel.
     float crypt = 1.0-smoothstep(${(BASE+CRYPT.ceiling-.3).toFixed(3)},${(BASE+CRYPT.ceiling+.05).toFixed(3)},vWorld.y);
-    if(crypt>0.0){
+    if(crypt>0.0&&vWorld.y>${(BASE-5.0).toFixed(2)}){
       const vec4 lamps[${CRYPT_LIGHTS.length}] = vec4[${CRYPT_LIGHTS.length}](${CRYPT_LIGHTS.map(l=>`vec4(${l.map(v=>v.toFixed(2)).join(',')})`).join(',')});
       vec3 at = vec3(pos.x,vWorld.y-${BASE.toFixed(2)},pos.y);
       vec2 nl = buildingDirection(n.xz);
@@ -1216,6 +1240,28 @@ ${DECOR_GLOW.map(([name,gain])=>`    if(type==${DECOR[name]}.0){color=vec4(outCo
         *(1.0-smoothstep(-.8,1.6,at.y-(${CRYPT.y.toFixed(2)})));
       ambient = mix(ambient,vec3(.082,.090,.100),crypt);
       direct = mix(direct,vec3(.98,.60,.29)*flame+vec3(.05,.34,.38)*tide,crypt);
+    }
+    else if(crypt>0.0){
+      // 地下2階〜地下7階: each level's own lamps, picked by height band.
+      const vec4 deep[${deepLamps.length}] = vec4[${deepLamps.length}](${deepLamps.map(l=>`vec4(${l.map(v=>v.toFixed(2)).join(',')})`).join(',')});
+      const vec3 deepColor[${DEPTHS.length}] = vec3[${DEPTHS.length}](${glslVec3(DEPTHS.map(d=>d.color))});
+      const vec3 deepAmbient[${DEPTHS.length}] = vec3[${DEPTHS.length}](${glslVec3(DEPTHS.map(d=>d.ambient))});
+      const float deepFalloff[${DEPTHS.length}] = float[${DEPTHS.length}](${DEPTHS.map(d=>d.falloff.toFixed(3)).join(',')});
+      float h = vWorld.y-${BASE.toFixed(2)};
+      int band = h < -31.0 ? ${DEPTHS.length-1} : clamp(int(floor((-5.0-h)/5.0)),0,${DEPTHS.length-2});
+      vec3 at = vec3(pos.x,h,pos.y);
+      vec2 nl = buildingDirection(n.xz);
+      vec3 normalLocal = vec3(nl.x,n.y,nl.y);
+      float flame = 0.0;
+      for(int i=0;i<${DEEP_LAMPS};i++){
+        vec4 lamp = deep[band*${DEEP_LAMPS}+i];
+        if(lamp.w<=0.0) continue;
+        vec3 d = lamp.xyz-at;
+        float r = length(d);
+        flame += lamp.w*(.3+.7*max(0.0,dot(normalLocal,d/max(r,.001))))/(1.0+r*r*deepFalloff[band]);
+      }
+      ambient = deepAmbient[band];
+      direct = deepColor[band]*flame;
     }
     if (type>=13.0 && type<=21.0) {
       float rim = pow(1.0-max(0.0,dot(n,view)),2.1);
