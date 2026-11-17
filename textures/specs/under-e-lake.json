@@ -1,0 +1,51 @@
+{
+  "sheet": "under-e-lake",
+  "theme": "a lake cave",
+  "tiles": [
+    {
+      "id": "stalactites",
+      "tile": true,
+      "prompt": "stalactite ceiling"
+    },
+    {
+      "id": "stalagmites",
+      "tile": true,
+      "prompt": "stalagmite floor"
+    },
+    {
+      "id": "flowstone",
+      "tile": true,
+      "prompt": "flowstone wall"
+    },
+    {
+      "id": "rimstone",
+      "tile": true,
+      "prompt": "rimstone pools"
+    },
+    {
+      "id": "lake_water",
+      "tile": true,
+      "prompt": "clear lake water"
+    },
+    {
+      "id": "lake_sand",
+      "tile": true,
+      "prompt": "white lake-bed sand"
+    },
+    {
+      "id": "cave_mud",
+      "tile": true,
+      "prompt": "wet cave mud"
+    },
+    {
+      "id": "waterfall",
+      "tile": false,
+      "prompt": "cave waterfall"
+    },
+    {
+      "id": "mist_water",
+      "tile": true,
+      "prompt": "misty water"
+    }
+  ]
+}

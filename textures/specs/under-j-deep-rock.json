@@ -1,0 +1,51 @@
+{
+  "sheet": "under-j-deep-rock",
+  "theme": "deep rock and hot springs",
+  "tiles": [
+    {
+      "id": "deep_granite",
+      "tile": true,
+      "prompt": "deep granite"
+    },
+    {
+      "id": "wet_black_rock",
+      "tile": true,
+      "prompt": "wet black rock"
+    },
+    {
+      "id": "iron_ore",
+      "tile": true,
+      "prompt": "red iron ore"
+    },
+    {
+      "id": "sediment",
+      "tile": true,
+      "prompt": "sedimentary layers"
+    },
+    {
+      "id": "cracked_rock",
+      "tile": true,
+      "prompt": "cracked dry rock"
+    },
+    {
+      "id": "warm_rock",
+      "tile": true,
+      "prompt": "warm red geothermal rock"
+    },
+    {
+      "id": "sulfur",
+      "tile": true,
+      "prompt": "sulfur crystals"
+    },
+    {
+      "id": "hot_spring",
+      "tile": true,
+      "prompt": "steaming hot spring"
+    },
+    {
+      "id": "volcanic_glass",
+      "tile": true,
+      "prompt": "volcanic glass"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "sheet": "under-c-mine",
+  "theme": "a mine",
+  "tiles": [
+    {
+      "id": "timber_frame",
+      "tile": false,
+      "prompt": "timber mine frame"
+    },
+    {
+      "id": "ore_rock",
+      "tile": true,
+      "prompt": "rock with ore"
+    },
+    {
+      "id": "rail_track",
+      "tile": false,
+      "prompt": "mine rail track"
+    },
+    {
+      "id": "rust_plate",
+      "tile": false,
+      "prompt": "riveted rusty plate"
+    },
+    {
+      "id": "coal_seam",
+      "tile": true,
+      "prompt": "coal seam"
+    },
+    {
+      "id": "crushed_rock",
+      "tile": true,
+      "prompt": "crushed rock floor"
+    },
+    {
+      "id": "iron_ladder",
+      "tile": false,
+      "prompt": "iron ladder on rock"
+    },
+    {
+      "id": "pulley",
+      "tile": false,
+      "prompt": "rope pulley"
+    },
+    {
+      "id": "soot_ceiling",
+      "tile": true,
+      "prompt": "soot-blackened rock ceiling"
+    }
+  ]
+}

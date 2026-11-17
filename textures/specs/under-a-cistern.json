@@ -1,0 +1,51 @@
+{
+  "sheet": "under-a-cistern",
+  "theme": "a vast underground cistern",
+  "tiles": [
+    {
+      "id": "mossy_column",
+      "tile": true,
+      "prompt": "mossy stone column"
+    },
+    {
+      "id": "waterline_wall",
+      "tile": true,
+      "prompt": "wall with a waterline"
+    },
+    {
+      "id": "flooded_floor",
+      "tile": true,
+      "prompt": "shallow water over flagstones"
+    },
+    {
+      "id": "drain_grate",
+      "tile": false,
+      "prompt": "stone drain grate"
+    },
+    {
+      "id": "hand_pump",
+      "tile": false,
+      "prompt": "iron hand pump"
+    },
+    {
+      "id": "drip_stone",
+      "tile": true,
+      "prompt": "limestone drip streaks"
+    },
+    {
+      "id": "wet_ceiling",
+      "tile": true,
+      "prompt": "dripping wet ceiling"
+    },
+    {
+      "id": "rusty_pipe",
+      "tile": true,
+      "prompt": "rusty flanged iron pipe"
+    },
+    {
+      "id": "coin_pool",
+      "tile": true,
+      "prompt": "coins under water"
+    }
+  ]
+}

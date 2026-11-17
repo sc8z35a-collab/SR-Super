@@ -1,0 +1,51 @@
+{
+  "sheet": "under-i-passages",
+  "theme": "passages between underground levels",
+  "tiles": [
+    {
+      "id": "spiral_stair",
+      "tile": false,
+      "prompt": "rock-cut spiral stair from above"
+    },
+    {
+      "id": "worn_steps",
+      "tile": true,
+      "prompt": "worn stone steps"
+    },
+    {
+      "id": "studded_door2",
+      "tile": false,
+      "prompt": "iron-studded door"
+    },
+    {
+      "id": "stone_door",
+      "tile": false,
+      "prompt": "stone door"
+    },
+    {
+      "id": "lift_cage",
+      "tile": false,
+      "prompt": "chain lift cage"
+    },
+    {
+      "id": "walkway",
+      "tile": true,
+      "prompt": "wooden walkway planks"
+    },
+    {
+      "id": "rope_rail",
+      "tile": false,
+      "prompt": "rope railing"
+    },
+    {
+      "id": "iron_grate",
+      "tile": true,
+      "prompt": "iron grate floor"
+    },
+    {
+      "id": "torch_bracket",
+      "tile": false,
+      "prompt": "wall torch bracket"
+    }
+  ]
+}

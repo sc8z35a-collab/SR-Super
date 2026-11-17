@@ -1,0 +1,6 @@
+{
+  "source": "supplied by the user as a finished 3x3 sheet",
+  "size": "1254x1254",
+  "dividers": "thin dark lines; sliced at exact thirds with a 3.5% inset",
+  "spec": "textures/specs/under-d-crystal.json"
+}

@@ -1,0 +1,51 @@
+{
+  "sheet": "under-h-altar",
+  "theme": "underground cathedral altar",
+  "tiles": [
+    {
+      "id": "altar_front",
+      "tile": false,
+      "prompt": "rock altar and reredos"
+    },
+    {
+      "id": "altar_cloth",
+      "tile": false,
+      "prompt": "red and gold altar cloth"
+    },
+    {
+      "id": "black_gold_marble",
+      "tile": true,
+      "prompt": "black and gold marble"
+    },
+    {
+      "id": "alabaster_floor",
+      "tile": true,
+      "prompt": "alabaster floor tiles"
+    },
+    {
+      "id": "glow_window",
+      "tile": false,
+      "prompt": "glowing rock window"
+    },
+    {
+      "id": "pulpit_relief",
+      "tile": false,
+      "prompt": "carved stone pulpit"
+    },
+    {
+      "id": "red_marble",
+      "tile": true,
+      "prompt": "red marble column"
+    },
+    {
+      "id": "choir_stalls",
+      "tile": false,
+      "prompt": "inlaid choir stalls"
+    },
+    {
+      "id": "star_fresco",
+      "tile": false,
+      "prompt": "starry fresco with angels"
+    }
+  ]
+}
