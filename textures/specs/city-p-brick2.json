@@ -1,0 +1,51 @@
+{
+  "sheet": "city-p-brick2",
+  "theme": "ancient underground city: bricks, second set",
+  "tiles": [
+    {
+      "id": "city-p-brick2-sunBrick2",
+      "tile": true,
+      "prompt": "sunBrick2"
+    },
+    {
+      "id": "city-p-brick2-brokenSunBrick2",
+      "tile": true,
+      "prompt": "brokenSunBrick2"
+    },
+    {
+      "id": "city-p-brick2-redBrick2",
+      "tile": true,
+      "prompt": "redBrick2"
+    },
+    {
+      "id": "city-p-brick2-burntBrick2",
+      "tile": true,
+      "prompt": "burntBrick2"
+    },
+    {
+      "id": "city-p-brick2-patchBrick2",
+      "tile": true,
+      "prompt": "patchBrick2"
+    },
+    {
+      "id": "city-p-brick2-sootBrick2",
+      "tile": true,
+      "prompt": "sootBrick2"
+    },
+    {
+      "id": "city-p-brick2-plasterBrick2",
+      "tile": true,
+      "prompt": "plasterBrick2"
+    },
+    {
+      "id": "city-p-brick2-mossBrick2",
+      "tile": true,
+      "prompt": "mossBrick2"
+    },
+    {
+      "id": "city-p-brick2-herringbone2",
+      "tile": true,
+      "prompt": "herringbone2"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "sheet": "city-b-brick",
+  "theme": "ancient underground city: bricks",
+  "tiles": [
+    {
+      "id": "city-b-brick-sunBrick",
+      "tile": true,
+      "prompt": "sunBrick"
+    },
+    {
+      "id": "city-b-brick-brokenSunBrick",
+      "tile": true,
+      "prompt": "brokenSunBrick"
+    },
+    {
+      "id": "city-b-brick-redBrick",
+      "tile": true,
+      "prompt": "redBrick"
+    },
+    {
+      "id": "city-b-brick-burntBrick",
+      "tile": true,
+      "prompt": "burntBrick"
+    },
+    {
+      "id": "city-b-brick-patchBrick",
+      "tile": true,
+      "prompt": "patchBrick"
+    },
+    {
+      "id": "city-b-brick-sootBrick",
+      "tile": true,
+      "prompt": "sootBrick"
+    },
+    {
+      "id": "city-b-brick-plasterBrick",
+      "tile": true,
+      "prompt": "plasterBrick"
+    },
+    {
+      "id": "city-b-brick-mossBrick",
+      "tile": true,
+      "prompt": "mossBrick"
+    },
+    {
+      "id": "city-b-brick-herringbone",
+      "tile": true,
+      "prompt": "herringbone"
+    }
+  ]
+}

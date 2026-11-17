@@ -1,0 +1,51 @@
+{
+  "sheet": "city-j-flame",
+  "theme": "ancient underground city: eternal flame",
+  "tiles": [
+    {
+      "id": "city-j-flame-flame",
+      "tile": false,
+      "prompt": "flame"
+    },
+    {
+      "id": "city-j-flame-sconce",
+      "tile": false,
+      "prompt": "sconce"
+    },
+    {
+      "id": "city-j-flame-sootSconce",
+      "tile": true,
+      "prompt": "sootSconce"
+    },
+    {
+      "id": "city-j-flame-oilLamp",
+      "tile": false,
+      "prompt": "oilLamp"
+    },
+    {
+      "id": "city-j-flame-shrineRelief",
+      "tile": false,
+      "prompt": "shrineRelief"
+    },
+    {
+      "id": "city-j-flame-blueFlame",
+      "tile": false,
+      "prompt": "blueFlame"
+    },
+    {
+      "id": "city-j-flame-tallowCandles",
+      "tile": false,
+      "prompt": "tallowCandles"
+    },
+    {
+      "id": "city-j-flame-embers",
+      "tile": true,
+      "prompt": "embers"
+    },
+    {
+      "id": "city-j-flame-forge",
+      "tile": false,
+      "prompt": "forge"
+    }
+  ]
+}

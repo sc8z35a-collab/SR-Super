@@ -1,0 +1,51 @@
+{
+  "sheet": "city-o-flame2",
+  "theme": "ancient underground city: eternal flame, second set",
+  "tiles": [
+    {
+      "id": "city-o-flame2-flame2",
+      "tile": false,
+      "prompt": "flame2"
+    },
+    {
+      "id": "city-o-flame2-sconce2",
+      "tile": false,
+      "prompt": "sconce2"
+    },
+    {
+      "id": "city-o-flame2-sootWall2",
+      "tile": true,
+      "prompt": "sootWall2"
+    },
+    {
+      "id": "city-o-flame2-oilLamp2",
+      "tile": false,
+      "prompt": "oilLamp2"
+    },
+    {
+      "id": "city-o-flame2-shrineRelief2",
+      "tile": false,
+      "prompt": "shrineRelief2"
+    },
+    {
+      "id": "city-o-flame2-blueFlame2",
+      "tile": false,
+      "prompt": "blueFlame2"
+    },
+    {
+      "id": "city-o-flame2-waxWall",
+      "tile": false,
+      "prompt": "waxWall"
+    },
+    {
+      "id": "city-o-flame2-embers2",
+      "tile": true,
+      "prompt": "embers2"
+    },
+    {
+      "id": "city-o-flame2-furnace2",
+      "tile": false,
+      "prompt": "furnace2"
+    }
+  ]
+}

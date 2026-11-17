@@ -1,0 +1,51 @@
+{
+  "sheet": "city-m-prison",
+  "theme": "ancient underground city: prison",
+  "tiles": [
+    {
+      "id": "city-m-prison-bentBars",
+      "tile": false,
+      "prompt": "bentBars"
+    },
+    {
+      "id": "city-m-prison-cage",
+      "tile": false,
+      "prompt": "cage"
+    },
+    {
+      "id": "city-m-prison-scratchedWall",
+      "tile": true,
+      "prompt": "scratchedWall"
+    },
+    {
+      "id": "city-m-prison-shackles",
+      "tile": false,
+      "prompt": "shackles"
+    },
+    {
+      "id": "city-m-prison-cellFloor",
+      "tile": true,
+      "prompt": "cellFloor"
+    },
+    {
+      "id": "city-m-prison-cellDoor",
+      "tile": false,
+      "prompt": "cellDoor"
+    },
+    {
+      "id": "city-m-prison-portcullis",
+      "tile": false,
+      "prompt": "portcullis"
+    },
+    {
+      "id": "city-m-prison-tally",
+      "tile": true,
+      "prompt": "tally"
+    },
+    {
+      "id": "city-m-prison-guardWall",
+      "tile": false,
+      "prompt": "guardWall"
+    }
+  ]
+}

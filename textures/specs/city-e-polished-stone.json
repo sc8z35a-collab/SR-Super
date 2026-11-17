@@ -1,0 +1,51 @@
+{
+  "sheet": "city-e-polished-stone",
+  "theme": "ancient underground city: polished stone",
+  "tiles": [
+    {
+      "id": "city-e-polished-stone-polBasalt",
+      "tile": true,
+      "prompt": "polBasalt"
+    },
+    {
+      "id": "city-e-polished-stone-polSandstone",
+      "tile": true,
+      "prompt": "polSandstone"
+    },
+    {
+      "id": "city-e-polished-stone-polSchist",
+      "tile": true,
+      "prompt": "polSchist"
+    },
+    {
+      "id": "city-e-polished-stone-inlay",
+      "tile": false,
+      "prompt": "inlay"
+    },
+    {
+      "id": "city-e-polished-stone-geometric",
+      "tile": false,
+      "prompt": "geometric"
+    },
+    {
+      "id": "city-e-polished-stone-glyphs",
+      "tile": false,
+      "prompt": "glyphs"
+    },
+    {
+      "id": "city-e-polished-stone-polColumn",
+      "tile": true,
+      "prompt": "polColumn"
+    },
+    {
+      "id": "city-e-polished-stone-polWorn",
+      "tile": true,
+      "prompt": "polWorn"
+    },
+    {
+      "id": "city-e-polished-stone-polCracked",
+      "tile": true,
+      "prompt": "polCracked"
+    }
+  ]
+}

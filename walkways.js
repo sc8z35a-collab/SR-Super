@@ -8,6 +8,8 @@ import { ground, coast, clamp, lerp } from './terrain.js';
 import { baptistery, marinersChapel, treasury, scriptorium, roofGarden, forecourt, roomName } from './chapels.js';
 import { crypt, cryptName } from './crypt.js';
 import { depths } from './depths.js';
+import { buildCity, inCity, cityFree, cityHeights, cityPlace } from './citybuild.js';
+import { CITY_ARRIVAL } from './citydata.js';
 import { FABRIC } from './fabric.js';
 import { naveHangings, chapelCeilings, upperCeilings, gutterTrough, nicheAndScreen, churchFurnishings } from './chapels.js';
 
@@ -437,7 +439,8 @@ export function buildWalkways(){
   for(let i=0;i<ROOF_INDEX;i++)staircase(walkFloors[i],i);
   roofTerrace(roofExterior);
   depths(underFloors,kit);
-  return {walkExterior,roofExterior,walkFloors,decals,underFloors};
+  const city=buildCity();
+  return {walkExterior,roofExterior,walkFloors,decals,underFloors,cityMesh:city.mesh,cityLamps:city.lamps};
 }
 
 export const CRYPT_LEVEL=-1;
@@ -445,15 +448,19 @@ export const DEEPEST_LEVEL=-1-DEPTHS.length;
 // Underground levels are not storeys of FLOORS: their walkers keep floor 0 and are told apart by
 // height. Level -1 is the crypt, -2 to -7 the levels below it (the deepest is the cathedral).
 const UNDER_Y=[CRYPT.y,...DEPTHS.map(d=>d.y)];
+// The ancient city east of the lake cave counts as its own level, -8.
+export const CITY_LEVEL=-8;
 export function levelOf(actor){
+  if(actor.interior&&inCity(actor.x,actor.y))return CITY_LEVEL;
   if(!actor.interior||actor.y>=FLOORS[0]-.21)return actor.floor;
   for(let i=0;i<UNDER_Y.length;i++)if(UNDER_Y[i]<=actor.y+.21)return -(i+1);
   return -UNDER_Y.length;
 }
-const ARRIVALS=[[9.9,3.6,0],[-9.9,4.4,Math.PI],[9.9,3.6,0],[-9.9,4.4,Math.PI],[9.9,3.6,0],[0,-12,Math.PI]];
+const ARRIVALS=[[9.9,3.6,0],[-9.9,4.4,Math.PI],[9.9,3.6,0],[-9.9,4.4,Math.PI],[9.9,3.6,0],[0,-12,Math.PI],CITY_ARRIVAL];
 export function arrivalYaw(index){return index<CRYPT_LEVEL?ARRIVALS[-index-2][2]:null;}
 export function visitFloor(index,atEntrance=false){
   if(index===CRYPT_LEVEL)return {x:-9.6,z:17.3,y:CRYPT.y,interior:true,floor:0};
+  if(index===CITY_LEVEL)return {x:CITY_ARRIVAL[0],z:CITY_ARRIVAL[1],y:Math.max(...cityHeights(CITY_ARRIVAL[0],CITY_ARRIVAL[1])),interior:true,floor:0};
   if(index<CRYPT_LEVEL){
     const [x,z]=ARRIVALS[-index-2];
     return {x,z,y:DEPTHS[-index-2].y,interior:true,floor:0};
@@ -468,8 +475,12 @@ export function visitFloor(index,atEntrance=false){
 }
 
 function free(x,z,y,inside){
-  if(inside&&buildingDistance(x,z)>-RADIUS)return false;
-  if(inside&&z<NAVE.back){
+  // The ancient city keeps its own walls in a grid; near the lake its edge also meets the cave's walls.
+  const city=inCity(x,y);
+  if(city&&!cityFree(x,z,y))return false;
+  if(city&&x>12.6)return true;
+  if(!city&&inside&&buildingDistance(x,z)>-RADIUS)return false;
+  if(!city&&inside&&z<NAVE.back){
     const dx=x/APSE.rx,dz=(z-NAVE.back)/APSE.rz;
     const t=(Math.atan2(dz,dx)+2*Math.PI)%(2*Math.PI);
     const segment=clamp(Math.floor((t-Math.PI)/(Math.PI/6)),0,5);
@@ -495,13 +506,15 @@ export function nextPosition(actor,dx,dz){
   if(!dx&&!dz)return actor;
   const x=actor.x+dx,z=actor.z+dz;
   const door=Math.abs(x)<ENTRY.half-.09&&z>=ENTRY.inner-.25;
-  const onStructure=actor.floor===ROOF_INDEX || (buildingDistance(x,z)<-.032&&(actor.interior||(door&&z<NAVE.front+.12)));
+  const city=inCity(x,actor.y);
+  const onStructure=city || actor.floor===ROOF_INDEX || (buildingDistance(x,z)<-.032&&(actor.interior||(door&&z<NAVE.front+.12)));
   if(!free(x,z,actor.y,onStructure&&!door))return actor;
   if(!onStructure&&!door&&buildingDistance(x,z)<RADIUS)return actor;
   const lo=actor.y-.31,hi=actor.y+.275;
   let height=-Infinity;
   const candidate=y=>{if(between(y,lo,hi))height=Math.max(height,y);};
   if(onStructure){
+    if(city)for(const h of cityHeights(x,z))candidate(h);
     for(const r of floors)if(between(x,r.x0,r.x1)&&between(z,r.z0,r.z1))candidate(r.y);
     if(z<NAVE.back&&Math.hypot(x/APSE.rx,(z-NAVE.back)/APSE.rz)<.99)candidate(FLOORS[0]);
     for(const r of flights){
@@ -525,6 +538,7 @@ export function locationName(actor){
     return actor.interior?'屋上 · 管理小屋':roomName(ROOF_INDEX,actor.x,actor.z)??names[ROOF_INDEX];
   if(!actor.interior)return roomName(0,actor.x,actor.z,true)??'島の外周';
   const level=levelOf(actor);
+  if(level===CITY_LEVEL)return '地下6階 · '+cityPlace(actor.x,actor.z);
   if(level===CRYPT_LEVEL)return actor.y>CRYPT.y+.21?'1階 ↔ 地下1階 · 階段':cryptName(actor.z);
   if(level<CRYPT_LEVEL){
     const i=-level-2;

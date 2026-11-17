@@ -1,0 +1,51 @@
+{
+  "sheet": "city-n-household",
+  "theme": "ancient underground city: household",
+  "tiles": [
+    {
+      "id": "city-n-household-hearth",
+      "tile": false,
+      "prompt": "hearth"
+    },
+    {
+      "id": "city-n-household-sherdPile",
+      "tile": true,
+      "prompt": "sherdPile"
+    },
+    {
+      "id": "city-n-household-loom",
+      "tile": false,
+      "prompt": "loom"
+    },
+    {
+      "id": "city-n-household-strawBed",
+      "tile": false,
+      "prompt": "strawBed"
+    },
+    {
+      "id": "city-n-household-potShelf",
+      "tile": false,
+      "prompt": "potShelf"
+    },
+    {
+      "id": "city-n-household-hangingFish",
+      "tile": false,
+      "prompt": "hangingFish"
+    },
+    {
+      "id": "city-n-household-roughTable",
+      "tile": false,
+      "prompt": "roughTable"
+    },
+    {
+      "id": "city-n-household-millstone",
+      "tile": false,
+      "prompt": "millstone"
+    },
+    {
+      "id": "city-n-household-waterJar",
+      "tile": false,
+      "prompt": "waterJar"
+    }
+  ]
+}

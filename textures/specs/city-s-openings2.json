@@ -1,0 +1,51 @@
+{
+  "sheet": "city-s-openings2",
+  "theme": "ancient underground city: openings, second set",
+  "tiles": [
+    {
+      "id": "city-s-openings2-clothDoor2",
+      "tile": false,
+      "prompt": "clothDoor2"
+    },
+    {
+      "id": "city-s-openings2-plankDoor2",
+      "tile": false,
+      "prompt": "plankDoor2"
+    },
+    {
+      "id": "city-s-openings2-stoneSlide2",
+      "tile": false,
+      "prompt": "stoneSlide2"
+    },
+    {
+      "id": "city-s-openings2-ironDoor2",
+      "tile": false,
+      "prompt": "ironDoor2"
+    },
+    {
+      "id": "city-s-openings2-lattice2",
+      "tile": false,
+      "prompt": "lattice2"
+    },
+    {
+      "id": "city-s-openings2-wallHole2",
+      "tile": false,
+      "prompt": "wallHole2"
+    },
+    {
+      "id": "city-s-openings2-lintelDoor2",
+      "tile": false,
+      "prompt": "lintelDoor2"
+    },
+    {
+      "id": "city-s-openings2-reedBlind2",
+      "tile": false,
+      "prompt": "reedBlind2"
+    },
+    {
+      "id": "city-s-openings2-ropeBridge2",
+      "tile": false,
+      "prompt": "ropeBridge2"
+    }
+  ]
+}

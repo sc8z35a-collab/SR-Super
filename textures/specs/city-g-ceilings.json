@@ -1,0 +1,51 @@
+{
+  "sheet": "city-g-ceilings",
+  "theme": "ancient underground city: low ceilings",
+  "tiles": [
+    {
+      "id": "city-g-ceilings-bedrock",
+      "tile": true,
+      "prompt": "bedrock"
+    },
+    {
+      "id": "city-g-ceilings-beamCeiling",
+      "tile": true,
+      "prompt": "beamCeiling"
+    },
+    {
+      "id": "city-g-ceilings-reedMudCeil",
+      "tile": true,
+      "prompt": "reedMudCeil"
+    },
+    {
+      "id": "city-g-ceilings-sootCeil",
+      "tile": true,
+      "prompt": "sootCeil"
+    },
+    {
+      "id": "city-g-ceilings-seepCeil",
+      "tile": true,
+      "prompt": "seepCeil"
+    },
+    {
+      "id": "city-g-ceilings-brokenCeil",
+      "tile": true,
+      "prompt": "brokenCeil"
+    },
+    {
+      "id": "city-g-ceilings-logCeil",
+      "tile": true,
+      "prompt": "logCeil"
+    },
+    {
+      "id": "city-g-ceilings-slabCeil",
+      "tile": true,
+      "prompt": "slabCeil"
+    },
+    {
+      "id": "city-g-ceilings-rootCeil",
+      "tile": true,
+      "prompt": "rootCeil"
+    }
+  ]
+}

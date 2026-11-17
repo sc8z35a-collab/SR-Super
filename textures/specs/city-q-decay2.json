@@ -1,0 +1,51 @@
+{
+  "sheet": "city-q-decay2",
+  "theme": "ancient underground city: decay, second set",
+  "tiles": [
+    {
+      "id": "city-q-decay2-wallBreak2",
+      "tile": false,
+      "prompt": "wallBreak2"
+    },
+    {
+      "id": "city-q-decay2-rubble2",
+      "tile": true,
+      "prompt": "rubble2"
+    },
+    {
+      "id": "city-q-decay2-cobweb2",
+      "tile": true,
+      "prompt": "cobweb2"
+    },
+    {
+      "id": "city-q-decay2-mold2",
+      "tile": true,
+      "prompt": "mold2"
+    },
+    {
+      "id": "city-q-decay2-sootStreaks2",
+      "tile": true,
+      "prompt": "sootStreaks2"
+    },
+    {
+      "id": "city-q-decay2-oilStain2",
+      "tile": true,
+      "prompt": "oilStain2"
+    },
+    {
+      "id": "city-q-decay2-cavePainting",
+      "tile": false,
+      "prompt": "cavePainting"
+    },
+    {
+      "id": "city-q-decay2-dripMoss2",
+      "tile": true,
+      "prompt": "dripMoss2"
+    },
+    {
+      "id": "city-q-decay2-sherds2",
+      "tile": true,
+      "prompt": "sherds2"
+    }
+  ]
+}

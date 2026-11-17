@@ -1,0 +1,51 @@
+{
+  "sheet": "city-h-decay",
+  "theme": "ancient underground city: decay",
+  "tiles": [
+    {
+      "id": "city-h-decay-wallBreak",
+      "tile": false,
+      "prompt": "wallBreak"
+    },
+    {
+      "id": "city-h-decay-rubbleBrick",
+      "tile": true,
+      "prompt": "rubbleBrick"
+    },
+    {
+      "id": "city-h-decay-cobweb",
+      "tile": true,
+      "prompt": "cobweb"
+    },
+    {
+      "id": "city-h-decay-mold",
+      "tile": true,
+      "prompt": "mold"
+    },
+    {
+      "id": "city-h-decay-sootStreaks",
+      "tile": true,
+      "prompt": "sootStreaks"
+    },
+    {
+      "id": "city-h-decay-oilStain",
+      "tile": true,
+      "prompt": "oilStain"
+    },
+    {
+      "id": "city-h-decay-graffiti",
+      "tile": false,
+      "prompt": "graffiti"
+    },
+    {
+      "id": "city-h-decay-dripMoss",
+      "tile": true,
+      "prompt": "dripMoss"
+    },
+    {
+      "id": "city-h-decay-sherdsFloor",
+      "tile": true,
+      "prompt": "sherdsFloor"
+    }
+  ]
+}
