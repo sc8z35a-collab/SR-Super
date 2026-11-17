@@ -511,7 +511,7 @@ function buildHouse(m, H, kind = 'house') {
     barred: ['barredDoor', 1.0, 1.9, 0], iron: ['ironDoor2', 1.0, 1.9, 0], lattice: ['lattice', .9, .9, .9], lattice2: ['lattice2', .9, .9, .9],
     lintel: ['lintelDoor', 1.2, 1.9, 0], lintel2: ['lintelDoor2', 1.2, 1.9, 0], clothdoor: ['clothDoor', 1.0, 1.9, 0], clothdoor2: ['clothDoor2', 1.0, 1.9, 0],
     patchdoor: ['patchDoor', 1.0, 1.9, 0], wax: ['waxWall', .9, .9, .5], sconce: ['sootSconce', 1.0, 1.4, .8], sootwall: ['sootWall2', 1.3, 1.4, .7],
-    glyphs: ['glyphs', 1.0, 1.0, .7], geometric: ['geometric', 1.0, 1.0, .7], relief: ['shrineRelief', 1.2, 1.2, .5], relief2: ['shrineRelief2', 1.2, 1.2, .5],
+    glyphs: ['glyphs', 1.0, 1.0, .7], geometric: ['geometric', 1.0, 1.0, .7], inlay: ['inlay', 1.3, 1.0, .6], shackle: ['shackles', .9, 1.0, .6], relief: ['shrineRelief', 1.2, 1.2, .5], relief2: ['shrineRelief2', 1.2, 1.2, .5],
     sign: ['signCloth', 1.0, 1.0, 1.0], cloth: ['dyedCloth', 1.4, 1.4, .5], tally: ['tally', 1.2, 1.2, .3], scratch: ['scratchedWall', 1.4, 1.5, .2],
   };
   for (const [k, e, tt, sd, w, hh, y0] of parse(H.x)) {
@@ -740,7 +740,7 @@ const FEATURE = {
     const y = floorY(F.c), half = F.w / 2, [L, Rr] = offsets(F.pts, half);
     for (let i = 0; i < F.pts.length - 1; i++) {
       quad(m, [L[i][0], y + .03, L[i][1]], [L[i + 1][0], y + .03, L[i + 1][1]], [Rr[i + 1][0], y + .03, Rr[i + 1][1]], [Rr[i][0], y + .03, Rr[i][1]], U.lakeWater, [0, 1, 0]);
-      for (const line of [L, Rr]) {
+      for (const line of [L, Rr, F.pts]) {
         const open = (F.open ?? []).some(([seg, s0, s1]) => seg === i);
         const pieces = open ? (F.open.filter(([seg]) => seg === i).reduce((acc, [, s0, s1]) => {
           const last = acc.pop(); acc.push([last[0], s0], [s1, 1]); return acc;
@@ -748,6 +748,14 @@ const FEATURE = {
         for (const [s0, s1] of pieces) {
           if (s1 - s0 < .01) continue;
           const A = mix(line[i], line[i + 1], s0), B = mix(line[i], line[i + 1], s1);
+          // The centre line only keeps the walker out of the water; the kerbs are drawn.
+          if (line === F.pts) {
+            // Its round ends would close the bridge gaps, so pull them back from each opening.
+            const L = Math.hypot(B[0] - A[0], B[1] - A[1]), k = (half - .2) / Math.max(L, 1e-6);
+            const a = s0 > 0 ? mix(A, B, Math.min(.5, k)) : A, b = s1 < 1 ? mix(B, A, Math.min(.5, k)) : B;
+            wallBlock(a, b, half - .2, y - .05, y + .4);
+            continue;
+          }
           slab(m, A, B, y - .05, y + .32, .3, M(F.kerb ?? 'roughBlock'));
           wallBlock(A, B, .15, y - .05, y + .4);
         }

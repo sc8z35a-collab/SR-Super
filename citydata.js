@@ -626,7 +626,89 @@ const CANAL = [
     d: '2 .5 .85 open', i: 'bed 0 -.3 50;pots -.6 .9 0', x: 'drip 1 .5 i' },
 ];
 
-export const HOUSES = [...GATE, ...LAKESIDE, ...MUD, ...MAZE, ...MARKET, ...TIMBER, ...CANAL];
+// 鍛冶と陶工の市: forges and kilns ring a square where their wares are sold off trestles.
+const SMITHY = [
+  { c: 'smithy', n: '大鍛冶の家', p: [[429.6, 88.0], [434.6, 85.4], [436.0, 89.4], [431.0, 91.4]], h: 2.4, w: 'sootBrick', ew: { 0: 'bedrock' }, f: 'ashFloor', r: 'sootCeil', top: 'soot2',
+    d: '2 .5 1.0 open', i: 'forge @0 .5 .6;iron @3 .5 .12;ash .3 .2 0;bed -1.4 -.2 60;sacks 1.6 .6 0;jar 1.0 -1.0', t: '2 .1 o;2 .9 o', x: 'sootwall 2 .3 o;soot2 1 .5 i' },
+  { c: 'smithy', n: '刃物鍛冶の家', p: [[437.0, 82.0], [442.0, 82.2], [442.2, 87.0], [436.6, 87.6]], h: 2.35, w: 'burntBrick2', ew: { 0: 'bedrock2' }, f: 'ashFloor', r: 'sootCeil', top: 'soot2',
+    d: '2 .5 1.0 open', i: 'forge @0 .3 .6;iron @1 .5 .12;table .9 .8 0;bed -1.6 .6 0;crate 1.8 -1.4 0', t: '2 .85 o', x: 'soot2 0 .8 i;sign 2 .2 o' },
+  { c: 'smithy', n: '鋳物師の家', p: [[442.8, 82.6], [446.8, 83.0], [450.2, 86.4], [443.0, 87.2]], h: 2.35, w: 'sootStone', f: 'ashFloor', r: 'sootCeil',
+    d: '2 .45 1.0 open', i: 'furnace @0 .4 .6;jar .9 -.2 0 .9;ash -.4 .6 0;bed 1.5 .9 45;iron @3 .5 .12', t: '2 .1 o', x: 'sootwall 0 .5 i' },
+  { c: 'smithy', n: '釘鍛冶の家', p: [[449.0, 88.0], [452.6, 88.4], [453.2, 93.2], [449.4, 93.0]], h: 2.25, w: 'sootBrick2', ew: { 1: 'bedrock' }, f: 'ashFloor', r: 'sootCeil', top: 'soot2',
+    d: '3 .5 .95 open', i: 'forge @1 .4 .6;iron @0 .5 .12;bed -.6 1.6 90;sacks -.9 -1.4 0', t: '3 .15 o', x: 'soot2 2 .5 i' },
+  { c: 'smithy', n: '陶工の窯場', p: [[447.6, 99.4], [452.4, 98.8], [451.0, 102.4], [447.8, 104.0]], h: 2.35, w: 'sunBrick', ew: { 1: 'burntBrick' }, f: 'sherdsFloor', r: 'logCeil', top: 'logs2',
+    d: '0 .5 1.0 open', i: 'furnace @2 .5 .6;pots -.8 -.4 0;jar .6 -.6 0 1.1;jar 1.2 .2 0 .8;sherds2 -.4 .9 0;bed -1.4 .6 0', t: '0 .9 o', x: 'soot 2 .4 o' },
+  { c: 'smithy', n: '轆轤の家', p: [[441.8, 102.2], [446.8, 101.8], [447.0, 106.2], [442.2, 106.6]], h: 2.3, w: 'redEarth', ew: { 2: 'bedrock2' }, f: 'dirtFloor', r: 'reedMudCeil',
+    d: '0 .5 1.0 open', i: 'mill -.8 -.6;mill .8 -.8;shelf @2 .3 .25;shelf @2 .7 .25;bed 1.6 .8 0;pots -1.6 1.2 0', t: '0 .1 o', x: 'sign 0 .85 o' },
+  { c: 'smithy', n: '素焼き職人の家', p: [[436.0, 101.6], [441.0, 101.8], [441.2, 107.0], [436.4, 106.2]], h: 2.3, w: 'brokenSunBrick', f: 'sherdsFloor', r: 'reedMudCeil',
+    d: '0 .5 1.0 open', i: 'jars @2 .5 .2;pots -1.2 -.8 0;pots .8 -.9 0;jar 1.6 .4 0 .9;bed -1.4 1.2 0;sherds .3 .4 0', t: '0 .9 o', x: 'hands 0 .2 o' },
+  { c: 'smithy', n: '炭焼きの家', p: [[432.4, 100.8], [435.4, 100.8], [435.6, 105.0], [432.8, 103.8]], h: 2.2, w: 'sootStone', f: 'ashFloor', r: 'sootCeil', top: 'soot2',
+    d: '0 .5 .95 open', i: 'sacks -.6 .8 0;sacks .4 1.2 0;ash .2 -.4 0;straw -.6 -.6 90', x: 'sootwall 0 .5 o' },
+  { c: 'smithy', n: 'ふいご職人の家', p: [[427.6, 92.0], [431.6, 92.6], [431.4, 96.6], [428.6, 96.4]], h: 2.25, w: 'oldPlanks', ew: { 3: 'sootPlanks' }, f: 'ashFloor', r: 'beamCeiling',
+    d: '1 .5 .95 open', i: 'hide -.2 .3 30;iron @3 .5 .12;bed -.6 -1.0 90;crate .8 1.0 0', t: '1 .1 o', x: 'soot 0 .5 i' },
+];
+
+// 切石の上層区: polished stone, inlay floors and three great houses, each a cluster of rooms
+// opening into one another around a hall; the old column stands in the little court between them.
+const ASHLAR = [
+  { c: 'ashlar', n: '石工頭の大屋敷・広間', p: [[531.0, 121.6], [539.6, 121.0], [540.0, 127.4], [531.6, 128.0]], h: 2.45, w: 'polSandstone', ew: { 0: 'inlay' }, f: 'polWorn', r: 'slabCeil', top: 'slab2',
+    d: '0 .5 1.1 open;2 .6 .9 open;2 .18 .9 open;1 .5 .9 open', i: 'table -.8 .2 0;stool -1.5 .2;stool -.1 .2;stool -.8 -.6;rug 1.6 .4 0;relief2 @3 .5 .12 1.3;candles 2.6 2.2;lamp @0 .2 .15;lamp @0 .8 .15;jar 3.4 -2.2 0 1.1',
+    t: '0 .1 o;0 .9 o', x: 'geometric 0 .3 i;geometric 0 .7 i;glyphs 3 .5 o' },
+  { c: 'ashlar', n: '石工頭の大屋敷・寝間', p: [[532.2, 128.4], [537.0, 128.2], [536.8, 131.0], [533.0, 130.4]], h: 2.3, w: 'polSandstone', f: 'wornRug', r: 'slabCeil', top: 'slab2',
+    d: '0 .6 .9 open', i: 'bed -1.2 .4 90;bed .9 .5 90;lamp @2 .5 .15', x: 'inlay 2 .5 i' },
+  { c: 'ashlar', n: '石工頭の大屋敷・蔵', p: [[537.4, 128.2], [541.6, 127.8], [541.2, 131.8], [537.6, 131.4]], h: 2.3, w: 'flatStone', f: 'polCracked', r: 'slabCeil',
+    d: '0 .26 .9 open', i: 'crate .6 .6 0;crate 1.2 -.2 10;jar -1.0 1.0 0 1.1;jar -1.4 .2 0 .9;sacks .9 1.4 0;coins -.2 -.4 0', x: 'web 2 .5 i' },
+  { c: 'ashlar', n: '石工頭の大屋敷・炊事場', p: [[540.4, 121.2], [545.0, 121.0], [545.4, 126.2], [540.6, 126.8]], h: 2.35, w: 'limeStone', ew: { 1: 'sootStone' }, f: 'polWorn', r: 'sootCeil', top: 'soot2',
+    d: '3 .5 .9 open;2 .3 .9 open;0 .6 .9 cloth', i: 'hearth @1 .5 .5;pots -.6 1.6 0;jars @2 .7 .2;table .2 -.6 90;jar -1.4 -1.6', x: 'soot2 1 .5 i' },
+  { c: 'ashlar', n: '石工頭の大屋敷・祭壇の間', p: [[542.2, 127.4], [547.4, 126.8], [547.0, 131.4], [542.0, 132.0]], h: 2.4, w: 'polBasalt', ew: { 2: 'inlay' }, f: 'polWorn', r: 'slabCeil', top: 'slab2',
+    d: '0 .34 .9 open', i: 'relief @2 .5 .1 1.5;candles -.6 1.2;candles .8 1.3;wax @1 .5 .1;rug .2 -.2 0;lamp @3 .5 .15', x: 'glyphs 1 .3 i;geometric 3 .5 i' },
+  { c: 'ashlar', n: '切石の館・広間', p: [[546.4, 108.4], [552.6, 107.8], [553.4, 114.0], [546.8, 114.6]], h: 2.45, w: 'polBasalt', ew: { 3: 'polSandstone' }, f: 'inlay', r: 'slabCeil', top: 'slab2',
+    d: '3 .5 1.0 open;0 .64 .9 open;1 .5 .9 open;2 .5 .9 open', i: 'table .2 .4 0;stool -.5 .4;stool .9 .4;rug -1.4 -1.2 0;relief2 @1 .2 .1 1.2;lamp @3 .15 .15;lamp @1 .85 .15;jar -2.4 2.2 0 1.0',
+    t: '3 .15 o;3 .85 o', x: 'geometric 3 .5 o;inlay 2 .2 i' },
+  { c: 'ashlar', n: '切石の館・奥の間', p: [[547.8, 103.6], [552.2, 102.8], [552.8, 107.2], [548.0, 107.8]], h: 2.35, w: 'polBasalt', f: 'wornRug', r: 'slabCeil',
+    d: '2 .5 .9 open', i: 'bed -1.2 -.4 90;bed .9 -.6 90;crate 1.6 1.0 0;lamp @0 .5 .15', x: 'glyphs 0 .5 i' },
+  { c: 'ashlar', n: '切石の館・書き物の間', p: [[553.6, 108.0], [556.4, 107.6], [557.4, 113.2], [553.8, 113.8]], h: 2.35, w: 'polSchist', f: 'polWorn', r: 'slabCeil',
+    d: '3 .5 .9 open', i: 'table .2 .2 0;stool .2 -.5;shelf @1 .5 .25;tally @2 .5 .12;candles -.6 1.8', x: 'glyphs 1 .3 i' },
+  { c: 'ashlar', n: '切石の館・下働きの間', p: [[547.0, 115.2], [553.6, 114.6], [554.0, 118.6], [547.4, 119.2]], h: 2.3, w: 'limeStone', f: 'polCracked', r: 'slabCeil',
+    d: '0 .47 .9 open;3 .5 1.0 open', i: 'straw -1.8 .6 0;straw .2 .9 0;bed 2.2 .4 90;pots 2.4 -1.2 0;basket -2.6 -1.0', t: '3 .85 o', x: 'mold 2 .5 i' },
+  { c: 'ashlar', n: '祭司の館・広間', p: [[527.0, 106.4], [533.6, 105.8], [534.2, 112.2], [527.4, 112.8]], h: 2.45, w: 'polSandstone', ew: { 1: 'inlay' }, f: 'inlay', r: 'slabCeil', top: 'slab2',
+    d: '1 .6 1.0 open;0 .58 .9 open;3 .44 .9 open', i: 'relief @3 .8 .1 1.4;candles -2.4 2.2;candles -2.2 -2.0;rug .3 .3 0;table .3 1.6 0;stool .3 2.3;lamp @1 .2 .15;wax @2 .5 .1',
+    t: '1 .15 o;1 .9 o', x: 'glyphs 2 .3 i;geometric 2 .7 i' },
+  { c: 'ashlar', n: '祭司の館・寝所', p: [[528.6, 102.4], [532.6, 100.2], [533.4, 105.2], [528.4, 105.8]], h: 2.3, w: 'polSandstone', f: 'wornRug', r: 'slabCeil',
+    d: '2 .5 .9 open', i: 'bed -.6 -.2 90;lamp @1 .5 .15;jar 1.2 1.2 0 .8', x: 'inlay 1 .5 i' },
+  { c: 'ashlar', n: '祭司の館・召使いの間', p: [[524.8, 107.6], [526.6, 107.4], [526.8, 112.6], [524.6, 113.2]], h: 2.2, w: 'limeStone', f: 'polCracked', r: 'slabCeil',
+    d: '1 .5 .9 open', i: 'straw 0 -.6 0;pots 0 1.4 0', x: 'web 3 .5 i' },
+  { c: 'ashlar', n: '南口の石の家', p: [[534.2, 100.8], [538.2, 100.2], [538.4, 104.6], [534.0, 105.4]], h: 2.3, w: 'flatStone', ew: { 1: 'polWorn' }, f: 'polWorn', r: 'slabCeil',
+    d: '1 .5 .95 open', i: 'bed -1.0 .3 0;table .7 .8 90;stool .2 .8;jar 1.4 -1.4', t: '1 .15 o', x: 'geometric 1 .8 o' },
+  { c: 'ashlar', n: '西口の石の家', p: [[524.6, 117.8], [528.4, 117.4], [528.8, 121.6], [525.6, 122.0]], h: 2.3, w: 'polSchist', f: 'polWorn', r: 'slabCeil',
+    d: '1 .5 .95 open;0 .5 .9 cloth', i: 'bed -.7 .6 0;table .9 -.4 90;lamp @2 .5 .15', t: '1 .85 o', x: 'glyphs 1 .3 o' },
+  { c: 'ashlar', n: '柱の広場の家', p: [[535.0, 113.8], [538.6, 113.4], [538.8, 117.0], [535.4, 117.6]], h: 2.3, w: 'polSandstone', f: 'polWorn', r: 'slabCeil',
+    d: '1 .5 .95 open', i: 'bed -.9 .2 0;pots .8 1.2 0;stool .6 -.4', t: '1 .9 o', x: 'inlay 1 .5 o' },
+  { c: 'ashlar', n: '石磨きの家', p: [[542.4, 111.0], [545.6, 110.6], [545.8, 114.6], [542.6, 115.0]], h: 2.3, w: 'polCracked', f: 'polWorn', r: 'slabCeil',
+    d: '2 .5 .95 open', i: 'mill -.4 -.8;sacks .8 -1.2 0;bed .6 .9 90', x: 'sign 2 .2 o' },
+  { c: 'ashlar', n: '坂上の切石の家', p: [[540.6, 103.4], [544.6, 103.0], [545.0, 107.0], [540.8, 107.6]], h: 2.3, w: 'limeStone', ew: { 3: 'polWorn' }, f: 'polWorn', r: 'slabCeil',
+    d: '3 .5 .95 open', i: 'bed .9 .3 0;hearth -.9 -1.2 0;jar -1.4 1.3', t: '3 .2 o', x: 'geometric 3 .7 o' },
+  { c: 'ashlar', n: '細工師の家', p: [[541.0, 108.0], [544.8, 107.6], [545.2, 110.2], [541.4, 110.6]], h: 2.25, w: 'polSchist', f: 'polWorn', r: 'slabCeil',
+    d: '3 .5 .95 open', i: 'bed .6 .7 90;table .6 -.6 0;stool -.2 -.6', x: 'inlay 0 .5 i' },
+  { c: 'ashlar', n: '石段脇の家', p: [[535.0, 106.0], [538.8, 105.4], [539.2, 109.6], [535.2, 110.0]], h: 2.3, w: 'flatStone', f: 'polCracked', r: 'slabCeil',
+    d: '1 .5 .95 open;3 .5 .9 cloth', i: 'bed .2 .9 90;pots -1.0 -1.0 0;stool .7 -.6', x: 'glyphs 1 .5 o' },
+  { c: 'ashlar', n: '石段下の家', p: [[535.4, 110.4], [539.4, 110.0], [539.6, 113.0], [535.4, 113.4]], h: 2.25, w: 'limeStone', f: 'polWorn', r: 'slabCeil',
+    d: '1 .5 .95 open', i: 'bed -.6 0 90;jar 1.4 .6', x: 'mold 3 .5 i' },
+];
+
+// 浴場跡と階段井戸: a great bath between four columns and a stepwell; the keepers live alongside.
+const BATH = [
+  { c: 'bath', n: '湯守りの家', p: [[566.6, -4.0], [571.0, -4.6], [571.4, -.4], [567.0, .2]], h: 2.3, w: 'polWorn', ew: { 2: 'mossStone' }, f: 'brokenTiles', r: 'seepIce2',
+    d: '0 .5 .95 open', i: 'bed -1.0 .6 90;jar 1.4 1.2 0 1.0;jar 1.5 .3 0 .8;hearth .9 -1.2 0;lamp @3 .5 .15', t: '0 .1 o', x: 'drip 2 .5 i' },
+  { c: 'bath', n: '脱衣場の跡', p: [[547.8, -11.0], [550.2, -11.2], [550.4, -6.0], [548.6, -5.4]], h: 2.2, w: 'polCracked', f: 'brokenTiles', r: 'brokenCeil', open: true,
+    b: '1 .3 .8 .6', d: '0 .5 .9 open', i: 'rubble -.2 1.4 0 .6 .3;crate .3 -1.4 0;cloth -.3 .3 0', x: 'mold2 3 .5 i' },
+  { c: 'bath', n: '垢すりの小屋', p: [[560.6, -27.4], [565.0, -27.8], [565.2, -23.6], [560.8, -23.2]], h: 2.2, w: 'mossStone', f: 'brokenTiles', r: 'seepCeil',
+    d: '2 .5 .95 open', i: 'bed -1.2 -.2 0;straw .6 -.8 90;jar 1.4 1.2', t: '2 .1 o', x: 'drip 0 .5 i' },
+  { c: 'bath', n: '湯女の家', p: [[572.8, -6.0], [575.8, -6.6], [576.0, -3.4], [573.0, -2.8]], h: 2.2, w: 'limeStone', f: 'wornRug', r: 'seepCeil',
+    d: '3 .5 .95 cloth', i: 'bed .4 .2 0;candles -.8 1.0;jar -.9 -1.0 0 .8', x: 'mold 1 .5 i' },
+];
+
+export const HOUSES = [...GATE, ...LAKESIDE, ...MUD, ...MAZE, ...MARKET, ...TIMBER, ...CANAL, ...SMITHY, ...ASHLAR, ...BATH];
 
 // ---------------------------------------------------------------- prison cells
 export const CELLS = [];
@@ -670,6 +752,13 @@ export const STALLS = [
   { c: 'canal', x: 416.6, z: -70.7, a: 183, w: 2.2, d: 1.1, g: 'dyedCloth', aw: 'patchCloth', back: 'dyedCloth', sign: true },
   { c: 'canal', x: 419.8, z: -70.9, a: 180, w: 2.0, d: 1.1, g: 'spices', aw: 'tentStripe' },
   { c: 'canal', x: 423.0, z: -71.0, a: 176, w: 2.0, d: 1.2, g: 'wornRug', ground: true, mat: 'burlap', aw: 'patchCloth' },
+  // 鍛冶と陶工の市
+  { c: 'smithy', x: 439.0, z: 92.0, a: 0, w: 2.2, d: 1.1, g: 'ironware', aw: 'patchCloth', body: 'sootPlanks', back: 'ironware' },
+  { c: 'smithy', x: 443.6, z: 91.6, a: 350, w: 2.0, d: 1.1, g: 'ironware', aw: 'tentStripe', body: 'sootPlanks' },
+  { c: 'smithy', x: 446.4, z: 95.6, a: 280, w: 2.0, d: 1.2, g: 'sherdPile', ground: true, mat: 'strawMat', aw: 'patchCloth', i: 'jar -1.3 -.8 0 .9' },
+  { c: 'smithy', x: 443.6, z: 99.2, a: 190, w: 2.2, d: 1.1, g: 'sherdPile', aw: 'tentStripe', i: 'pots 1.4 -.8 0' },
+  { c: 'smithy', x: 438.6, z: 99.0, a: 170, w: 2.0, d: 1.1, g: 'coins', aw: 'patchCloth', sign: true },
+  { c: 'smithy', x: 435.4, z: 95.6, a: 90, w: 2.1, d: 1.1, g: 'ironware', aw: 'tentStripe', hang: 'herbs' },
 ];
 
 // ---------------------------------------------------------------- features
@@ -701,6 +790,12 @@ export const FEATURES = [
   { k: 'bridge', c: 'canal', x: 413.0, z: -74.78, a: 0, len: 2.8, w: 1.0 },
   { k: 'bridge', c: 'canal', x: 428.0, z: -75.3, a: 0, len: 2.8, w: 1.0 },
   { k: 'items', c: 'canal', i: 'cloth 395.0 -73.7 0;cloth 405.6 -73.75 0;cloth 420.6 -73.7 0;cloth 432.2 -73.8 0;jar 385.6 -69.6 0 1.1;barrel 385.2 -80.6;crate 412.6 -82.8 10;sacks 438.8 -78.6 0;puddle 384.8 -75.0 0;basket 426.6 -82.6;sherds 400.6 -83.0 0' },
+  // 鍛冶の広場, 切石の中庭, 浴場.
+  { k: 'items', c: 'smithy', i: 'brazier 441.0 95.6;sacks 433.4 93.2 0;crate 447.6 89.8 20;sherds 446.6 101.4 0;ash 436.6 98.8 30;barrel 432.8 98.0' },
+  { k: 'items', c: 'ashlar', i: 'brazier 543.0 118.6;relief2 537.6 119.6 90 1.2;jar 546.2 120.4 0 1.1;candles 539.6 119.6;sherds2 529.8 115.6 0;crate 534.2 120.2 0' },
+  { k: 'bath', c: 'bath', x: 557.6, z: -12.6, a: 0, w: 8.4, d: 6.6, edge: 'polWorn' },
+  { k: 'well', c: 'bath', x: 571.0, z: -14.0, r: 2.0 },
+  { k: 'items', c: 'bath', i: 'jar 553.2 -21.2 0 1.1;rubble 575.6 -16.8 0 .9 .4;cloth 566.4 -20.6 0;sherds2 558 -4.6 0;puddle 561.6 -19.8 0;basket 552.0 -3.6' },
 ];
 
 // ---------------------------------------------------------------- free-standing torches: x z chamber [flame]
@@ -716,5 +811,8 @@ export const TORCHES = [
   [353.2, 93.0, 'timber', 'w'], [343.8, 106.2, 'timber'], [346.6, 117.4, 'timber'], [360.6, 109.0, 'timber'], [363.0, 117.6, 'timber'], [339.2, 112.8, 'timber'], [334.8, 90.4, 'timber'],
   [385.6, -73.6, 'canal'], [392.0, -73.4, 'canal'], [401.8, -73.2, 'canal'], [413.8, -73.0, 'canal'], [426.6, -73.4, 'canal'], [438.6, -73.4, 'canal'],
   [388.4, -76.4, 'canal', 'b'], [400.4, -76.6, 'canal'], [413.0, -77.0, 'canal'], [428.0, -77.0, 'canal'], [437.8, -79.0, 'canal'], [401.2, -66.2, 'canal'], [409.0, -83.2, 'canal', 'w'], [395.0, -83.4, 'canal'], [427.8, -82.8, 'canal'],
+  [434.0, 97.8, 'smithy'], [447.8, 96.6, 'smithy'], [441.0, 88.8, 'smithy', 'w'], [440.0, 100.6, 'smithy'],
+  [527.0, 115.6, 'ashlar'], [539.8, 102.0, 'ashlar'], [539.9, 111.4, 'ashlar'], [546.0, 117.0, 'ashlar'], [555.4, 119.0, 'ashlar'], [529.6, 124.0, 'ashlar'], [534.6, 118.4, 'ashlar', 'b'],
+  [549.6, -15.4, 'bath'], [565.6, -12.6, 'bath'], [557.6, -20.6, 'bath'], [557.6, -4.4, 'bath'], [563.0, -2.0, 'bath'], [574.0, -21.6, 'bath'], [576.4, -9.4, 'bath', 'b'], [567.6, -14.0, 'bath'],
   [173.8, -48.0, 'maze'], [196.8, -46.0, 'maze'], [197.4, -60.6, 'maze'], [183.2, -56.8, 'maze'], [178.0, -27.0, 'maze'], [193.5, -20.4, 'maze'], [201.6, -60.0, 'maze'], [209.6, -52.0, 'maze', 'b'],
 ];
