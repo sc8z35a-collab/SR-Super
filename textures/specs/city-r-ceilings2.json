@@ -1,0 +1,51 @@
+{
+  "sheet": "city-r-ceilings2",
+  "theme": "ancient underground city: low ceilings, second set",
+  "tiles": [
+    {
+      "id": "city-r-ceilings2-bedrock2",
+      "tile": true,
+      "prompt": "bedrock2"
+    },
+    {
+      "id": "city-r-ceilings2-plankBeams2",
+      "tile": true,
+      "prompt": "plankBeams2"
+    },
+    {
+      "id": "city-r-ceilings2-reedMud2",
+      "tile": true,
+      "prompt": "reedMud2"
+    },
+    {
+      "id": "city-r-ceilings2-soot2",
+      "tile": true,
+      "prompt": "soot2"
+    },
+    {
+      "id": "city-r-ceilings2-seepIce2",
+      "tile": true,
+      "prompt": "seepIce2"
+    },
+    {
+      "id": "city-r-ceilings2-brokenCeil2",
+      "tile": true,
+      "prompt": "brokenCeil2"
+    },
+    {
+      "id": "city-r-ceilings2-logs2",
+      "tile": true,
+      "prompt": "logs2"
+    },
+    {
+      "id": "city-r-ceilings2-slab2",
+      "tile": true,
+      "prompt": "slab2"
+    },
+    {
+      "id": "city-r-ceilings2-roots2",
+      "tile": true,
+      "prompt": "roots2"
+    }
+  ]
+}

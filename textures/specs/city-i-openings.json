@@ -1,0 +1,51 @@
+{
+  "sheet": "city-i-openings",
+  "theme": "ancient underground city: openings",
+  "tiles": [
+    {
+      "id": "city-i-openings-clothDoor",
+      "tile": false,
+      "prompt": "clothDoor"
+    },
+    {
+      "id": "city-i-openings-plankDoor",
+      "tile": false,
+      "prompt": "plankDoor"
+    },
+    {
+      "id": "city-i-openings-stoneSlide",
+      "tile": false,
+      "prompt": "stoneSlide"
+    },
+    {
+      "id": "city-i-openings-barredDoor",
+      "tile": false,
+      "prompt": "barredDoor"
+    },
+    {
+      "id": "city-i-openings-lattice",
+      "tile": false,
+      "prompt": "lattice"
+    },
+    {
+      "id": "city-i-openings-wallHole",
+      "tile": false,
+      "prompt": "wallHole"
+    },
+    {
+      "id": "city-i-openings-lintelDoor",
+      "tile": false,
+      "prompt": "lintelDoor"
+    },
+    {
+      "id": "city-i-openings-reedBlind",
+      "tile": false,
+      "prompt": "reedBlind"
+    },
+    {
+      "id": "city-i-openings-ropeBridge",
+      "tile": false,
+      "prompt": "ropeBridge"
+    }
+  ]
+}

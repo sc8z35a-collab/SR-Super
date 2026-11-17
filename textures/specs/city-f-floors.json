@@ -1,0 +1,51 @@
+{
+  "sheet": "city-f-floors",
+  "theme": "ancient underground city: floors",
+  "tiles": [
+    {
+      "id": "city-f-floors-dirtFloor",
+      "tile": true,
+      "prompt": "dirtFloor"
+    },
+    {
+      "id": "city-f-floors-strawFloor",
+      "tile": true,
+      "prompt": "strawFloor"
+    },
+    {
+      "id": "city-f-floors-cobbleLane",
+      "tile": true,
+      "prompt": "cobbleLane"
+    },
+    {
+      "id": "city-f-floors-smallSteps",
+      "tile": false,
+      "prompt": "smallSteps"
+    },
+    {
+      "id": "city-f-floors-mudPuddles",
+      "tile": true,
+      "prompt": "mudPuddles"
+    },
+    {
+      "id": "city-f-floors-ashFloor",
+      "tile": true,
+      "prompt": "ashFloor"
+    },
+    {
+      "id": "city-f-floors-dirtyPlanks",
+      "tile": true,
+      "prompt": "dirtyPlanks"
+    },
+    {
+      "id": "city-f-floors-pebbleFloor",
+      "tile": true,
+      "prompt": "pebbleFloor"
+    },
+    {
+      "id": "city-f-floors-brokenTiles",
+      "tile": true,
+      "prompt": "brokenTiles"
+    }
+  ]
+}

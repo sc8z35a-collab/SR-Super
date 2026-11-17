@@ -1,0 +1,51 @@
+{
+  "sheet": "city-k-goods",
+  "theme": "ancient underground city: market goods",
+  "tiles": [
+    {
+      "id": "city-k-goods-dryFish",
+      "tile": false,
+      "prompt": "dryFish"
+    },
+    {
+      "id": "city-k-goods-mushrooms",
+      "tile": true,
+      "prompt": "mushrooms"
+    },
+    {
+      "id": "city-k-goods-spices",
+      "tile": false,
+      "prompt": "spices"
+    },
+    {
+      "id": "city-k-goods-jarRows",
+      "tile": false,
+      "prompt": "jarRows"
+    },
+    {
+      "id": "city-k-goods-ironware",
+      "tile": false,
+      "prompt": "ironware"
+    },
+    {
+      "id": "city-k-goods-coins",
+      "tile": true,
+      "prompt": "coins"
+    },
+    {
+      "id": "city-k-goods-roots",
+      "tile": false,
+      "prompt": "roots"
+    },
+    {
+      "id": "city-k-goods-herbs",
+      "tile": false,
+      "prompt": "herbs"
+    },
+    {
+      "id": "city-k-goods-boneCraft",
+      "tile": false,
+      "prompt": "boneCraft"
+    }
+  ]
+}

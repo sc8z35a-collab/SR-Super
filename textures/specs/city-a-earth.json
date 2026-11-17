@@ -1,0 +1,51 @@
+{
+  "sheet": "city-a-earth",
+  "theme": "ancient underground city: earth walls",
+  "tiles": [
+    {
+      "id": "city-a-earth-rammed",
+      "tile": true,
+      "prompt": "rammed"
+    },
+    {
+      "id": "city-a-earth-strawMud",
+      "tile": true,
+      "prompt": "strawMud"
+    },
+    {
+      "id": "city-a-earth-wattle",
+      "tile": false,
+      "prompt": "wattle"
+    },
+    {
+      "id": "city-a-earth-crackedMud",
+      "tile": true,
+      "prompt": "crackedMud"
+    },
+    {
+      "id": "city-a-earth-sootMud",
+      "tile": true,
+      "prompt": "sootMud"
+    },
+    {
+      "id": "city-a-earth-redEarth",
+      "tile": true,
+      "prompt": "redEarth"
+    },
+    {
+      "id": "city-a-earth-whiteFlake",
+      "tile": true,
+      "prompt": "whiteFlake"
+    },
+    {
+      "id": "city-a-earth-handprints",
+      "tile": true,
+      "prompt": "handprints"
+    },
+    {
+      "id": "city-a-earth-crumblingMud",
+      "tile": true,
+      "prompt": "crumblingMud"
+    }
+  ]
+}

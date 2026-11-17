@@ -1,0 +1,51 @@
+{
+  "sheet": "city-l-cloth",
+  "theme": "ancient underground city: market cloth",
+  "tiles": [
+    {
+      "id": "city-l-cloth-tentStripe",
+      "tile": false,
+      "prompt": "tentStripe"
+    },
+    {
+      "id": "city-l-cloth-patchCloth",
+      "tile": false,
+      "prompt": "patchCloth"
+    },
+    {
+      "id": "city-l-cloth-strawMat",
+      "tile": true,
+      "prompt": "strawMat"
+    },
+    {
+      "id": "city-l-cloth-fur",
+      "tile": true,
+      "prompt": "fur"
+    },
+    {
+      "id": "city-l-cloth-dyedCloth",
+      "tile": false,
+      "prompt": "dyedCloth"
+    },
+    {
+      "id": "city-l-cloth-ropeNet",
+      "tile": true,
+      "prompt": "ropeNet"
+    },
+    {
+      "id": "city-l-cloth-wornRug",
+      "tile": false,
+      "prompt": "wornRug"
+    },
+    {
+      "id": "city-l-cloth-burlap",
+      "tile": false,
+      "prompt": "burlap"
+    },
+    {
+      "id": "city-l-cloth-signCloth",
+      "tile": false,
+      "prompt": "signCloth"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "sheet": "city-c-wood",
+  "theme": "ancient underground city: wood",
+  "tiles": [
+    {
+      "id": "city-c-wood-oldPlanks",
+      "tile": true,
+      "prompt": "oldPlanks"
+    },
+    {
+      "id": "city-c-wood-sootPlanks",
+      "tile": true,
+      "prompt": "sootPlanks"
+    },
+    {
+      "id": "city-c-wood-rottenPlanks",
+      "tile": true,
+      "prompt": "rottenPlanks"
+    },
+    {
+      "id": "city-c-wood-petrified",
+      "tile": true,
+      "prompt": "petrified"
+    },
+    {
+      "id": "city-c-wood-splitLog",
+      "tile": true,
+      "prompt": "splitLog"
+    },
+    {
+      "id": "city-c-wood-patchDoor",
+      "tile": false,
+      "prompt": "patchDoor"
+    },
+    {
+      "id": "city-c-wood-wormwood",
+      "tile": true,
+      "prompt": "wormwood"
+    },
+    {
+      "id": "city-c-wood-reedWall",
+      "tile": true,
+      "prompt": "reedWall"
+    },
+    {
+      "id": "city-c-wood-barkWall",
+      "tile": true,
+      "prompt": "barkWall"
+    }
+  ]
+}

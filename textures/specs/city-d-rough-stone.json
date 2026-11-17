@@ -1,0 +1,51 @@
+{
+  "sheet": "city-d-rough-stone",
+  "theme": "ancient underground city: rough stone",
+  "tiles": [
+    {
+      "id": "city-d-rough-stone-fieldStone",
+      "tile": true,
+      "prompt": "fieldStone"
+    },
+    {
+      "id": "city-d-rough-stone-mudStone",
+      "tile": true,
+      "prompt": "mudStone"
+    },
+    {
+      "id": "city-d-rough-stone-flatStone",
+      "tile": true,
+      "prompt": "flatStone"
+    },
+    {
+      "id": "city-d-rough-stone-roughBlock",
+      "tile": true,
+      "prompt": "roughBlock"
+    },
+    {
+      "id": "city-d-rough-stone-riverStone",
+      "tile": true,
+      "prompt": "riverStone"
+    },
+    {
+      "id": "city-d-rough-stone-mossStone",
+      "tile": true,
+      "prompt": "mossStone"
+    },
+    {
+      "id": "city-d-rough-stone-crumbleStone",
+      "tile": true,
+      "prompt": "crumbleStone"
+    },
+    {
+      "id": "city-d-rough-stone-limeStone",
+      "tile": true,
+      "prompt": "limeStone"
+    },
+    {
+      "id": "city-d-rough-stone-sootStone",
+      "tile": true,
+      "prompt": "sootStone"
+    }
+  ]
+}
