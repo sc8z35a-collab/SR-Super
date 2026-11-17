@@ -429,22 +429,35 @@ function roofTerrace(m){
 export function buildWalkways(){
   floors.length=obstacles.length=flights.length=0;
   const walkExterior=new Mesh(),roofExterior=new Mesh(),walkFloors=FLOORS.slice(0,ROOF_INDEX).map(()=>new Mesh()),decals=new Mesh();
+  const underFloors=DEPTHS.map(()=>new Mesh());
   foundation(walkExterior);
   hall(walkFloors[0],decals);
   for(let i=1;i<4;i++)gallery(walkFloors[i],i);
   for(let i=4;i<ROOF_INDEX;i++)upperRooms(walkFloors[i],i);
   for(let i=0;i<ROOF_INDEX;i++)staircase(walkFloors[i],i);
   roofTerrace(roofExterior);
-  return {walkExterior,roofExterior,walkFloors,decals};
+  depths(underFloors,kit);
+  return {walkExterior,roofExterior,walkFloors,decals,underFloors};
 }
 
 export const CRYPT_LEVEL=-1;
-// The crypt is not a storey of FLOORS: its walkers keep floor 0 and are told apart by height.
+export const DEEPEST_LEVEL=-1-DEPTHS.length;
+// Underground levels are not storeys of FLOORS: their walkers keep floor 0 and are told apart by
+// height. Level -1 is the crypt, -2 to -7 the levels below it (the deepest is the cathedral).
+const UNDER_Y=[CRYPT.y,...DEPTHS.map(d=>d.y)];
 export function levelOf(actor){
-  return actor.interior&&actor.y<FLOORS[0]-.21?CRYPT_LEVEL:actor.floor;
+  if(!actor.interior||actor.y>=FLOORS[0]-.21)return actor.floor;
+  for(let i=0;i<UNDER_Y.length;i++)if(UNDER_Y[i]<=actor.y+.21)return -(i+1);
+  return -UNDER_Y.length;
 }
+const ARRIVALS=[[9.9,3.6,0],[-9.9,4.4,Math.PI],[9.9,3.6,0],[-9.9,4.4,Math.PI],[9.9,3.6,0],[0,-12,Math.PI]];
+export function arrivalYaw(index){return index<CRYPT_LEVEL?ARRIVALS[-index-2][2]:null;}
 export function visitFloor(index,atEntrance=false){
   if(index===CRYPT_LEVEL)return {x:-9.6,z:17.3,y:CRYPT.y,interior:true,floor:0};
+  if(index<CRYPT_LEVEL){
+    const [x,z]=ARRIVALS[-index-2];
+    return {x,z,y:DEPTHS[-index-2].y,interior:true,floor:0};
+  }
   const y=FLOORS[index];
   if(index===0&&atEntrance)return {x:0,z:NAVE.front+1.74,y:entryTop(NAVE.front+1.74),interior:false,floor:0};
   if(index===0)return {x:0,z:24.9,y,interior:true,floor:0};
@@ -511,7 +524,14 @@ export function locationName(actor){
   if(actor.floor===ROOF_INDEX && actor.y>=ROOF_HEIGHT-.057)
     return actor.interior?'屋上 · 管理小屋':roomName(ROOF_INDEX,actor.x,actor.z)??names[ROOF_INDEX];
   if(!actor.interior)return roomName(0,actor.x,actor.z,true)??'島の外周';
-  if(levelOf(actor)===CRYPT_LEVEL)return actor.y>CRYPT.y+.21?'1階 ↔ 地下 · 階段':cryptName(actor.z);
+  const level=levelOf(actor);
+  if(level===CRYPT_LEVEL)return actor.y>CRYPT.y+.21?'1階 ↔ 地下1階 · 階段':cryptName(actor.z);
+  if(level<CRYPT_LEVEL){
+    const i=-level-2;
+    // The cathedral's sanctuary is raised half a metre above its nave.
+    if(actor.y<=DEPTHS[i].y+(i===DEPTHS.length-1?.8:.21))return DEPTHS[i].name;
+    return i===DEPTHS.length-1?'地下6階 ↔ 地下大聖堂 · 大階段':`地下${i+1}階 ↔ 地下${i+2}階 · 階段`;
+  }
   if(Math.abs(actor.y-FLOORS[actor.floor])>.21){
     const level=Math.max(0,FLOORS.findLastIndex(y=>y<=actor.y));
     return level===ROOF_INDEX-1?'6階 ↔ 屋上 · 階段':`${level+1}階 ↔ ${level+2}階 · 階段`;

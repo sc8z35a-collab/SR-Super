@@ -7,6 +7,7 @@ import { SURFACE as S } from './surfaces.js';
 import { CRYPT, CRYPT_STAIR, CRYPT_COLUMNS, FLOORS } from './layout.js';
 import { lerp, random } from './terrain.js';
 import { lathe, disc, floorQuad, slab, candle, candlestand, crossMark } from './chapels.js';
+import { subtract, openingRails, CRYPT_OPENING } from './depths.js';
 
 const LIGHT = 11;
 const Y = CRYPT.y, TOP = CRYPT.ceiling;
@@ -18,9 +19,9 @@ const SCREEN_Z = 20.75;
 const SPRING = Y + 2.32;
 
 const ZONES = [
-  { name: '地下 · 潮の回廊', z1: 11.6 },
-  { name: '地下 · 石棺の間', z1: SCREEN_Z },
-  { name: '地下 · 地下礼拝所', z1: Infinity }
+  { name: '地下1階 · 潮の回廊', z1: 11.6 },
+  { name: '地下1階 · 石棺の間', z1: SCREEN_Z },
+  { name: '地下1階 · 地下礼拝所', z1: Infinity }
 ];
 export function cryptName(z) { return ZONES.find(zone => z < zone.z1).name; }
 
@@ -28,9 +29,12 @@ export function cryptName(z) { return ZONES.find(zone => z < zone.z1).name; }
 
 function shell(m, kit) {
   const { x0, x1, z0, z1 } = CRYPT, s = CRYPT_STAIR, t = .35;
-  for (const r of [rect(x0, CHANNEL.x0, z0, z1), rect(CHANNEL.x1, x1, z0, z1), rect(CHANNEL.x0, CHANNEL.x1, CHANNEL.z1, z1)]) {
+  // The east aisle opens over the flight down to 地下2階.
+  const hole = { ...CRYPT_OPENING, x1 };
+  for (const r of [rect(x0, CHANNEL.x0, z0, z1), ...subtract(rect(CHANNEL.x1, x1, z0, z1), [hole]), rect(CHANNEL.x0, CHANNEL.x1, CHANNEL.z1, z1)]) {
     kit.deck(m, r, Y, D.cryptFlagstones, .33);
   }
+  openingRails(kit, m, Y, 'E');
   for (const r of [rect(x0 - t, x0, z0 - t, z1 + t), rect(x1, x1 + t, z0 - t, z1 + t),
     rect(x0, x1, z0 - t, z0), rect(x0, x1, z1, z1 + t)]) slab(m, r, Y - 1.4, TOP, D.rubbleWall, .95);
   // Brick vault under the nave floor, open above the stair.
@@ -210,7 +214,6 @@ function tombHall(m, kit) {
   for (const z of [13.6, 18.0]) {
     sarcophagus(m, kit, -5.5, z, true);
     sarcophagus(m, kit, 5.5, z, true);
-    sarcophagus(m, kit, 9.75, z, false);
     plaque(m, CRYPT.x1 - .04, z, true);
   }
   sarcophagus(m, kit, 0, 18.95, false, D.porphyry, D.alabaster);
