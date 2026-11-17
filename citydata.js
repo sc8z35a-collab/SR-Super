@@ -782,10 +782,135 @@ const ROCKCUT = [
     d: '0 .47 .9 open', i: 'bed .3 .5 80;shackles @1 .5 .12', x: 'tally 2 .5 i' },
 ];
 
-export const HOUSES = [...GATE, ...LAKESIDE, ...MUD, ...MAZE, ...MARKET, ...TIMBER, ...CANAL, ...SMITHY, ...ASHLAR, ...BATH, ...ROCKCUT];
+// 岩牢: a guarded passage between two tunnels with barred cells down both sides. A gap in the north
+// row leads to the guards' quarters and the room where questions were asked.
+const CELLBLOCK = [
+  { c: 'cells', n: '牢番の詰所', p: [[647.6, 149.4], [650.2, 149.6], [650.6, 153.4], [649.2, 153.4]], h: 2.2, w: 'guardWall', f: 'cellFloor', r: 'slabCeil',
+    d: '1 .3 .9 open', o: '0 .5 .6 1.0 1.4', i: 'bed 0 .6 0;tally @3 .5 .12;iron @2 .5 .12', t: '1 .8 o', x: 'tally 1 .7 o' },
+  { c: 'cells', n: '責め問いの間', p: [[652.4, 152.0], [657.6, 151.8], [657.8, 156.0], [653.4, 156.6]], h: 2.3, w: 'scratchedWall', ew: { 1: 'guardWall' }, f: 'cellFloor', r: 'seepCeil',
+    d: '1 .4 .9 open', i: 'shackles @0 .5 .12;shackles @3 .5 .12;table .2 .4 0;stool .2 -.4;iron @2 .5 .12;puddle -1.0 -.8 0;brazier 1.4 1.2', x: 'scratch 2 .3 i;tally 0 .8 i;sootwall 2 .7 i' },
+  { c: 'cells', n: '獄吏の家', p: [[659.0, 151.6], [663.0, 151.2], [663.4, 155.4], [659.4, 156.0]], h: 2.2, w: 'flatStone', ew: { 3: 'guardWall' }, f: 'pebbleFloor', r: 'slabCeil',
+    d: '3 .5 .9 open;1 .5 .9 open', i: 'bed .9 .6 0;table -.6 -.6 90;stool .1 -.6;jar 1.4 -1.4', t: '3 .2 o', x: 'tally 3 .8 o' },
+  { c: 'cells', n: '牢役人の家', p: [[664.0, 151.0], [667.8, 150.6], [668.4, 154.6], [664.4, 155.2]], h: 2.2, w: 'flatStone', f: 'pebbleFloor', r: 'slabCeil',
+    d: '3 .5 .9 open', i: 'bed .6 .4 0;hearth -1.0 1.2 90;coins .5 -1.0 0', x: 'mold 1 .5 i' },
+];
+
+// 鉄籠の獄: a watch tower in a tall cave hung with iron cages; the turnkeys live by the walls.
+const CAGEHOUSES = [
+  { c: 'cages', n: '獄卒頭の家', p: [[858.4, -122.4], [862.0, -121.6], [862.2, -118.6], [859.6, -118.8]], h: 2.3, w: 'guardWall', ew: { 3: 'roughBlock' }, f: 'cellFloor', r: 'slabCeil',
+    d: '1 .5 .9 open', i: 'bed -.3 .3 80;shackles @0 .5 .12;table .9 -.3 0', t: '1 .15 o', x: 'tally 0 .5 o' },
+  { c: 'cages', n: '鍵番の小屋', p: [[878.2, -124.6], [881.6, -125.4], [881.0, -121.8], [878.6, -121.0]], h: 2.2, w: 'flatStone', f: 'cellFloor', r: 'slabCeil',
+    d: '3 .5 .9 open', i: 'bed .4 .2 0;iron @1 .5 .12;tally @2 .5 .12', t: '3 .2 o', x: 'scratch 0 .5 i' },
+];
+
+// 崩落区と骨董夜市: half the roof has come down; what still stands is lived in, and the clearing in the
+// middle fills with candle-lit stalls selling whatever was dug out of the rubble.
+const RUIN = [
+  { c: 'ruin', n: '斜めに建つ家', p: [[762.6, 17.6], [767.2, 13.2], [769.2, 16.4], [764.6, 20.8]], h: 2.15, w: 'crumbleStone', ew: { 2: 'patchBrick' }, f: 'pebbleFloor', r: 'brokenCeil', top: 'brokenCeil2',
+    d: '2 .5 .9 open', i: 'bed -.2 -.4 45;pots .8 .6 0;web @0 .5 .1', x: 'mold 1 .5 i;hole 0 .4 i' },
+  { c: 'ruin', n: '屋根の抜けた家', p: [[769.6, 10.4], [774.2, 9.8], [774.6, 14.0], [770.2, 14.6]], h: 2.2, w: 'crumbleStone', f: 'sherdsFloor', r: 'brokenCeil', open: true,
+    b: '2 .2 .65 .7;1 .3 .7 .5', d: '3 .5 .9 open', i: 'rubble .4 .2 0 1.0 .45;beam -.8 -.6 300 2.4;sherds2 -1.0 .9 0', x: 'breach 0 .5 i' },
+  { c: 'ruin', n: '瓦礫拾いの家', p: [[775.2, 9.4], [779.6, 8.8], [780.2, 13.0], [775.6, 13.6]], h: 2.15, w: 'patchBrick2', ew: { 0: 'bedrock' }, f: 'sherdsFloor', r: 'reedMudCeil',
+    d: '2 .5 .9 open', i: 'sherds -.6 -.4 0;sacks 1.2 -.9 0;crate 1.4 .6 10;bed -1.2 .5 90', t: '2 .85 o', x: 'graffiti 2 .3 o' },
+  { c: 'ruin', n: '南口の崩れかけの家', p: [[781.0, 9.2], [784.6, 10.2], [784.2, 14.2], [780.8, 14.0]], h: 2.1, w: 'crumbleStone', ew: { 1: 'rubbleBrick' }, f: 'pebbleFloor', r: 'brokenCeil',
+    d: '2 .5 .9 open', b: '1 .4 .8 .9', i: 'straw -.4 0 0;rubble .9 -.2 0 .5 .25', x: 'web 3 .5 i' },
+  { c: 'ruin', n: '岩肌に寄った家', p: [[791.2, 17.0], [794.8, 16.2], [796.6, 20.6], [792.6, 21.6]], h: 2.15, w: 'roughBlock', ew: { 1: 'bedrock' }, f: 'pebbleFloor', r: 'bedrock2',
+    d: '3 .5 .9 open', i: 'bed .3 .3 60;jar -1.0 -.2;pots .2 -1.1 0', t: '3 .85 o', x: 'drip 1 .5 i' },
+  { c: 'ruin', n: '東口脇の家', p: [[795.0, 23.4], [798.8, 23.0], [799.2, 27.4], [795.4, 27.8]], h: 2.15, w: 'mudStone', f: 'dirtFloor', r: 'reedMudCeil',
+    d: '3 .5 .9 open;2 .5 .9 cloth', i: 'bed .8 0 0;table -.8 .5 90;stool -.2 .5', t: '2 .15 o', x: 'hands 3 .5 o' },
+  { c: 'ruin', n: '東口の北の家', p: [[795.2, 32.8], [799.4, 32.4], [799.0, 36.8], [795.0, 37.2]], h: 2.15, w: 'crumbleStone', ew: { 3: 'patchBrick' }, f: 'pebbleFloor', r: 'brokenCeil',
+    d: '0 .5 .9 open;3 .5 .9 open', i: 'bed .6 .9 90;hearth -1.0 -.8 0;pots 1.4 -1.2 0', t: '0 .15 o', x: 'soot 2 .5 i' },
+  { c: 'ruin', n: '北東の生き残った家', p: [[789.0, 40.0], [793.2, 39.4], [793.6, 43.6], [789.4, 44.2]], h: 2.2, w: 'flatStone', f: 'pebbleFloor', r: 'slabCeil',
+    d: '0 .5 .9 open', i: 'bed -1.0 .6 0;table .7 .8 90;jar 1.4 -1.4;lamp @3 .5 .15', t: '0 .9 o', x: 'glyphs 0 .2 o' },
+  { c: 'ruin', n: '北の傾いた家', p: [[782.4, 42.6], [787.2, 42.2], [787.6, 46.8], [782.8, 47.4]], h: 2.1, w: 'crumbleStone', f: 'sherdsFloor', r: 'brokenCeil', top: 'brokenCeil2',
+    d: '0 .5 .9 open', b: '3 .3 .7 .6', i: 'beam .6 .6 200 2.2;straw -.6 -.4 0;pots 1.4 -1.4 0', x: 'breach2 1 .5 i' },
+  { c: 'ruin', n: '壁の倒れた家', p: [[776.4, 42.6], [781.2, 43.0], [780.8, 47.0], [776.8, 46.8]], h: 2.15, w: 'patchBrick', f: 'pebbleFloor', r: 'brokenCeil',
+    d: '0 .5 .9 open', b: '2 .2 .8 .4', i: 'rubble -.4 1.2 0 .8 .3;bed 1.2 -.4 90;sherds2 -1.2 -.6 0', x: 'mold2 1 .5 i' },
+  { c: 'ruin', n: '北西口の家', p: [[769.0, 40.8], [774.8, 41.4], [775.2, 46.2], [770.6, 45.8]], h: 2.2, w: 'mudStone', ew: { 2: 'crumbleStone' }, f: 'dirtFloor', r: 'reedMudCeil',
+    d: '0 .5 .9 open;3 .4 .9 cloth', i: 'partition .6 .4 90 2.2;bed -1.4 .6 0;straw 1.8 .8 0;pots 1.8 -1.2 0', t: '0 .15 o', x: 'hands 0 .85 o' },
+  { c: 'ruin', n: '崩落跡の西の家', p: [[760.4, 29.6], [764.0, 29.2], [764.4, 33.4], [761.6, 34.0]], h: 2.15, w: 'crumbleStone', f: 'pebbleFloor', r: 'brokenCeil',
+    d: '1 .5 .9 open', i: 'bed -.3 .4 0;jar .9 -1.2', x: 'web 3 .5 i' },
+  { c: 'ruin', n: '屋根のない小屋', p: [[762.2, 35.0], [766.0, 34.6], [766.4, 38.2], [763.6, 38.6]], h: 2.0, w: 'rubbleBrick', f: 'sherdsFloor', r: 'brokenCeil', open: true,
+    b: '0 .3 .8 .5', d: '1 .5 .9 open', i: 'straw 0 .2 0;rubble .8 -.8 0 .5 .25', x: 'graffiti 1 .5 o' },
+  { c: 'ruin', n: '夜市の古物屋', p: [[768.4, 24.6], [772.6, 24.2], [773.0, 28.4], [768.8, 28.8]], h: 2.2, w: 'plasterBrick', ew: { 1: 'patchBrick' }, f: 'wornRug', r: 'beamCeiling',
+    d: '1 .5 .95 open', i: 'shelf @3 .5 .25;jars @2 .5 .2;coins .3 -.6 0;crate -1.2 -1.2 0;bed .9 .8 0;candles .2 .5;lamp @1 .2 .15', t: '1 .15 o;1 .85 o', x: 'sign 1 .5 o' },
+  { c: 'ruin', n: '骨董の蔵', p: [[770.2, 31.2], [774.4, 31.8], [774.0, 35.8], [769.8, 35.4]], h: 2.2, w: 'flatStone', f: 'polCracked', r: 'slabCeil',
+    d: '1 .5 .95 open', i: 'relief @0 .5 .1 1.1;relief2 @2 .5 .1 1.0;crate -1.2 .9 0;jar -1.4 -.6 0 1.0;bones @3 .5 .12;candles .6 -.6', t: '1 .85 o', x: 'glyphs 1 .2 o' },
+  { c: 'ruin', n: '夜市の灯り屋', p: [[786.4, 20.4], [790.2, 21.6], [789.4, 25.6], [785.8, 24.6]], h: 2.15, w: 'sootBrick', f: 'dirtFloor', r: 'sootCeil', top: 'soot2',
+    d: '3 .5 .95 open', i: 'lamp @0 .3 .15;lamp @0 .7 .15;lamp @1 .5 .15;wax @2 .5 .1;candles .3 .3;bed .6 -.6 70', t: '3 .2 o', x: 'sign 3 .8 o' },
+  { c: 'ruin', n: '夜市の掘り出し屋', p: [[788.6, 31.2], [792.6, 30.6], [793.0, 34.8], [789.0, 35.4]], h: 2.15, w: 'crumbleStone', ew: { 3: 'plasterBrick2' }, f: 'sherdsFloor', r: 'brokenCeil',
+    d: '3 .5 .95 open', i: 'sherds2 .4 .2 0;crate 1.2 1.2 0;iron @1 .5 .12;straw .4 -1.2 90', t: '3 .85 o', x: 'graffiti 3 .2 o' },
+];
+
+// 東端の茸と魚の市: the last market before the tombs, stalls packed between fishmongers' houses.
+const EAST = [
+  { c: 'east', n: '南の茸問屋', p: [[938.6, -17.4], [942.8, -18.0], [943.2, -14.2], [939.0, -13.6]], h: 2.2, w: 'mudStone', ew: { 0: 'bedrock' }, f: 'mudPuddles', r: 'rootCeil', top: 'roots2',
+    d: '2 .5 .95 open', i: 'goods .1 -.4 0 mushrooms;basket -1.2 -1.0;bed 1.2 .4 0;herbs @3 .5 .12', t: '2 .15 o', x: 'sign 2 .8 o' },
+  { c: 'east', n: '干魚の家', p: [[943.6, -18.2], [948.0, -18.8], [948.4, -14.8], [944.0, -14.4]], h: 2.2, w: 'riverStone', f: 'pebbleFloor', r: 'logCeil', top: 'logs2',
+    d: '2 .5 .95 open', i: 'fish @0 .3 .12;fish @0 .7 .12;fish @1 .5 .12;barrel -1.4 .6;bed .8 .6 90', t: '2 .85 o', x: 'sign 2 .2 o' },
+  { c: 'east', n: '岩陰の茸小屋', p: [[949.2, -18.6], [952.0, -16.8], [953.4, -13.6], [949.4, -14.2]], h: 2.1, w: 'mossStone', f: 'mudPuddles', r: 'rootCeil',
+    d: '3 .5 .9 open;2 .5 .9 open', i: 'goods .3 -.2 40 mushrooms;straw -.4 .6 0', x: 'mold2 0 .5 i' },
+  { c: 'east', n: '茸の苗床の家', p: [[954.4, -11.6], [958.0, -10.2], [958.4, -6.0], [954.8, -6.6]], h: 2.15, w: 'rammed', ew: { 1: 'bedrock' }, f: 'mudPuddles', r: 'rootCeil', top: 'roots2',
+    d: '3 .5 .95 open', i: 'goods -.2 -1.0 20 mushrooms;goods .4 .6 60 mushrooms;bed 1.2 .6 0;jar -1.2 1.2', t: '3 .2 o', x: 'drip 1 .5 i' },
+  { c: 'east', n: '東の魚売りの家', p: [[954.8, -5.6], [958.8, -5.0], [958.2, -.6], [954.6, -1.0]], h: 2.2, w: 'riverStone', ew: { 1: 'mossStone' }, f: 'pebbleFloor', r: 'logCeil',
+    d: '3 .5 .95 open', i: 'fish @2 .5 .12;net @1 .5 .12;bed .6 -.6 0;barrel -1.2 1.2', t: '3 .85 o', x: 'sign 3 .2 o' },
+  { c: 'east', n: '北東の家', p: [[952.8, .6], [956.6, 1.0], [955.6, 5.0], [952.4, 4.4]], h: 2.15, w: 'mudStone', f: 'dirtFloor', r: 'reedMudCeil',
+    d: '3 .5 .95 open', i: 'bed .6 .2 10;hearth -.6 -1.0 0;pots .9 1.4 0', x: 'soot 0 .5 i' },
+  { c: 'east', n: '北口の家', p: [[938.4, 4.6], [942.6, 5.0], [942.8, 8.6], [939.0, 8.8]], h: 2.15, w: 'flatStone', f: 'pebbleFloor', r: 'slabCeil',
+    d: '1 .5 .95 open', i: 'bed -1.0 .3 0;table .7 .4 90;stool .1 .4', t: '1 .15 o', x: 'glyphs 1 .5 o' },
+  { c: 'east', n: '西口の網の家', p: [[932.4, 1.6], [936.0, 1.2], [937.6, 4.8], [934.0, 5.4]], h: 2.15, w: 'riverStone', f: 'pebbleFloor', r: 'logCeil',
+    d: '0 .5 .95 open', i: 'net @2 .5 .12;bed .2 .6 70;basket -1.0 -.4', t: '0 .2 o', x: 'drip 3 .5 i' },
+  { c: 'east', n: '南西の家', p: [[929.4, -9.4], [933.2, -10.2], [933.6, -6.2], [929.8, -5.8]], h: 2.15, w: 'mudStone', ew: { 3: 'bedrock' }, f: 'mudPuddles', r: 'reedMudCeil',
+    d: '1 .5 .95 open', i: 'bed -.8 .3 0;pots .9 -1.2 0;jar .9 1.2', t: '1 .85 o', x: 'mold 3 .5 i' },
+  { c: 'east', n: '茸干しの裏の家', p: [[943.4, -13.6], [947.0, -13.8], [947.2, -10.6], [943.8, -10.2]], h: 2.1, w: 'rammed', f: 'strawFloor', r: 'reedMudCeil',
+    d: '2 .5 .95 open', i: 'herbs @0 .5 .12;straw 0 -.3 90;basket 1.2 .8', x: 'web 1 .5 i' },
+  { c: 'east', n: '魚の塩漬け屋', p: [[949.8, -12.8], [953.0, -12.4], [953.4, -8.4], [950.2, -9.0]], h: 2.15, w: 'riverStone', f: 'pebbleFloor', r: 'logCeil',
+    d: '2 .5 .95 open;1 .5 .9 cloth', i: 'barrel -.8 -1.0;barrel 0 -1.4;jar .9 -1.0 0 1.1;bed -.2 .9 90', x: 'sign 2 .5 o' },
+  { c: 'east', n: '北口脇の家', p: [[947.8, 2.8], [951.6, 2.2], [951.8, 5.8], [949.2, 6.6]], h: 2.15, w: 'mudStone', f: 'dirtFloor', r: 'reedMudCeil',
+    d: '0 .5 .95 open', i: 'bed .2 .5 80;pots -.9 -.6 0', t: '0 .85 o', x: 'hands 0 .5 o' },
+  { c: 'east', n: '西口脇の家', p: [[934.0, -4.2], [937.6, -4.6], [937.8, -.8], [934.2, -.4]], h: 2.15, w: 'mossStone', f: 'mudPuddles', r: 'seepCeil',
+    d: '1 .5 .95 open;3 .5 .9 open', i: 'bed .6 .2 0;jar -1.2 -1.2;fish @2 .5 .12', x: 'drip2 2 .5 i' },
+  { c: 'east', n: '市の真ん中の家', p: [[939.6, 1.0], [943.4, .6], [943.6, 4.0], [940.0, 4.2]], h: 2.15, w: 'rammed', f: 'dirtFloor', r: 'reedMudCeil',
+    d: '0 .5 .95 open', i: 'bed -.9 .3 0;table .8 .2 90;stool .1 .2', t: '0 .1 o', x: 'sign 0 .8 o' },
+];
+
+// 墓所: the dead of the city in sealed rooms and wall niches; one keeper lives among them.
+const TOMBS = [
+  { c: 'tombs', n: '石の墓室', shut: true, p: [[983.4, 129.6], [988.2, 130.0], [988.0, 133.2], [983.6, 133.0]], h: 2.1, w: 'polBasalt', ew: { 2: 'flatStone' }, f: 'polWorn', r: 'slabCeil', top: 'slab2',
+    x: 'slide 2 .5 o;glyphs 2 .15 o;glyphs 2 .85 o;relief 1 .5 o', i: 'relief @0 .5 .1 1.2' },
+  { c: 'tombs', n: '傾いた墓室', shut: true, p: [[990.6, 131.4], [993.8, 134.4], [992.0, 137.2], [989.2, 134.6]], h: 2.0, w: 'flatStone', f: 'polWorn', r: 'slabCeil',
+    x: 'lintel 3 .5 o;geometric 2 .5 o' },
+  { c: 'tombs', n: '封じられた墓室', shut: true, p: [[992.2, 138.6], [995.0, 138.4], [995.0, 142.4], [992.4, 142.6]], h: 2.0, w: 'polSchist', f: 'polWorn', r: 'slabCeil',
+    x: 'slide2 3 .5 o;tally 0 .5 o' },
+  { c: 'tombs', n: '墓守の小屋', p: [[972.6, 140.2], [976.2, 139.8], [976.6, 143.8], [973.6, 144.4]], h: 2.1, w: 'mudStone', ew: { 3: 'bedrock2' }, f: 'dirtFloor', r: 'rootCeil', top: 'roots2',
+    d: '1 .5 .9 open', i: 'bed -.4 .4 0;candles .9 -1.2;jar .9 1.2;lamp @2 .5 .15', t: '1 .2 o', x: 'paint 3 .5 i' },
+  { c: 'tombs', n: '北の墓室', shut: true, p: [[978.0, 146.4], [982.4, 146.8], [982.0, 150.0], [978.4, 149.6]], h: 2.0, w: 'polBasalt', f: 'polWorn', r: 'slabCeil',
+    x: 'slide 0 .5 o;glyphs 0 .15 o;inlay 1 .5 o' },
+  { c: 'tombs', n: '王の墓室', shut: true, p: [[984.6, 146.0], [988.6, 145.4], [989.0, 148.6], [985.0, 149.2]], h: 2.2, w: 'inlay', ew: { 0: 'polSandstone' }, f: 'polWorn', r: 'slabCeil', top: 'slab2',
+    x: 'lintel2 0 .5 o;relief2 0 .15 o;relief 0 .85 o;geometric 3 .5 o' },
+];
+
+export const HOUSES = [
+  ...GATE, ...LAKESIDE, ...MUD, ...MAZE, ...MARKET, ...TIMBER, ...CANAL, ...SMITHY, ...ASHLAR, ...BATH, ...ROCKCUT,
+  ...CELLBLOCK, ...CAGEHOUSES, ...RUIN, ...EAST, ...TOMBS,
+];
 
 // ---------------------------------------------------------------- prison cells
-export const CELLS = [];
+// 岩牢の独房: barred doors on the passage; two have been broken open. shut: no way in for the walker.
+export const CELLS = [
+  { c: 'cells', n: '独房', shut: true, p: [[651.0, 142.0], [653.4, 141.6], [653.6, 145.1], [651.2, 145.3]], h: 2.1, w: 'scratchedWall', f: 'cellFloor', r: 'seepCeil', d: '2 .5 .9 bars', i: 'straw 0 -.4 0;shackles @0 .5 .12', x: 'tally 1 .5 i' },
+  { c: 'cells', n: '独房', shut: true, p: [[653.9, 141.4], [656.6, 141.2], [656.6, 144.9], [654.0, 145.0]], h: 2.1, w: 'roughBlock', f: 'cellFloor', r: 'seepCeil', d: '2 .5 .9 bars', i: 'straw .2 -.6 90;pots -.8 .8 0', x: 'scratch 0 .5 i' },
+  { c: 'cells', n: '破られた独房', p: [[657.0, 141.0], [659.2, 141.2], [659.4, 144.6], [657.0, 144.8]], h: 2.1, w: 'scratchedWall', f: 'cellFloor', r: 'seepCeil', d: '2 .5 .9 open', i: 'straw 0 -.5 0;bones @0 .5 .12;rubble .6 .6 0 .4 .2', x: 'tally 3 .5 i;iron 2 .5 o' },
+  { c: 'cells', n: '独房', shut: true, p: [[659.8, 141.0], [662.6, 141.0], [662.8, 144.2], [659.8, 144.5]], h: 2.1, w: 'guardWall', f: 'cellFloor', r: 'seepCeil', d: '2 .5 .9 bars', i: 'shackles @1 .5 .12;straw -.4 -.4 0', x: 'scratch 3 .5 i' },
+  { c: 'cells', n: '独房', shut: true, p: [[663.2, 140.8], [665.6, 140.6], [665.8, 143.6], [663.2, 144.0]], h: 2.1, w: 'scratchedWall', f: 'cellFloor', r: 'seepCeil', d: '2 .5 .9 bars', i: 'straw 0 -.3 0;puddle .3 .5 0', x: 'tally 0 .5 i' },
+  { c: 'cells', n: '水牢', shut: true, p: [[666.2, 140.2], [668.4, 139.6], [668.8, 142.6], [666.4, 143.2]], h: 2.1, w: 'mossStone', f: 'mudPuddles', r: 'seepIce2', d: '2 .5 .9 bars', i: 'puddle 0 0 0;shackles @0 .5 .12', x: 'drip2 1 .5 i' },
+  { c: 'cells', n: '独房', shut: true, p: [[651.6, 148.0], [654.2, 147.8], [654.0, 151.2], [651.8, 151.4]], h: 2.1, w: 'scratchedWall', f: 'cellFloor', r: 'seepCeil', d: '0 .5 .9 bars', i: 'straw 0 .4 0', x: 'tally 2 .5 i;scratch 1 .5 i' },
+  { c: 'cells', n: '独房', shut: true, p: [[654.6, 147.8], [657.2, 147.6], [657.4, 151.0], [654.6, 151.2]], h: 2.1, w: 'roughBlock', f: 'cellFloor', r: 'seepCeil', d: '0 .5 .9 bars', i: 'straw -.3 .4 90;bones @2 .5 .12', x: 'scratch 3 .5 i' },
+  { c: 'cells', n: '破られた独房', p: [[658.4, 147.4], [661.0, 147.2], [660.8, 150.8], [658.4, 151.0]], h: 2.1, w: 'guardWall', f: 'cellFloor', r: 'brokenCeil', d: '0 .5 .9 open', i: 'straw 0 .6 0;shackles @2 .5 .12', x: 'tally 1 .5 i;barred 0 .5 o' },
+  { c: 'cells', n: '独房', shut: true, p: [[661.4, 147.0], [663.8, 146.8], [664.0, 150.4], [661.6, 150.6]], h: 2.1, w: 'scratchedWall', f: 'cellFloor', r: 'seepCeil', d: '0 .5 .9 bars', i: 'straw .2 .5 0;pots -.6 -.2 0', x: 'tally 3 .5 i' },
+  { c: 'cells', n: '独房', shut: true, p: [[664.4, 146.6], [666.8, 146.2], [667.0, 149.8], [664.6, 150.2]], h: 2.1, w: 'roughBlock', f: 'cellFloor', r: 'seepCeil', d: '0 .5 .9 bars', i: 'shackles @2 .5 .12;straw 0 .3 0', x: 'scratch 1 .5 i' },
+  { c: 'cells', n: '重罪人の独房', shut: true, p: [[667.4, 145.8], [670.2, 145.0], [670.6, 148.6], [667.6, 149.4]], h: 2.1, w: 'guardWall', f: 'cellFloor', r: 'seepCeil', d: '0 .5 .9 bars', i: 'shackles @1 .5 .12;shackles @2 .5 .12;straw 0 .6 0', x: 'tally 3 .5 i;scratch 2 .5 i' },
+];
 
 // ---------------------------------------------------------------- market stalls
 // x z: stall centre; a: the side customers stand on (0 = +z); g: goods on the counter.
@@ -833,6 +958,22 @@ export const STALLS = [
   { c: 'smithy', x: 443.6, z: 99.2, a: 190, w: 2.2, d: 1.1, g: 'sherdPile', aw: 'tentStripe', i: 'pots 1.4 -.8 0' },
   { c: 'smithy', x: 438.6, z: 99.0, a: 170, w: 2.0, d: 1.1, g: 'coins', aw: 'patchCloth', sign: true },
   { c: 'smithy', x: 435.4, z: 95.6, a: 90, w: 2.1, d: 1.1, g: 'ironware', aw: 'tentStripe', hang: 'herbs' },
+  // 骨董夜市
+  { c: 'ruin', x: 777.6, z: 26.0, a: 60, w: 2.0, d: 1.3, g: 'boneCraft', ground: true, mat: 'wornRug', aw: 'patchCloth', i: 'candles -1.2 .6;lamp 1.2 .6' },
+  { c: 'ruin', x: 782.6, z: 24.4, a: 0, w: 2.2, d: 1.1, g: 'coins', aw: 'tentStripe', body: 'polWorn', i: 'candles 1.4 -.6' },
+  { c: 'ruin', x: 785.6, z: 28.6, a: 280, w: 2.0, d: 1.2, g: 'ironware', ground: true, mat: 'burlap', aw: 'patchCloth', i: 'lamp -1.2 .6' },
+  { c: 'ruin', x: 783.6, z: 33.4, a: 200, w: 2.2, d: 1.1, g: 'sherdPile', aw: 'tentStripe', back: 'shrineRelief2', i: 'candles 1.4 -.6' },
+  { c: 'ruin', x: 778.0, z: 34.6, a: 150, w: 2.0, d: 1.4, g: 'fur', ground: true, mat: 'strawMat', aw: 'patchCloth', i: 'candles -1.2 .7' },
+  { c: 'ruin', x: 776.2, z: 30.4, a: 95, w: 2.0, d: 1.1, g: 'boneCraft', aw: 'tentStripe', hang: 'herbs' },
+  // 東端の茸と魚の市
+  { c: 'east', x: 939.6, z: -8.6, a: 30, w: 2.0, d: 1.1, g: 'mushrooms', aw: 'patchCloth', i: 'basket -1.3 -.8' },
+  { c: 'east', x: 943.4, z: -7.0, a: 330, w: 2.2, d: 1.1, g: 'dryFish', aw: 'tentStripe', hang: 'hangingFish' },
+  { c: 'east', x: 947.2, z: -5.4, a: 270, w: 2.0, d: 1.3, g: 'mushrooms', ground: true, mat: 'strawMat', aw: 'patchCloth' },
+  { c: 'east', x: 944.6, z: -2.4, a: 180, w: 2.2, d: 1.1, g: 'dryFish', aw: 'patchCloth', hang: 'hangingFish', sign: true },
+  { c: 'east', x: 940.6, z: -3.8, a: 120, w: 2.0, d: 1.1, g: 'roots', aw: 'tentStripe' },
+  { c: 'east', x: 950.8, z: -4.0, a: 240, w: 2.0, d: 1.1, g: 'mushrooms', aw: 'tentStripe', i: 'sacks 1.3 -.9 0' },
+  { c: 'east', x: 936.4, z: -9.8, a: 60, w: 2.0, d: 1.1, g: 'herbs', aw: 'patchCloth', hang: 'herbs' },
+  { c: 'east', x: 948.4, z: -.8, a: 210, w: 2.0, d: 1.3, g: 'fur', ground: true, mat: 'burlap', aw: 'tentStripe' },
 ];
 
 // ---------------------------------------------------------------- features
@@ -879,6 +1020,30 @@ export const FEATURES = [
     free: [1, 3, 5], parapet: [2, 4], steps: [[677.59, -179.91, 174, 1.2, 2.0]] },
   { k: 'terrace', c: 'rockcut', h: 1.3, floor: 'flatStone', wall: 'roughBlock', p: [[685.4, -184.8], [692.4, -178.6], [690.0, -175.6], [684.0, -179.6]], free: [3], parapet: [1, 2] },
   { k: 'items', c: 'rockcut', i: 'sacks 651.2 -168.4 0;rubble 652.0 -173.6 0 .7 .3;jar 663.4 -169.6 0 1.0;crate 678.4 -172.6 20;puddle 673.6 -169.2 0;basket 684.6 -170.2;sherds 668 -176 0;jar 688.4 -182.6 0 1.1;candles 690.6 -177.4' },
+  // 鉄籠の獄: the watch tower and its cages, hung at different heights; two stand on the floor.
+  { k: 'tower', c: 'cages', x: 868.5, z: -129.5, s: 3.0, h: 3.3 },
+  { k: 'cage', c: 'cages', x: 861.6, z: -134.4, s: 1.2, up: 1.8 },
+  { k: 'cage', c: 'cages', x: 865.2, z: -138.6, s: 1.4, up: 0 },
+  { k: 'cage', c: 'cages', x: 871.6, z: -139.0, s: 1.1, up: 2.0 },
+  { k: 'cage', c: 'cages', x: 876.8, z: -135.2, s: 1.2, up: 1.6 },
+  { k: 'cage', c: 'cages', x: 878.8, z: -130.0, s: 1.5, up: 0 },
+  { k: 'cage', c: 'cages', x: 874.6, z: -122.8, s: 1.0, up: 2.2 },
+  { k: 'cage', c: 'cages', x: 858.8, z: -126.2, s: 1.2, up: 1.4 },
+  { k: 'cage', c: 'cages', x: 866.8, z: -121.4, s: 1.1, up: 1.9 },
+  { k: 'cage', c: 'cages', x: 870.4, z: -134.2, s: .9, up: 2.4 },
+  { k: 'items', c: 'cages', i: 'bones 865.0 -140.4 0;shackles 856.4 -133.4 70;tally 880.4 -133.0 260;puddle 872.4 -126.0 0;sherds 862.6 -129.6 0;brazier 873.6 -128.4' },
+  // 崩落区: three places where the roof came down.
+  { k: 'collapse', c: 'ruin', x: 781.6, z: 17.0, r: 1.4, h: 1.2 },
+  { k: 'collapse', c: 'ruin', x: 766.6, z: 31.0, r: 1.0, h: 1.0 },
+  { k: 'collapse', c: 'ruin', x: 785.4, z: 38.6, r: 1.2, h: 1.1 },
+  { k: 'fallen', c: 'ruin', x: 774.4, z: 19.6, a: 115, len: 4.6, r: .38, mat: 'polColumn' },
+  { k: 'items', c: 'ruin', i: 'brazier 780.6 29.4;candles 780.4 26.6;candles 781.8 31.4;rubble 790.2 26.6 0 .8 .35;rubble 772.4 38.8 0 .6 .3;sherds2 787.8 17.4 0;web 761.4 26.0 90' },
+  // 東端の市.
+  { k: 'items', c: 'east', i: 'brazier 944.2 -5.0;barrel 952.2 -1.8;sacks 937.4 -12.4 0;basket 931.6 -3.0;puddle 946.4 -11.6 0;crate 936.8 6.4 20' },
+  // 墓所: niches cut into the cave walls, urns and candles before them.
+  { k: 'niches', c: 'tombs', list: [[971.39, 135.07, 69.6, 'shrineRelief', 1.4, 1.5, .3], [972.49, 132.07, 69.6, 'cavePainting', 1.5, 1.2, .5], [979.67, 127.69, 20.4, 'glyphs', 1.4, 1.4, .3],
+    [983.98, 127.53, 353.7, 'shrineRelief2', 1.4, 1.5, .3], [992.86, 147.86, 225, 'boneCraft', 1.3, 1.0, .6], [971.6, 144.26, 102.7, 'tally', 1.2, 1.2, .3]] },
+  { k: 'items', c: 'tombs', i: 'candles 972.6 134.2;candles 980.2 129.0;candles 984.4 128.8;jar 985.6 135.4 0 .9;jar 990.4 140.2 0 1.1;pots 977.8 144.8 0;bones 991.6 145.4 225;candles 986.6 144.6;sherds2 981.6 137.6 0;relief2 979.0 137.6 180 1.2' },
 ];
 
 // ---------------------------------------------------------------- free-standing torches: x z chamber [flame]
@@ -899,5 +1064,10 @@ export const TORCHES = [
   [549.6, -15.4, 'bath'], [565.6, -12.6, 'bath'], [557.6, -20.6, 'bath'], [557.6, -4.4, 'bath'], [563.0, -2.0, 'bath'], [574.0, -21.6, 'bath'], [576.4, -9.4, 'bath', 'b'], [567.6, -14.0, 'bath'],
   [653.0, -164.0, 'rockcut'], [658.4, -167.4, 'rockcut'], [666.0, -169.0, 'rockcut'], [672.4, -169.6, 'rockcut'], [679.0, -170.2, 'rockcut'], [688.0, -170.4, 'rockcut'],
   [656.2, -177.6, 'rockcut', 'w'], [666.8, -179.0, 'rockcut'], [678.8, -178.8, 'rockcut'], [651.2, -175.0, 'rockcut'], [686.6, -176.6, 'rockcut', 'b'],
-  [173.8, -48.0, 'maze'], [196.8, -46.0, 'maze'], [197.4, -60.6, 'maze'], [183.2, -56.8, 'maze'], [178.0, -27.0, 'maze'], [193.5, -20.4, 'maze'], [201.6, -60.0, 'maze'], [209.6, -52.0, 'maze', 'b'],
+  [649.6, 146.8, 'cells'], [655.4, 146.4, 'cells'], [660.2, 145.8, 'cells'], [665.4, 145.1, 'cells'], [670.0, 143.6, 'cells', 'b'], [657.8, 153.8, 'cells'],
+  [857.0, -130.0, 'cages'], [866.4, -117.4, 'cages'], [874.8, -119.0, 'cages'], [862.6, -139.6, 'cages', 'b'], [879.4, -136.6, 'cages'], [873.8, -132.0, 'cages'],
+  [763.4, 24.0, 'ruin'], [787.4, 15.4, 'ruin'], [797.4, 30.0, 'ruin'], [767.4, 39.6, 'ruin'], [775.4, 23.4, 'ruin', 'w'], [787.4, 30.4, 'ruin'], [779.8, 37.4, 'ruin'], [791.0, 37.6, 'ruin', 'b'],
+  [932.4, -1.0, 'east'], [948.0, 7.0, 'east'], [936.4, -12.6, 'east'], [953.8, -3.0, 'east'], [942.6, -11.8, 'east', 'w'], [945.0, 1.8, 'east'],
+  [976.4, 132.2, 'tombs', 'b'], [981.6, 140.2, 'tombs', 'v'], [988.6, 138.6, 'tombs', 'b'], [983.6, 144.4, 'tombs', 'v'],
+  [173.8, -48.0, 'maze'], [196.8, -46.0, 'maze'], [197.4, -60.6, 'maze'], [186.4, -56.9, 'maze'], [178.0, -27.0, 'maze'], [193.5, -20.4, 'maze'], [201.6, -60.0, 'maze'], [209.6, -52.0, 'maze', 'b'],
 ];

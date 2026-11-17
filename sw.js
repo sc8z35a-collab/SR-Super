@@ -1,4 +1,4 @@
-const CACHE = 'tidal-cathedral-v15';
+const CACHE = 'tidal-cathedral-v16';
 const LOCAL = ['./', './index.html', './style.css', './main.js', './mesh.js', './terrain.js', './cathedral.js',
   './character.js', './shaders.js', './renderer.js', './manifest.webmanifest', './icon-192.png', './icon-512.png',
   './layout.js','./walkways.js','./ornament.js','./materials-68.webp','./craft-46.webp',
