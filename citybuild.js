@@ -457,10 +457,12 @@ function buildHouse(m, H, kind = 'house') {
   for (let e = 0; e < n; e++) {
     const E = edge(e), mat = wallMat(e);
     const solid = (s0, s1, y0, y1) => { if (s1 - s0 > .02) slab(m, E.P(s0), E.P(s1), y0, y1, t, mat); };
-    let pos = 0;
+    // The walker may brush a door's jambs: wall blockers stop a little short of each doorway.
+    const block = (s0, s1) => { if (s1 - s0 > .02) wallBlock(E.P(s0), E.P(s1), t / 2, base, top); };
+    let pos = 0, trim = 0;
     for (const cut of cuts[e].sort((p, q) => p.s0 - q.s0)) {
       const s0 = Math.max(.1, cut.s0), s1 = Math.min(E.L - .1, cut.s1);
-      if (s0 > pos) { solid(pos, s0, base - .02, wallTop); wallBlock(E.P(pos), E.P(s0), t / 2, base, top); }
+      if (s0 > pos) { solid(pos, s0, base - .02, wallTop); block(pos + trim, s0 - (cut.type === 'door' ? .12 : 0)); }
       if (cut.type === 'door') {
         solid(s0, s1, y + cut.dh, wallTop);
         const A = E.P(s0), B = E.P(s1);
@@ -493,8 +495,9 @@ function buildHouse(m, H, kind = 'house') {
         for (const sgn of [1, -1]) rubble(m, mid[0] + E.nin[0] * sgn * .45, mid[1] + E.nin[1] * sgn * .45, base, r, .28, 'rubble2');
       }
       pos = Math.max(pos, s1);
+      trim = cut.type === 'door' ? .12 : 0;
     }
-    if (E.L > pos) { solid(pos, E.L, base - .02, wallTop); wallBlock(E.P(pos), E.P(E.L), t / 2, base, top); }
+    if (E.L > pos) { solid(pos, E.L, base - .02, wallTop); block(pos + trim, E.L); }
     // Corner post.
     m.box(E.a[0], (base + wallTop + .05) / 2, E.a[1], t + .08, wallTop + .05 - base, t + .08, M(H.post ?? H.ew?.[e] ?? H.w), .92);
   }
@@ -679,7 +682,7 @@ function buildTunnel(m, T) {
     const dir = [pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]], dl = Math.hypot(...dir);
     const f = side === 'l' ? [dir[1] / dl, -dir[0] / dl] : [-dir[1] / dl, dir[0] / dl];
     const yy = lerp(ys[i], ys[i + 1], k);
-    const pic = { paint: 'cavePainting', graffiti: 'graffiti', glyphs: 'glyphs', web: 'cobweb', drip: 'dripMoss2', hole: 'wallHole2', relief: 'shrineRelief2', tally: 'tally', hands: 'handprints', cloth: 'dyedCloth' }[kind];
+    const pic = { paint: 'cavePainting', graffiti: 'graffiti', glyphs: 'glyphs', web: 'cobweb', drip: 'dripMoss2', hole: 'wallHole2', relief: 'shrineRelief2', tally: 'tally', hands: 'handprints', cloth: 'dyedCloth', soot: 'sootStreaks2', shackle: 'shackles', geometric: 'geometric' }[kind];
     if (!pic) throw new Error(`city: unknown tunnel picture ${kind}`);
     stand(m, p[0] + f[0] * .015, p[1] + f[1] * .015, f, .9, yy + .45, yy + 1.45, M(pic));
   }
@@ -796,7 +799,7 @@ const FEATURE = {
     // Steps spiral down the inside of the shaft.
     for (let i = 0; i < 12; i++) {
       const a = i / 12 * Math.PI * 2 + .3, sx = x + Math.cos(a) * (r - .45), sz = z + Math.sin(a) * (r - .45);
-      m.box(sx, y - .3 - i * .26, sz, .7, .14, .5, M('wornSteps'), .9);
+      m.box(sx, y - .3 - i * .26, sz, .7, .14, .5, M('smallSteps'), .9);
     }
     flat(m, x, z, [0, 1], r * 1.6, r * 1.6, y - 3.2, U.lakeWater);
     roundBlock(x, z, r + .3, y, y + .9);
