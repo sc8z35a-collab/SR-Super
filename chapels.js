@@ -758,7 +758,7 @@ export function gutterTrough(m, a, b, r) {
 // ---------------------------------------------------------------- walls of the island and new screens
 
 // A picture on a vertical rectangle facing `out` (+x/-x/+z/-z); u runs to the viewer's right.
-function picture(m, cx, cz, y0, y1, w, out, mat) {
+export function picture(m, cx, cz, y0, y1, w, out, mat) {
   const [ox, oz] = out;
   // The viewer looks along -out; their right is (oz, -ox) in building space.
   const rx = oz, rz = -ox;

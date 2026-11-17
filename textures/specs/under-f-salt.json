@@ -1,0 +1,51 @@
+{
+  "sheet": "under-f-salt",
+  "theme": "an underground salt cathedral",
+  "tiles": [
+    {
+      "id": "salt_wall",
+      "tile": true,
+      "prompt": "rock salt wall"
+    },
+    {
+      "id": "salt_floor",
+      "tile": true,
+      "prompt": "polished salt floor tiles"
+    },
+    {
+      "id": "salt_column",
+      "tile": true,
+      "prompt": "rock salt column"
+    },
+    {
+      "id": "salt_relief",
+      "tile": false,
+      "prompt": "salt relief of angels and a cathedral"
+    },
+    {
+      "id": "chiselled_rock",
+      "tile": true,
+      "prompt": "chiselled salt rock"
+    },
+    {
+      "id": "obsidian_floor",
+      "tile": true,
+      "prompt": "obsidian floor tiles"
+    },
+    {
+      "id": "cave_marble",
+      "tile": true,
+      "prompt": "grey cave marble"
+    },
+    {
+      "id": "rock_arch",
+      "tile": false,
+      "prompt": "arch carved in salt"
+    },
+    {
+      "id": "rock_dome",
+      "tile": false,
+      "prompt": "salt dome seen from below"
+    }
+  ]
+}

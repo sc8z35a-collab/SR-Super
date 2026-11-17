@@ -1,0 +1,51 @@
+{
+  "sheet": "under-b-catacombs",
+  "theme": "catacombs",
+  "tiles": [
+    {
+      "id": "skull_wall",
+      "tile": true,
+      "prompt": "wall of stacked skulls"
+    },
+    {
+      "id": "bone_wall",
+      "tile": false,
+      "prompt": "bone ornament wall"
+    },
+    {
+      "id": "loculi",
+      "tile": false,
+      "prompt": "burial niches"
+    },
+    {
+      "id": "tuff",
+      "tile": true,
+      "prompt": "carved tuff wall"
+    },
+    {
+      "id": "red_fresco",
+      "tile": false,
+      "prompt": "early Christian red fresco"
+    },
+    {
+      "id": "earth_floor",
+      "tile": true,
+      "prompt": "earth floor"
+    },
+    {
+      "id": "crumbling_ceiling",
+      "tile": true,
+      "prompt": "crumbling lime ceiling"
+    },
+    {
+      "id": "catacomb_stone",
+      "tile": false,
+      "prompt": "blank gravestone"
+    },
+    {
+      "id": "coffin_lid",
+      "tile": false,
+      "prompt": "dusty wooden coffin"
+    }
+  ]
+}

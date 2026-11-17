@@ -1,5 +1,5 @@
 import { Mesh } from './mesh.js';
-import { BASE, WIDTH, LENGTH, NAVE, WING, APSE, ENTRY, ENTRY_STEPS, FLOORS, ROOF_HEIGHT, ROOF_INDEX, CRYPT, CRYPT_STAIR,
+import { BASE, WIDTH, LENGTH, NAVE, WING, APSE, ENTRY, ENTRY_STEPS, FLOORS, ROOF_HEIGHT, ROOF_INDEX, CRYPT, CRYPT_STAIR, DEPTHS,
   UPPER_AISLE, UPPER_ROOM, HUT, HUT_STEP, inRoofHut, world, entryTop, buildingDistance } from './layout.js';
 import { CRAFT, decorateNave, decorateGallery, bridgeMoulding, chapterLibrary, bellChamber } from './ornament.js';
 import { SURFACE } from './surfaces.js';
@@ -7,6 +7,7 @@ import { bellWinch, sanctuaryObjects, weatheredCrate, workshopObjects } from './
 import { ground, coast, clamp, lerp } from './terrain.js';
 import { baptistery, marinersChapel, treasury, scriptorium, roofGarden, forecourt, roomName } from './chapels.js';
 import { crypt, cryptName } from './crypt.js';
+import { depths } from './depths.js';
 import { FABRIC } from './fabric.js';
 import { naveHangings, chapelCeilings, upperCeilings, gutterTrough, nicheAndScreen, churchFurnishings } from './chapels.js';
 
@@ -192,15 +193,15 @@ function hall(m,decals){
   }
 }
 
-function stairFlight(m,r,low,high,up){
+function stairFlight(m,r,low,high,up,mat=FABRIC.stoneSteps){
   const count=Math.ceil((high-low)/.172),tread=(r.z1-r.z0)/count;
   flights.push({...r,low,high,up,count});
   for(let i=1;i<=count;i++){
     const y=lerp(low,high,i/count);
     const z=r.z0+(up>0?i-1:count-i)*tread;
-    box(m,rect(r.x0,r.x1,z-.001,z+tread+.001),y-.29,y,FABRIC.stoneSteps,i%9===0?.88:1);
+    box(m,rect(r.x0,r.x1,z-.001,z+tread+.001),y-.29,y,mat,i%9===0?.88:1);
     const rim=up>0?z:z+tread;
-    box(m,rect(r.x0,r.x1,rim-.022,rim+.030),y-.052,y+.004,FABRIC.stoneSteps,1.12);
+    box(m,rect(r.x0,r.x1,rim-.022,rim+.030),y-.052,y+.004,mat,1.12);
   }
   for(const x of [r.x0,r.x1]){
     rail(m,[x,r.z0],[x,r.z1],up>0?low:high,up>0?high:low);

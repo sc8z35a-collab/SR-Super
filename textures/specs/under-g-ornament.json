@@ -1,0 +1,51 @@
+{
+  "sheet": "under-g-ornament",
+  "theme": "underground cathedral ornament",
+  "tiles": [
+    {
+      "id": "chandelier",
+      "tile": false,
+      "prompt": "crystal chandelier"
+    },
+    {
+      "id": "candelabra",
+      "tile": false,
+      "prompt": "silver candelabra"
+    },
+    {
+      "id": "iron_railing",
+      "tile": false,
+      "prompt": "black iron railing"
+    },
+    {
+      "id": "halo_mosaic",
+      "tile": false,
+      "prompt": "gold star mosaic"
+    },
+    {
+      "id": "blue_velvet",
+      "tile": true,
+      "prompt": "blue velvet drape"
+    },
+    {
+      "id": "rock_saint",
+      "tile": false,
+      "prompt": "saint carved in rock"
+    },
+    {
+      "id": "ivory_carving",
+      "tile": true,
+      "prompt": "ivory carved stone"
+    },
+    {
+      "id": "hanging_lamp",
+      "tile": false,
+      "prompt": "brass hanging lamp"
+    },
+    {
+      "id": "amber_window",
+      "tile": false,
+      "prompt": "glowing amber window"
+    }
+  ]
+}

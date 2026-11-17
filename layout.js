@@ -18,6 +18,26 @@ export const HUT_STEP=.105;
 export const CRYPT={y:-4.45,ceiling:-.275,x0:-11.4,x1:11.4,z0:3.4,z1:27.8};
 export const CRYPT_STAIR={x0:-10.75,x1:-8.45,z0:5.0,z1:16.4};
 export const CRYPT_COLUMNS={x:[-7.4,-3.6,3.6,7.4],z:[7.0,11.4,15.8,20.2]};
+// Underground levels below the crypt, stacked under the nave (local metres). Each has its own lamps,
+// [x, height above the base, z, strength], which the shader reads by height band.
+const LAMP=(x,h,z,w=1)=>[x,h,z,w];
+export const DEPTHS=[
+  {key:'cistern',name:'地下2階 · 大貯水槽',y:-9.6,ceiling:-5.15,z0:-20,z1:18.5,color:[.95,.68,.4],ambient:[.05,.075,.07],falloff:.22,
+    lamps:[[-10.9,-14],[-10.9,-4],[-10.9,10],[-10.9,16],[10.9,-14],[10.9,-4]].map(([x,z])=>LAMP(x,-7.0,z)).concat([LAMP(0,-6.6,11.5,1.2),LAMP(0,-6.6,-6,1.2),LAMP(4.4,-6.6,1.5)])},
+  {key:'catacombs',name:'地下3階 · カタコンベ',y:-14.6,ceiling:-10.15,z0:-20,z1:18.5,color:[1,.62,.3],ambient:[.06,.05,.04],falloff:.3,
+    lamps:[LAMP(0,-12.7,-14),LAMP(0,-12.7,-2),LAMP(0,-12.7,10),LAMP(7,-13,-12,.8),LAMP(7,-13,0,.8),LAMP(-6.5,-13,-14,.8),LAMP(-6.5,-13,10,.8),LAMP(0,-12.2,16.3,1.2),LAMP(7.5,-13,16.8,.7)]},
+  {key:'mine',name:'地下4階 · 坑道',y:-19.6,ceiling:-15.15,z0:-20,z1:18.5,color:[1,.72,.38],ambient:[.05,.045,.04],falloff:.24,
+    lamps:[-15,-8,-1,6,13].map(z=>LAMP(0,-16.5,z)).concat([LAMP(6,-16.8,-10),LAMP(-6,-16.8,-2),LAMP(6,-16.8,12),LAMP(-6,-16.8,14)])},
+  {key:'crystal',name:'地下5階 · 水晶洞窟',y:-24.6,ceiling:-20.15,z0:-20,z1:18.5,color:[.45,.62,1],ambient:[.05,.045,.08],falloff:.2,
+    lamps:[LAMP(-5,-23.6,-15,1.3),LAMP(0,-23.8,-9,1.3),LAMP(3,-23.8,6,1.3),LAMP(-1,-23.8,15,1.2),LAMP(-7,-23.4,-4,.9),LAMP(6,-23.4,-6,.9),
+      LAMP(-4,-23.4,9,.9),LAMP(5,-23.6,13,.8),LAMP(-8,-24.2,-14,.7),LAMP(2,-24.2,-2,.7),LAMP(-3,-24.2,13,.7),LAMP(-9.9,-22.4,6,.8)]},
+  {key:'lake',name:'地下6階 · 地底湖',y:-29.6,ceiling:-25.15,z0:-20,z1:18.5,color:[.55,.8,.9],ambient:[.04,.07,.08],falloff:.16,
+    lamps:[LAMP(0,-27.6,-17,1.3),LAMP(-8,-28.8,14,1.1),LAMP(-7.5,-27.2,-8),LAMP(7.5,-27.2,-8),LAMP(-7.5,-27.2,4),LAMP(7.5,-27.2,4),LAMP(0,-27,10),LAMP(-9.5,-27,-19,.8)]},
+  {key:'cathedral',name:'地下7階 · 地下大聖堂',y:-46,ceiling:-30.4,z0:-20,z1:28,color:[1,.8,.55],ambient:[.09,.075,.06],falloff:.035,
+    lamps:[-12,-3,6,15].map(z=>LAMP(0,-37.7,z,2.2)).concat([-11,-5,1,7].map(z=>LAMP(10.8,-38,z,.9)),[LAMP(0,-43.4,24,1.6),LAMP(-6.5,-41,27.5,1.3),LAMP(6.5,-41,27.5,1.3),LAMP(-9.9,-37,-2,.7)])}
+];
+// Stair flights between levels: E and W run along the walls, G is the cathedral's processional stair.
+export const DEPTH_FLIGHTS={E:{x0:8.75,x1:11.05,z0:4.6,z1:16},W:{x0:-11.05,x1:-8.75,z0:-8,z1:3.4},G:{x0:-11.05,x1:-8.75,z0:-18,z1:13}};
 // Light sources for the crypt shader: [x, height above the base, z, strength].
 export const CRYPT_LIGHTS=[
   ...CRYPT_COLUMNS.z.flatMap(z=>[[-3.0,-2.4,z,1],[3.0,-2.4,z,1]]),

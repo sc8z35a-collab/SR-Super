@@ -1,0 +1,51 @@
+{
+  "sheet": "under-d-crystal",
+  "theme": "a crystal cave",
+  "tiles": [
+    {
+      "id": "amethyst",
+      "tile": true,
+      "prompt": "amethyst cluster"
+    },
+    {
+      "id": "quartz_cluster",
+      "tile": true,
+      "prompt": "clear quartz cluster"
+    },
+    {
+      "id": "fluorite",
+      "tile": true,
+      "prompt": "green fluorite"
+    },
+    {
+      "id": "blue_crystal",
+      "tile": true,
+      "prompt": "glowing blue crystals"
+    },
+    {
+      "id": "crystal_floor",
+      "tile": true,
+      "prompt": "cave floor with crystals"
+    },
+    {
+      "id": "pyrite",
+      "tile": true,
+      "prompt": "pyrite cubes"
+    },
+    {
+      "id": "geode",
+      "tile": false,
+      "prompt": "geode section"
+    },
+    {
+      "id": "glow_moss",
+      "tile": true,
+      "prompt": "glowing moss"
+    },
+    {
+      "id": "glow_mushroom",
+      "tile": true,
+      "prompt": "glowing mushrooms"
+    }
+  ]
+}
